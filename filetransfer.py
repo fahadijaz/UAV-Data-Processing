@@ -496,7 +496,7 @@ if __name__ == "__main__":
 
     # Process each detected SD card
     for sd_card_path in sd_card_paths:
-        ft = FileTransfer(input_path=sd_card_path, output_path=output_path, data_overview_file=data_file)
+        ft = FileTransfer(input_path=sd_card_path, output_path=output_path, data_overview_file=data_file, flight_log=flight_log)
         ft.summary()
         file_transfers.append(ft)
         
