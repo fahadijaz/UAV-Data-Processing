@@ -1,0 +1,453 @@
+---
+title: "Image Process Historic_Spectral data for P4M"
+author: "Harkingto"
+date: "2024-02-10"
+output:
+  pdf_document: default
+  word_document: default
+---
+
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+#clean list 
+cat("\014")
+rm(list=ls())
+
+```
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+#library("raster") # for loading raster TIF file
+#library("sf") # for loading shp file
+#library("dplyr") #data manipulation #to calculate the average weight of each group :
+#library("readxl")
+# Uncomment necessary libraries and install if missing
+#if (!require("sf")) install.packages("sf", dependencies=TRUE)
+#if (!require("raster")) install.packages("raster", dependencies=TRUE)
+#if (!require("dplyr")) install.packages("dplyr", dependencies=TRUE)
+
+#library(sf) # for loading GeoJSON file
+#library(raster) # for loading raster TIF file
+#library(dplyr) # data manipulation
+
+```
+
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+setwd("P:/PhenoCrop")
+
+```
+
+
+
+
+
+# OBJECTIVES
+
+
+
+Extract:
+
+Spectral value:
+- GNDVI
+- NDVI
+- EVI
+
+### Multispectral data processing ###
+
+
+
+############################
+#### Spectral feature #####
+##########################
+
+
+
+
+
+```{r}
+
+## load Polygon shp file
+shp=st_read("P:/PhenoCrop/3_qgis/shape files new/Phenocrop.geojson")
+plot(st_geometry(shp), border="red")
+
+```
+
+
+
+
+
+
+
+### Spectral data upload ###
+
+
+
+```{r}
+
+
+# Uploading files 
+
+
+r1_date <- "P:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data"
+
+rlist <- list.files(r1_date , pattern = "index",full.names = TRUE)
+rlist
+
+
+#stack image files
+r1 <- stack(rlist)
+r1
+
+names(r1) <-  c( 'blue', 'green', 'ndvi','nir', 'rededge','red')
+names(r1)
+
+
+
+
+```
+
+
+
+
+
+
+
+
+
+```{r}
+
+# Uploading files 
+
+
+#r2_date <- "./Spectral_P4M_tutorial/P20_230609_RGBM"
+
+#rlist <- list.files(r2_date , pattern = "index",full.names = TRUE)
+#rlist
+
+#stack image files
+#r2 <- stack(rlist)
+#r2
+
+#names(r2) <-  c( 'blue', 'green', 'ndvi','nir', 'rededge','red')
+#names(r2)
+
+
+```
+
+
+
+
+
+```{r}
+
+
+# Uploading files 
+
+
+#r3_date <- "./Spectral_P4M_tutorial/P20_230616_RGBM"
+
+#rlist <- list.files(r3_date , pattern = "index",full.names = TRUE)
+#rlist
+
+#stack image files
+#r3 <- stack(rlist)
+#r3
+
+#names(r3) <-  c( 'blue', 'green', 'ndvi','nir', 'rededge','red')
+#names(r3)
+
+```
+
+
+```{r}
+plot(r1)
+```
+
+
+
+
+```{r}
+
+rasters<-list(r1)
+
+rasters
+
+
+```
+
+
+
+
+```{r}
+
+
+
+## Extract all flight date
+
+# Put all flight date in the list
+date <- list(r1_date
+             )
+
+
+# create function to extract only the date from the string
+substrRight <- function(x, n){
+  substr(x, nchar(x)-n+1, nchar(x))
+}
+
+# create vector
+Flight <- vector()
+
+
+#loop for extracting the date from each string in the list
+for(i in seq_along(date)) {
+  
+  temp <-substrRight(date[i], 15)
+  Flight <- append(Flight, value = temp)
+  
+}
+
+
+```
+
+
+
+
+
+
+### Extract spectral values ###
+
+
+###################
+####  VIs  #######
+#################
+
+
+```{r}
+
+
+#create VIS dataframe
+
+NDVI_med = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+NDVI_mean = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+NDVI_std = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+
+red_med = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+red_mean = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+red_std = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+
+blue_med = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+blue_mean = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+blue_std = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+
+nir_med = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+nir_mean = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+nir_std = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+
+green_med = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+green_mean = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+green_std = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+
+redE_med = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+redE_mean = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+redE_std = as.data.frame (matrix(NA, nrow = nrow(shp) ,ncol = length(rasters)))
+
+
+```
+
+
+
+```{r}
+
+
+## VIs- median and max ##
+
+
+
+#calculate VI
+for(i in seq_along(rasters) ) {
+  
+  #calculate VI
+  
+  ndvi  <- (rasters[[i]]$nir - rasters[[i]]$red)/(rasters[[i]]$nir + rasters[[i]]$red)
+  red   <- (rasters[[i]]$red)
+  blue   <- (rasters[[i]]$blue)
+  green   <- (rasters[[i]]$green)
+  redE   <- (rasters[[i]]$rededge)
+  nir   <- (rasters[[i]]$nir)
+
+  
+  #Extract median and max value
+  
+  
+  NDVI_med_extract <- raster::extract(ndvi,shp,fun=median)
+  NDVI_med[,i] <- NDVI_med_extract
+
+  NDVI_mean_extract <- raster::extract(ndvi,shp,fun=mean)
+  NDVI_mean[,i] <- NDVI_mean_extract
+  
+  NDVI_std_extract <- raster::extract(ndvi,shp,fun=sd)
+  NDVI_std[,i] <- NDVI_std_extract
+  
+  
+  red_med_extract <- raster::extract(red,shp,fun=median)
+  red_med[,i] <- red_med_extract
+  
+  red_mean_extract <- raster::extract(ndvi,shp,fun=mean)
+  red_mean[,i] <- red_mean_extract
+  
+  red_std_extract <- raster::extract(ndvi,shp,fun=sd)
+  red_std[,i] <- red_std_extract
+  
+  
+  green_med_extract <- raster::extract(green,shp,fun=median)
+  green_med[,i] <- green_med_extract
+  
+  green_mean_extract <- raster::extract(ndvi,shp,fun=mean)
+  green_mean[,i] <- green_mean_extract
+  
+  green_std_extract <- raster::extract(ndvi,shp,fun=sd)
+  green_std[,i] <- green_std_extract
+  
+  
+  blue_med_extract <- raster::extract(blue,shp,fun=median)
+  blue_med[,i] <- blue_med_extract
+  
+  blue_mean_extract <- raster::extract(ndvi,shp,fun=mean)
+  blue_mean[,i] <- blue_mean_extract
+  
+  blue_std_extract <- raster::extract(ndvi,shp,fun=sd)
+  blue_std[,i] <- blue_std_extract
+  
+  
+  redE_med_extract <- raster::extract(redE,shp,fun=median)
+  redE_med[,i] <- redE_med_extract
+  
+  redE_mean_extract <- raster::extract(ndvi,shp,fun=mean)
+  redE_mean[,i] <- redE_mean_extract
+  
+  redE_std_extract <- raster::extract(ndvi,shp,fun=sd)
+  redE_std[,i] <- redE_std_extract
+  
+  
+  nir_med_extract <- raster::extract(nir,shp,fun=median)
+  nir_med[,i] <- nir_med_extract
+  
+  nir_mean_extract <- raster::extract(ndvi,shp,fun=mean)
+  nir_mean[,i] <- nir_mean_extract
+  
+  nir_std_extract <- raster::extract(ndvi,shp,fun=sd)
+  nir_std[,i] <- nir_std_extract
+ 
+}
+
+
+
+
+## Prepare Dataframe
+
+#NDVI
+
+colnames(NDVI_med) <- Flight
+colnames(NDVI_med) <- paste(colnames(NDVI_med),'NDVImedian', sep='_')
+
+colnames(NDVI_mean) <- Flight
+colnames(NDVI_mean) <- paste(colnames(NDVI_mean),'NDVImean', sep='_')
+
+colnames(NDVI_std) <- Flight
+colnames(NDVI_std) <- paste(colnames(NDVI_std),'NDVIstd', sep='_')
+
+# For blue
+colnames(blue_med) <- Flight
+colnames(blue_med) <- paste(colnames(blue_med), 'bluemedian', sep='_')
+
+colnames(blue_mean) <- Flight
+colnames(blue_mean) <- paste(colnames(blue_mean), 'bluemean', sep='_')
+
+colnames(blue_std) <- Flight
+colnames(blue_std) <- paste(colnames(blue_std), 'bluestd', sep='_')
+
+# For red
+colnames(red_med) <- Flight
+colnames(red_med) <- paste(colnames(red_med), 'redmedian', sep='_')
+
+colnames(red_mean) <- Flight
+colnames(red_mean) <- paste(colnames(red_mean), 'redmean', sep='_')
+
+colnames(red_std) <- Flight
+colnames(red_std) <- paste(colnames(red_std), 'redstd', sep='_')
+
+# For green
+colnames(green_med) <- Flight
+colnames(green_med) <- paste(colnames(green_med), 'greenmedian', sep='_')
+
+colnames(green_mean) <- Flight
+colnames(green_mean) <- paste(colnames(green_mean), 'greenmean', sep='_')
+
+colnames(green_std) <- Flight
+colnames(green_std) <- paste(colnames(green_std), 'greenstd', sep='_')
+
+# For redE
+colnames(redE_med) <- Flight
+colnames(redE_med) <- paste(colnames(redE_med), 'redEmedian', sep='_')
+
+colnames(redE_mean) <- Flight
+colnames(redE_mean) <- paste(colnames(redE_mean), 'redEmean', sep='_')
+
+colnames(redE_std) <- Flight
+colnames(redE_std) <- paste(colnames(redE_std), 'redEstd', sep='_')
+
+# For nir
+colnames(nir_med) <- Flight
+colnames(nir_med) <- paste(colnames(nir_med), 'nirmedian', sep='_')
+
+colnames(nir_mean) <- Flight
+colnames(nir_mean) <- paste(colnames(nir_mean), 'nirmean', sep='_')
+
+colnames(nir_std) <- Flight
+colnames(nir_std) <- paste(colnames(nir_std), 'nirstd', sep='_')
+
+# Binding all variables
+VI <- cbind(NDVI_med, NDVI_mean, NDVI_std, blue_med, blue_mean, blue_std, red_med, red_mean, red_std, green_med, green_mean, green_std, redE_med, redE_mean, redE_std, nir_med, nir_mean, nir_std)
+
+
+
+
+
+
+```
+
+
+
+```{r}
+
+write.csv(VI, file = "P:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/R_generated_values.csv", row.names = TRUE,col.names = TRUE)
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
