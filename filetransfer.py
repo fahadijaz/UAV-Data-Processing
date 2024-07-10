@@ -75,7 +75,7 @@ class FileTransfer:
         pass
         flight_info = {
             'dir_name': directory, 
-            'flight_name': name_from_input,
+            'flight_name': [name_from_input],
             'date': stat_start.strftime('%Y%m%d'),
             'ID': directory[:3],
             'start_time': stat_start.strftime('%H%M%S'),
@@ -263,7 +263,9 @@ class FileTransfer:
         """
         try:
             for i, folder in enumerate(self.flights_folders):
+                
                 info = self.data_overview.loc[self.data_overview['FlightRoute'] == folder['flight_name'][0]]
+                logging.info(f'type:')
                 if not info.empty:
                     output_path = os.path.join(self.output_path, str(info['BasePath'].values[0]), str(folder['date'] +' '+str(info['BaseName'].values[0])))
                     self.flights_folders[i]['output_path'] = output_path
@@ -272,6 +274,11 @@ class FileTransfer:
             logging.info("Matching of flight folders with output paths completed successfully.")
         except Exception as e:
             logging.error(f"Error in matching flight folders: {e}")
+
+    def print(self):
+        for i, flight in enumerate(self.flights_folders):
+                logging.info(f"{i}.Move: {flight['dir_name']:55} to location: {flight['output_path']}")
+            
 
     def summary(self):
         """
@@ -285,10 +292,11 @@ class FileTransfer:
             self.detect_and_handle_new_routes()     #include a trashcan initialisation
             self.match()
 
-            for i, flight in enumerate(self.flights_folders):
-                logging.info(f"{i}.Move: {flight['dir_name']:55} to location: {flight['output_path']}")
+            #for i, flight in enumerate(self.flights_folders):
+            #    logging.info(f"{i}.Move: {flight['dir_name']:55} to location: {flight['output_path']}")
             
             while True:
+                self.print()
                 edit = input("Do you want to edit any output paths? (yes/no): ").strip().lower() # add option to duplicate, trash, move
                 if edit in ['yes', 'y']:
                     type_edit = input("do you want to move, duplicate, or trash? (move/duplicate/trash)")
@@ -320,7 +328,7 @@ class FileTransfer:
                     elif type_edit in ['trash', 't']:
                         flight_index = int(input("Enter the number corresponding to the flight you want to trash: "))
                         if 0 <= flight_index < len(self.flights_folders):
-                                info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name']]
+                                info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name'][0]]
                                 output_path = os.path.join(self.output_path, str(info['BasePath'].values[0]), '_TRASHCAN\\'+ str(self.flights_folders[flight_index]['date'] +' '+str(info['BaseName'].values[0])))
                                 self.flights_folders[flight_index]['output_path'] = output_path
 
