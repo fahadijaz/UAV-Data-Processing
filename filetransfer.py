@@ -329,7 +329,7 @@ class FileTransfer:
                         flight_index = int(input("Enter the number corresponding to the flight you want to trash: "))
                         if 0 <= flight_index < len(self.flights_folders):
                                 info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name'][0]]
-                                output_path = os.path.join(self.output_path, str(info['BasePath'].values[0]), '_TRASHCAN\\'+ str(self.flights_folders[flight_index]['date'] +' '+str(info['BaseName'].values[0])))
+                                output_path = os.path.join(self.output_path, '_TRASHCAN\\'+ str(info['BasePath'].values[0]), str(self.flights_folders[flight_index]['date'] +' '+str(info['BaseName'].values[0])))
                                 self.flights_folders[flight_index]['output_path'] = output_path
 
                                 logging.info(f"Updated: {self.flights_folders[flight_index]['dir_name']} to new location: {self.flights_folders[flight_index]['output_path']}")
