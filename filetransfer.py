@@ -78,8 +78,8 @@ class FileTransfer:
         flight_info = {
             'dir_name': directory, 
             'flight_name': [name_from_input],
-            'date': [stat_start.strftime('%Y%m%d')],
-            'ID': [directory[1,2,3]],
+            'date': stat_start.strftime('%Y%m%d'),
+            'ID': directory[:3],
             'start_time': stat_start.strftime('%H%M%S'),
             'end_time': stat_end.strftime('%H%M%S'),
             'type': 'phantom-MS',
