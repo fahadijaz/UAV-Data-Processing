@@ -61,56 +61,6 @@ class FileTransfer:
         # Log the input and output paths
         logging.info(f'Input Path: {self.input_path}\nOutput Path: {self.output_path}')
 
-    def merge_folders(self):#new logic, no need to merge
-        """
-        Identifies and merges folders with similar names in the input path.
-
-        This method iterates through the folders in the input path, comparing their names
-        to identify those that belong to the same flight run. If a match is found, the user
-        is prompted to confirm whether to merge the folders.
-        """
-        # If same foldernames but not in order then the system will not merge. still the output folder whould be the same 
-        current_flight = None
-
-        for folder in sorted(self.direct):
-            # Extract the unique identifier for the current folder
-            current_folder_id = folder.split("_")[3:]
-
-            if current_flight:
-                current_flight_id = current_flight.split("_")[3:]
-
-                if current_flight_id == current_folder_id and current_folder_id:
-                    logging.info(f'Found folder from the same run: {current_flight} and {folder}')
-                    confirm = input(f"{current_flight} and {folder} are a match. Do you want to merge? (yes/no): ").strip().lower()
-
-                    if confirm in ('yes', 'y'):
-                        self.merge(current_flight, folder)
-                else:
-                    current_flight = folder
-            else:
-                current_flight = folder
-
-
-    def merge(self, folder1, folder2): #new logic, no need to merge
-        """
-        Merges the contents of folder2 into folder1 and deletes folder2.
-
-        Args:
-            folder1 (str): The destination folder.
-            folder2 (str): The source folder to be merged.
-        """
-        try:
-            folder_path = os.path.join(self.input_path, folder2)
-            to_path = os.path.join(self.input_path, folder1)
-
-            for file in os.listdir(folder_path):
-                from_path = os.path.join(folder_path, file)
-                shutil.move(from_path, to_path)
-
-            os.rmdir(folder_path)
-            logging.info(f'Merge successful: files moved from {folder2} to {folder1}')
-        except Exception as e:
-            logging.error(f'Error merging folders {folder1} and {folder2}: {e}')
 
     def Phantomdata_system(self, directory):
 
