@@ -20,7 +20,7 @@ logging.basicConfig(
 )
 
 class FileTransfer:
-    def __init__(self, input_path=None, output_path=None, data_overview_file=None):
+    def __init__(self, input_path=None, output_path=None, data_overview_file=None, flight_log=None):
         """
         Initializes the FileTransfer class with paths and overview file.
 
@@ -42,6 +42,8 @@ class FileTransfer:
         self.type_counts = {'MS': 0, '3D': 0, 'Reflectance': 0}
         self.number_of_elements = len(self.direct)
         self.data_overview_file = data_overview_file
+        self.flight_log_file = flight_log
+        self.flight_log = pd.read_csv(self.flight_log_file)
 
         # Load the data overview file if provided, otherwise initialize an empty DataFrame
         if data_overview_file and os.path.exists(data_overview_file):
@@ -51,7 +53,6 @@ class FileTransfer:
             create_csv = input("Do you want to create a new CSV file? (yes/no): ").strip().lower()
             if create_csv in ['yes', 'y']:
                 self.data_overview = pd.DataFrame(columns=['FlightRoute', 'BasePath', 'BaseName'])
-                trash_row = {'FlightRoute':'no_flight', 'BasePath':'', 'BaseName':''} #add logic for this or ignore and make somewhere else
                 self.data_overview[1]
                 self.data_overview.to_csv(data_overview_file, index=False)
                 logging.info(f"Created new CSV file: {data_overview_file}")
@@ -70,17 +71,20 @@ class FileTransfer:
         dir_path = os.path.join(self.input_path, directory)
         start_file = os.listdir(dir_path)[4]
         end_file = os.listdir(dir_path)[-1]
+        nr_files = len(os.listdir(dir_path))
         stat_start = datetime.fromtimestamp(os.stat(os.path.join(dir_path, start_file)).st_mtime)
         stat_end = datetime.fromtimestamp(os.stat(os.path.join(dir_path, end_file)).st_mtime)
         pass
         flight_info = {
             'dir_name': directory, 
             'flight_name': [name_from_input],
-            'date': stat_start.strftime('%Y%m%d'),
-            'ID': directory[:3],
+            'date': [stat_start.strftime('%Y%m%d')],
+            'ID': [directory[1,2,3]],
             'start_time': stat_start.strftime('%H%M%S'),
             'end_time': stat_end.strftime('%H%M%S'),
-            'type': 'phantom'
+            'type': 'phantom-MS',
+            'num_files':nr_files,
+            'num_dir':1
         }
 
         self.flights_folders.append(flight_info)
@@ -100,6 +104,7 @@ class FileTransfer:
                 else:
 
                     start_time, end_time = self.collect_timestamp(directory)
+                    nr_files = len(os.listdir(directory))
                     flight_info = {
                         'dir_name': directory,
                         'flight_name': directory.split("_")[3:],
@@ -107,7 +112,9 @@ class FileTransfer:
                         'ID': directory.split("_")[2],
                         'start_time': start_time,
                         'end_time': end_time,
-                        'type': [('MS' if 'MS' in directory else 'Reflectance' if directory.count('_') == 2 else '3D')]
+                        'type': [('MS' if 'MS' in directory else 'Reflectance' if directory.count('_') == 2 else '3D')],
+                        'num_files':nr_files,
+                        'num_dir': 1
                     }
                     self.flights_folders.append(flight_info)
 
@@ -276,6 +283,9 @@ class FileTransfer:
             logging.error(f"Error in matching flight folders: {e}")
 
     def print(self):
+        """
+        Prints a summary for 
+        """
         for i, flight in enumerate(self.flights_folders):
                 logging.info(f"{i}.Move: {flight['dir_name']:55} to location: {flight['output_path']}")
             
@@ -408,10 +418,38 @@ class FileTransfer:
             t.join()
 
         pbar.close()
+        self.save_flight_log()
         final_user_input = input("Do you want to remove the files form the sd card?(yes/no)")
         if final_user_input in ['yes', 'y']:
             self.close_and_whipe_sd_cards()
+    
+    def save_flight_log(self):
         
+        for folder in self.flights_folders:
+            new_entry = pd.DataFrame([folder])
+            self.data_overview = pd.concat([self.data_overview, new_entry], ignore_index=True)
+            self.data_overview.to_csv(self.data_overview_file, index=False)
+            
+            """
+            info = None
+
+            if  info = self.flight_log.loc[self.data_overview['flight_name'] == folder['flight_name'] and self.data_overview['date'] == folder['date']]
+            if info:
+                if info['start_time']>folder['start_time']:
+                    info['start_time'] = folder['start_timne']
+                    
+                
+                if info['end_time']<folder['end_time']:
+                    info['end_time'] = folder['end_time']
+                
+                info['num_dir']+=1
+                self.flight_log.update([self.flight_log, info], ignore_index=True)
+                """
+            
+
+            self.flight_log.to_csv(self.flight_log, index=False)
+
+
     def close_and_whipe_sd_cards(self):
         shutil.rmtree(self.input_path)  # Use shutil.rmtree to delete directories
 
@@ -448,6 +486,7 @@ if __name__ == "__main__":
     output_path = "P:\\PhenoCrop\\1_flights"
     #output_path = "P:\\PhenoCrop\\Test_Folder\\Test_ISAK\\test_output"
     data_file = "P:\\PhenoCrop\\0_csv\\data_overview.csv"
+    flight_log = "P:\\PhenoCrop\\0_csv\\flight_log.csv"
 
     # Detect available SD cards
     sd_card_paths = detect_sd_cards2()
