@@ -428,7 +428,7 @@ class FileTransfer:
         
         
         df = pd.read_csv(self.flight_log_file)
-        logging.info(f"initial csv {df} ")#to {self.flight_log}")
+        #logging.info(f"initial csv {df} ")#to {self.flight_log}")
         for flight in self.flights_folders:
                 dir_name = flight['dir_name']
                 flight_name = str(flight['flight_name'][0]).strip()
@@ -472,7 +472,7 @@ class FileTransfer:
                     }
                     new_entry = pd.DataFrame([new_entry])
                     df = pd.concat([df,new_entry], ignore_index=True)
-        logging.info(f"updated csv {df} ")
+        #logging.info(f"updated csv {df} ")
             # Write the updated DataFrame back to the CSV file
         df.to_csv(self.flight_log_file, index=False)
 
