@@ -102,9 +102,9 @@ class FileTransfer:
                     #test for phantom data, if phantomdata implement system for it. 
                     self.Phantomdata_system(directory)
                 else:
-
+                    dir_path = os.path.join(self.input_path, directory)
                     start_time, end_time = self.collect_timestamp(directory)
-                    nr_files = len(os.listdir(directory))
+                    nr_files = len(os.listdir(dir_path))
                     flight_info = {
                         'dir_name': directory,
                         'flight_name': directory.split("_")[3:],
@@ -272,7 +272,7 @@ class FileTransfer:
             for i, folder in enumerate(self.flights_folders):
                 
                 info = self.data_overview.loc[self.data_overview['FlightRoute'] == folder['flight_name'][0]]
-                logging.info(f'type:')
+                #logging.info(f'type:')
                 if not info.empty:
                     output_path = os.path.join(self.output_path, str(info['BasePath'].values[0]), str(folder['date'] +' '+str(info['BaseName'].values[0])))
                     self.flights_folders[i]['output_path'] = output_path
