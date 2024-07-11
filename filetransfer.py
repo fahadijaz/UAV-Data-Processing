@@ -79,7 +79,7 @@ class FileTransfer:
             'dir_name': directory, 
             'flight_name': [name_from_input],
             'date': stat_start.strftime('%Y%m%d'),
-            'ID': directory[:3],
+            'folder_ID': directory[:3],
             'start_time': stat_start.strftime('%H%M%S'),
             'end_time': stat_end.strftime('%H%M%S'),
             'type': ['phantom-MS'],
@@ -88,6 +88,22 @@ class FileTransfer:
         }
 
         self.flights_folders.append(flight_info)
+
+    def test_folder_for_TIF(self):
+        for folder in self.flights_folders:
+            if "MEDIA" in folder:
+                if 'TIF'not in os.listdir(os.path.join(self.input_path,folder)):
+                    break
+
+            elif folder['type'] == 'Reflectance':
+                checklist = ["G.TIF","R.TIF","NIR.TIF","RE.TIF"]
+                all_found = True
+                for substring in checklist:
+                    if not any(substring in file for file in os.listdir(os.path.join(self.input_path,folder))):
+                        all_found = False
+                        break
+        
+
 
     def get_information(self):
         """
@@ -109,7 +125,7 @@ class FileTransfer:
                         'dir_name': directory,
                         'flight_name': directory.split("_")[3:],
                         'date': directory.split("_")[1][:8],
-                        'ID': directory.split("_")[2],
+                        'folder_ID': directory.split("_")[2],
                         'start_time': start_time,
                         'end_time': end_time,
                         'type': [('MS' if 'MS' in directory else 'Reflectance' if directory.count('_') == 2 else '3D')],
@@ -347,7 +363,7 @@ class FileTransfer:
                         flight_index = int(input("Enter the number corresponding to the flight you want to trash: "))
                         if 0 <= flight_index < len(self.flights_folders):
                                 info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name'][0]]
-                                output_path = os.path.join(self.output_path, '_TRASHCAN\\'+ str(info['BasePath'].values[0]), str(self.flights_folders[flight_index]['date'] +' '+str(info['BaseName'].values[0])))
+                                output_path = os.path.join(self.output_path, '_TRASHCAN\\'+ str(info['BasePath'].values[0]), f"{self.flights_folders[flight_index]['date']} {str(info['BaseName'].values[0])} {str(info['BaseDrone'].values[0])} {str(info['BaseHight'].values[0])} {str(info['BaseType'].values[0])} {str(info['BaseOverlap'].values[0])}")
                                 self.flights_folders[flight_index]['output_path'] = output_path
                                 self.flights_folders[flight_index]['flight_name'] = [f"{self.flights_folders[flight_index]['flight_name'][0]}_trashed-flight"]
 
@@ -441,7 +457,7 @@ class FileTransfer:
                 dir_name = flight['dir_name']
                 flight_name = str(flight['flight_name'][0]).strip()
                 date = str(flight['date']).strip()
-                ID = flight['ID']
+                folder_ID = flight['folder_ID']
                 start_time = flight['start_time']
                 end_time = flight['end_time']
                 flight_type = flight['type'][0]
@@ -457,7 +473,7 @@ class FileTransfer:
                     # Update existing entry
                     idx = existing_entry.index[0]
                     df.at[idx, 'dir_name'] += f", {dir_name}"
-                    df.at[idx, 'ID'] += f", {ID}"
+                    df.at[idx, 'folder_ID'] += f", {folder_ID}"
                     df.at[idx, 'type'] += f", {flight_type}"
                     df.at[idx, 'num_files'] += f", {num_files}"
                     df.at[idx, 'num_dir'] += num_dir
@@ -471,7 +487,7 @@ class FileTransfer:
                         "dir_name": dir_name,
                         "flight_name": flight_name,
                         "date": date,
-                        "ID": ID,
+                        "folder_ID": folder_ID,
                         "start_time": start_time,
                         "end_time": end_time,
                         "type": flight_type,
