@@ -93,15 +93,13 @@ class FileTransfer:
         for folder in self.flights_folders:
             if "MEDIA" in folder:
                 if 'TIF'not in os.listdir(os.path.join(self.input_path,folder)):
-                    break
+                    logging.warning(f'Did not find any tif files on media folder:{folder}')
 
             elif folder['type'] == 'Reflectance':
                 checklist = ["G.TIF","R.TIF","NIR.TIF","RE.TIF"]
-                all_found = True
                 for substring in checklist:
                     if not any(substring in file for file in os.listdir(os.path.join(self.input_path,folder))):
-                        all_found = False
-                        break
+                        logging.warning(f'Did not find any tif files in reflectance folder:{folder}')
         
 
 
