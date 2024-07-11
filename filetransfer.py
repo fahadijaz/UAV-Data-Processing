@@ -48,6 +48,7 @@ class FileTransfer:
         # Load the data overview file if provided, otherwise initialize an empty DataFrame
         if data_overview_file and os.path.exists(data_overview_file):
             self.data_overview = pd.read_csv(data_overview_file)
+            logging.info(f"Csv loaded sucsessfully: {data_overview_file}")
         else:
             logging.warning("Data overview file not found. Please create a new CSV file with the correct formatting.")
             create_csv = input("Do you want to create a new CSV file? (yes/no): ").strip().lower()
@@ -133,10 +134,10 @@ class FileTransfer:
                     self.flights_folders.append(flight_info)
 
                 # Count each type of flight
-                for flight in self.flights_folders:
-                    flight_type = flight['type'][0]
-                    if flight_type in self.type_counts:
-                        self.type_counts[flight_type] += 1
+            for flight in self.flights_folders:
+                flight_type = flight['type'][0]
+                if flight_type in self.type_counts:
+                    self.type_counts[flight_type] += 1
 
             logging.info("Successfully gathered flight information.")
         except Exception as e:
