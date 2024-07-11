@@ -222,9 +222,9 @@ class FileTransfer:
                 logging.info(f"New flight route detected: {flight_route}")
                 add_route = input(f"Do you want to add the flight route '{flight_route}' to the CSV file? (yes/no): ").strip().lower()
                 if add_route in ['yes', 'y']:
-                    base_name = input("Enter the corresponding base name for this flight route: ").strip()
-                    base_path = input("Enter the corresponding base path for this flight route: ").strip()
-                    self.add_flight_route_to_csv(flight_route, base_path, base_name)
+                    base_name = input("Enter the corresponding base information for this flight route(foldername|drone|hight|type|overlap): ").strip()
+                    #base_path = input("Enter the corresponding base path for this flight route: ").strip()
+                    self.add_flight_route_to_csv(flight_route, base_name)
                 else:
                     raise ValueError(f"Flight route '{flight_route}' not added. Please update the CSV file to continue.")
             else:
@@ -232,7 +232,7 @@ class FileTransfer:
         except Exception as e:
             logging.error(f"Error checking and updating CSV for flight route '{flight_route}': {e}")
             
-    def add_flight_route_to_csv(self, flight_route, base_path, base_name):
+    def add_flight_route_to_csv(self, flight_route, base_info):
         """
         Adds a new flight route to the data overview CSV file.
 
@@ -242,7 +242,14 @@ class FileTransfer:
             base_name (str): The base name for the flight route.
         """
         try:
-            new_entry = pd.DataFrame([{'FlightRoute': flight_route, 'BasePath': base_path, 'BaseName': base_name}])
+            info = base_info.split(" ")
+            base_name = info[0]
+            base_drone = info[1]
+            base_hight = info[2]
+            base_type = info[3]
+            base_overlap = f'{info[4]} {info[5]}'
+            base_path = f'{base_name}/{base_type}'
+            new_entry = pd.DataFrame([{'FlightRoute': flight_route, 'BasePath': base_path, 'BaseName': base_name, 'BaseDrone':base_drone, 'BaseHight':base_hight,'BaseType':base_type, 'BaseOverlap':base_overlap }])
             self.data_overview = pd.concat([self.data_overview, new_entry], ignore_index=True)
             self.data_overview.to_csv(self.data_overview_file, index=False)
             logging.info(f"Added new flight route '{flight_route}' with base path '{base_path}' and base name '{base_name}' to the CSV file.")
@@ -274,7 +281,7 @@ class FileTransfer:
                 info = self.data_overview.loc[self.data_overview['FlightRoute'] == folder['flight_name'][0]]
                 #logging.info(f'type:')
                 if not info.empty:
-                    output_path = os.path.join(self.output_path, str(info['BasePath'].values[0]), str(folder['date'] +' '+str(info['BaseName'].values[0])))
+                    output_path = os.path.join(self.output_path, str(info['BasePath'].values[0]), f"{str(folder['date'])} {str(info['BaseName'].values[0])} {str(info['BaseDrone'].values[0])} {str(info['BaseHight'].values[0])} {str(info['BaseType'].values[0])} {str(info['BaseOverlap'].values[0])}")
                     self.flights_folders[i]['output_path'] = output_path
                 else:
                     logging.warning(f"No matching route found for flight folder: {folder['dir_name']}")
@@ -341,7 +348,7 @@ class FileTransfer:
                                 info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name'][0]]
                                 output_path = os.path.join(self.output_path, '_TRASHCAN\\'+ str(info['BasePath'].values[0]), str(self.flights_folders[flight_index]['date'] +' '+str(info['BaseName'].values[0])))
                                 self.flights_folders[flight_index]['output_path'] = output_path
-                                self.flights_folders[flight_index]['flight_name'] = self.flights_folders[flight_index]['flight_name']+'_trashed_flight'
+                                self.flights_folders[flight_index]['flight_name'] = [f"{self.flights_folders[flight_index]['flight_name'][0]}_trashed-flight"]
 
                                 logging.info(f"Updated: {self.flights_folders[flight_index]['dir_name']} to new location: {self.flights_folders[flight_index]['output_path']}")
                         else:
