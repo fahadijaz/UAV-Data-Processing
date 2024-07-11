@@ -283,6 +283,7 @@ class FileTransfer:
                 if not info.empty:
                     output_path = os.path.join(self.output_path, str(info['BasePath'].values[0]), f"{str(folder['date'])} {str(info['BaseName'].values[0])} {str(info['BaseDrone'].values[0])} {str(info['BaseHight'].values[0])} {str(info['BaseType'].values[0])} {str(info['BaseOverlap'].values[0])}")
                     self.flights_folders[i]['output_path'] = output_path
+                    self.flights_folders[i]['hight'] = info['BaseHight'].values[0]
                 else:
                     logging.warning(f"No matching route found for flight folder: {folder['dir_name']}")
             logging.info("Matching of flight folders with output paths completed successfully.")
@@ -447,6 +448,7 @@ class FileTransfer:
                 num_files = str(flight['num_files'])
                 num_dir = 1
                 output_path = flight['output_path']
+                hight = flight['hight']
 
                 # Find existing entry with the same date and flight name
                 existing_entry = df[(df['date'] == date) & (df['flight_name'] == flight_name)]
@@ -475,7 +477,8 @@ class FileTransfer:
                         "type": flight_type,
                         "num_files": num_files,
                         "num_dir": num_dir,
-                        "output_path": output_path
+                        "output_path": output_path,
+                        "hight": hight
                     }
                     new_entry = pd.DataFrame([new_entry])
                     df = pd.concat([df,new_entry], ignore_index=True)
