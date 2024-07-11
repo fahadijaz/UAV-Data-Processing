@@ -39,7 +39,7 @@ class FileTransfer:
 
         # List all directories in the input path
         self.direct = os.listdir(self.input_path)
-        self.type_counts = {'MS': 0, '3D': 0, 'Reflectance': 0}
+        self.type_counts = {'MS': 0, '3D': 0, 'Reflectance': 0, 'phantom-MS':0}
         self.number_of_elements = len(self.direct)
         self.data_overview_file = data_overview_file
         self.flight_log_file = flight_log
@@ -67,7 +67,7 @@ class FileTransfer:
 
         #print(f'flight with old phantomdrone detected,known phantom fileds:\n0. PhenoCrop')
         #user_input = input('type number of known route to map the flight')
-        name_from_input = 'phantom_phenocrop_2024'
+        name_from_input = 'phantom-phenocrop-2024'
         dir_path = os.path.join(self.input_path, directory)
         start_file = os.listdir(dir_path)[4]
         end_file = os.listdir(dir_path)[-1]
@@ -82,7 +82,7 @@ class FileTransfer:
             'ID': directory[:3],
             'start_time': stat_start.strftime('%H%M%S'),
             'end_time': stat_end.strftime('%H%M%S'),
-            'type': 'phantom-MS',
+            'type': ['phantom-MS'],
             'num_files':nr_files,
             'num_dir':1
         }
@@ -341,6 +341,7 @@ class FileTransfer:
                                 info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name'][0]]
                                 output_path = os.path.join(self.output_path, '_TRASHCAN\\'+ str(info['BasePath'].values[0]), str(self.flights_folders[flight_index]['date'] +' '+str(info['BaseName'].values[0])))
                                 self.flights_folders[flight_index]['output_path'] = output_path
+                                self.flights_folders[flight_index]['flight_name'] = self.flights_folders[flight_index]['flight_name']+'_trashed_flight'
 
                                 logging.info(f"Updated: {self.flights_folders[flight_index]['dir_name']} to new location: {self.flights_folders[flight_index]['output_path']}")
                         else:
@@ -425,29 +426,55 @@ class FileTransfer:
     
     def save_flight_log(self):
         
-        for folder in self.flights_folders:
-            new_entry = pd.DataFrame([folder])
-            self.data_overview = pd.concat([self.data_overview, new_entry], ignore_index=True)
-            self.data_overview.to_csv(self.data_overview_file, index=False)
-            
-            """
-            info = None
+        
+        df = pd.read_csv(self.flight_log_file)
+        logging.info(f"initial csv {df} ")#to {self.flight_log}")
+        for flight in self.flights_folders:
+                dir_name = flight['dir_name']
+                flight_name = str(flight['flight_name'][0]).strip()
+                date = str(flight['date']).strip()
+                ID = flight['ID']
+                start_time = flight['start_time']
+                end_time = flight['end_time']
+                flight_type = flight['type'][0]
+                num_files = str(flight['num_files'])
+                num_dir = 1
+                output_path = flight['output_path']
 
-            if  info = self.flight_log.loc[self.data_overview['flight_name'] == folder['flight_name'] and self.data_overview['date'] == folder['date']]
-            if info:
-                if info['start_time']>folder['start_time']:
-                    info['start_time'] = folder['start_timne']
-                    
-                
-                if info['end_time']<folder['end_time']:
-                    info['end_time'] = folder['end_time']
-                
-                info['num_dir']+=1
-                self.flight_log.update([self.flight_log, info], ignore_index=True)
-                """
-            
+                # Find existing entry with the same date and flight name
+                existing_entry = df[(df['date'] == date) & (df['flight_name'] == flight_name)]
 
-            self.flight_log.to_csv(self.flight_log, index=False)
+                if not existing_entry.empty:
+                    # Update existing entry
+                    idx = existing_entry.index[0]
+                    df.at[idx, 'dir_name'] += f", {dir_name}"
+                    df.at[idx, 'ID'] += f", {ID}"
+                    df.at[idx, 'type'] += f", {flight_type}"
+                    df.at[idx, 'num_files'] += f", {num_files}"
+                    df.at[idx, 'num_dir'] += num_dir
+
+                    # Compare and update start_time and end_time
+                    df.at[idx, 'start_time'] = min(df.at[idx, 'start_time'], start_time)
+                    df.at[idx, 'end_time'] = max(df.at[idx, 'end_time'], end_time)
+                else:
+                    # Add new entry
+                    new_entry = {
+                        "dir_name": dir_name,
+                        "flight_name": flight_name,
+                        "date": date,
+                        "ID": ID,
+                        "start_time": start_time,
+                        "end_time": end_time,
+                        "type": flight_type,
+                        "num_files": num_files,
+                        "num_dir": num_dir,
+                        "output_path": output_path
+                    }
+                    new_entry = pd.DataFrame([new_entry])
+                    df = pd.concat([df,new_entry], ignore_index=True)
+        logging.info(f"updated csv {df} ")
+            # Write the updated DataFrame back to the CSV file
+        df.to_csv(self.flight_log_file, index=False)
 
 
     def close_and_whipe_sd_cards(self):
