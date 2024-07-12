@@ -187,10 +187,10 @@ class FileTransfer:
             else:
                 if self.type_counts['Reflectance'] > 0:
                     # make system to duplicate reflectansepanel, and implement a check for MS flight found but no reflectance panel. 
-                    logging.warning('More MS flights than reflectance panel images. You may need to ignore or duplicate some.')
+                    logging.info('More MS flights than reflectance panel images. You may need to ignore or duplicate some.')
                     self.reflectance_logic()
                 else:
-                    logging.warning('No folder found for reflectance panel for the MS flight. Still continue?')
+                    logging.info('No folder found for reflectance panel for the MS flight. Still continue?')
         except Exception as e:
             logging.error(f"Error in reflectance_types: {e}")
 
