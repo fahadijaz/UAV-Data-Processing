@@ -1,6 +1,7 @@
 from filetransfer import FileTransfer
 import os
 import csv
+import pandas as pd
 
 input_path = "P:\\PhenoCrop\\1_flights"
 data_file = "P:\\PhenoCrop\\0_csv\\data_overview.csv"
@@ -11,7 +12,7 @@ folder_list = os.listdir(input_path) #main folder
 print(folder_list)
 not_logged_flights = []
 for field in folder_list:
-    if field != 'E166' and field != '_TRASHCAN':
+    if field != '_TRASHCAN':
         all_folder_path = os.path.join(input_path,field,'3D')
         for folder in os.listdir(all_folder_path):
             try:
@@ -24,11 +25,11 @@ for field in folder_list:
                 folder_obj.match()
                 folder_obj.save_flight_log()
             except Exception as e:
-                not_logged_flights.append(f'could not log folder with name: {folder}, and path{folder_path}')
-not_logged_flights
+                not_logged_flights.append([folder,folder_path])
 
-with open("P:\\PhenoCrop\\Test_Folder\\Test_ISAK\\not_logged.csv", 'w') as f:
-     
-    # using csv.writer method from CSV package
-    write = csv.writer(f)
-    write(not_logged_flights)
+
+df = pd.DataFrame(columns=['folder','path'])
+df = pd.DataFrame(not_logged_flights, columns=['folder','path'])
+df.to_csv('list.csv', index=False)
+
+not_logged_csv_path = "P:\\PhenoCrop\\Test_Folder\\Test_ISAK\\not_logged.csv"
