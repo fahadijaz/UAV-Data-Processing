@@ -157,14 +157,15 @@ class FileTransfer:
         try:
             dir_path = os.path.join(self.input_path, directory)
             files_sorted = sorted(os.listdir(dir_path))
-
+            start_time = files_sorted[4].split("_")[1][8:]
             # Find the start time
+            '''
             start_time = None
             for file in files_sorted:
                 if 'JPG' in file:
                     start_time = file.split("_")[1][8:]
                     break
-
+            '''
             # Find the end time
             end_time = files_sorted[-2].split("_")[1][8:] #input a if test to see if it is a JPG
 

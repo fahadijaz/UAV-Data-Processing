@@ -15,7 +15,7 @@ folder_list = os.listdir(input_path) #main folder
 print(folder_list)
 not_logged_flights = []
 for field in folder_list:
-    if field != '_TRASHCAN':
+    if field != '_TRASHCAN' and field != 'skyline':
         all_folder_path = os.path.join(input_path,field,'MS')
         for folder in os.listdir(all_folder_path):
             try:
