@@ -322,6 +322,7 @@ class FileTransfer:
         try:
             #self.merge_folders() #remove merge system
             self.get_information()  #new logic in finding ms flights, detect phantom flight
+            self.test_folder_for_TIF()
             self.reflectance_types()    #new logic in assigning the refleectanse panel
             self.detect_and_handle_new_routes()     #include a trashcan initialisation
             self.match()
@@ -352,9 +353,13 @@ class FileTransfer:
                         new_path_index = int(input("Enter the number corresponding to the flight whose path you want to use: "))
                         # Validate the indices
                         if 0 <= flight_index < len(self.flights_folders) and 0 <= new_path_index < len(self.flights_folders):
+                            
                             temp = self.flights_folders[flight_index]
-                            temp['output_path'] = self.flights_folders[new_path_index]['output_path']
+                            #logging.info(self.flights_folders[flight_index]['output_path'])
                             self.flights_folders.append(temp)
+                            self.flights_folders[-1]['output_path'] = self.flights_folders[new_path_index]['output_path']
+                            #logging.info(self.flights_folders[flight_index]['output_path']) #bugtesting
+                            
                             logging.info(f"duplicated: {self.flights_folders[flight_index]['dir_name']} to new location: {self.flights_folders[flight_index]['output_path']}")
                         else:
                             logging.warning("Invalid indices entered. Please try again.")
@@ -467,6 +472,7 @@ class FileTransfer:
                 hight = flight['hight']
 
                 # Find existing entry with the same date and flight name
+
                 existing_entry = df[(df['date'] == date) & (df['flight_name'] == flight_name)]
 
                 if not existing_entry.empty:
