@@ -2,72 +2,109 @@ import os
 import shutil
 import logging
 import pandas as pd
-from tqdm import tqdm
+import copy
 import subprocess
+from tqdm import tqdm
 from threading import Thread
 from queue import Queue
-import pytz
 from datetime import datetime
+from typing import List, Tuple
 
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',  # Set the logging format
-    handlers=[
-        logging.StreamHandler()  # Log to console
-    ]
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[logging.StreamHandler()]
 )
 
 class FileTransfer:
-    def __init__(self, input_path=None, output_path=None, data_overview_file=None, flight_log=None):
-        """
-        Initializes the FileTransfer class with paths and overview file.
-
-        Args:
-            input_path (str): Path to the input directory.
-            output_path (str): Path to the output directory.
-            data_overview_file (str): Path to the CSV file containing data overview.
-        """
+    def __init__(self, input_path: str, output_path: str, data_overview_file: str, flight_log: str):
         self.input_path = input_path
         self.output_path = output_path
-        self.number_of_elements = None
-        self.nr_MS = 0
-        self.nr_3D = 0
-        self.nr_reflectance = 0
-        self.flights_folders = []
-
-        # List all directories in the input path
-        self.direct = os.listdir(self.input_path)
-        self.type_counts = {'MS': 0, '3D': 0, 'Reflectance': 0, 'phantom-MS':0}
-        self.number_of_elements = len(self.direct)
         self.data_overview_file = data_overview_file
         self.flight_log_file = flight_log
-        self.flight_log = pd.read_csv(self.flight_log_file)
+        self.temp_log_file = "P:\\PhenoCrop\\0_csv\\temp_flight_log.csv"
+        self.type_counts = {'MS': 0, '3D': 0, 'Reflectance': 0, 'phantom-MS': 0}
+        self.flights_folders = []
 
-        # Load the data overview file if provided, otherwise initialize an empty DataFrame
-        if data_overview_file and os.path.exists(data_overview_file):
-            self.data_overview = pd.read_csv(data_overview_file)
-            logging.info(f"Csv loaded sucsessfully: {data_overview_file}")
+
+        self._load_data_overview()
+        self.temp_flight_log = self._load_flight_log(self.temp_log_file)
+        self._list_directories()
+
+    def _load_data_overview(self):
+        if os.path.exists(self.data_overview_file):
+            self.data_overview = pd.read_csv(self.data_overview_file)
+            logging.info(f"Csv loaded successfully: {self.data_overview_file}")
         else:
-            logging.warning("Data overview file not found. Please create a new CSV file with the correct formatting.")
-            create_csv = input("Do you want to create a new CSV file? (yes/no): ").strip().lower()
-            if create_csv in ['yes', 'y']:
-                self.data_overview = pd.DataFrame(columns=['FlightRoute', 'BasePath', 'BaseName'])
-                self.data_overview[1]
-                self.data_overview.to_csv(data_overview_file, index=False)
-                logging.info(f"Created new CSV file: {data_overview_file}")
+            self.data_overview = pd.DataFrame(columns=['FlightRoute', 'BasePath', 'BaseName'])
+            self.data_overview.to_csv(self.data_overview_file, index=False)
+            logging.warning("Data overview file not found. Created a new CSV file.")
+
+    @staticmethod
+    def _load_flight_log(log_file):
+        if os.path.exists(log_file):
+            flight_log = pd.read_csv(log_file)
+        else:
+            flight_log = pd.DataFrame(columns=[
+                "dir_name", "flight_name", "date", "folder_ID", "start_time",
+                "end_time", "type", "num_files", "num_dir", "output_path", "height"
+            ])
+            flight_log.to_csv(log_file, index=False)
+            logging.warning("Flight log file not found. Created a new CSV file.")
+        return flight_log
+
+    def _list_directories(self):
+        self.direct = os.listdir(self.input_path)
+        self.number_of_elements = len(self.direct)
+
+    def get_information(self):
+        dirs = sorted(os.listdir(self.input_path))
+        for directory in dirs:
+            if 'FPLAN' in directory or 'MEDIA' in directory:
+                self.Phantomdata_system(directory)
             else:
-                raise FileNotFoundError("Data overview file is required to proceed.")
-        
-        # Log the input and output paths
-        logging.info(f'Input Path: {self.input_path}\nOutput Path: {self.output_path}')
+                self._process_directory(directory)
+        self._count_flight_types()
+        logging.info("Successfully gathered flight information.")
 
+    def _process_directory(self, directory: str):
+        dir_path = os.path.join(self.input_path, directory)
+        start_time, end_time = self._collect_timestamp(directory)
+        nr_files = len(os.listdir(dir_path))
+        flight_info = {
+            'dir_name': directory,
+            'flight_name': directory.split("_")[3:],
+            'date': directory.split("_")[1][:8],
+            'folder_ID': directory.split("_")[2],
+            'start_time': start_time,
+            'end_time': end_time,
+            'type': 'MS' if 'MS' in directory else 'Reflectance' if directory.count('_') == 2 else '3D',
+            'num_files': nr_files,
+            'num_dir': 1
+        }
+        self.flights_folders.append(flight_info)
 
-    def Phantomdata_system(self, directory):
+    def _collect_timestamp(self, directory: str) -> Tuple[str, str]:
+        try:
+            dir_path = os.path.join(self.input_path, directory)
+            files_sorted = sorted(os.listdir(dir_path))
+            start_time = files_sorted[4].split("_")[1][8:]
+            end_time = files_sorted[-2].split("_")[1][8:]
+            return start_time, end_time
+        except Exception as e:
+            logging.error(f"Error collecting timestamps for directory {directory}: {e}")
+            return None, None
 
-        #print(f'flight with old phantomdrone detected,known phantom fileds:\n0. PhenoCrop')
-        #user_input = input('type number of known route to map the flight')
+    def _count_flight_types(self):
+        for flight in self.flights_folders:
+            flight_type = flight['type']
+            if flight_type in self.type_counts:
+                self.type_counts[flight_type] += 1
+        self._check_reflectance_panel_files()
+
+    def Phantomdata_system(self, directory: str):
         name_from_input = 'phantom-phenocrop-2024'
         dir_path = os.path.join(self.input_path, directory)
         start_file = os.listdir(dir_path)[4]
@@ -75,142 +112,29 @@ class FileTransfer:
         nr_files = len(os.listdir(dir_path))
         stat_start = datetime.fromtimestamp(os.stat(os.path.join(dir_path, start_file)).st_mtime)
         stat_end = datetime.fromtimestamp(os.stat(os.path.join(dir_path, end_file)).st_mtime)
-        pass
         flight_info = {
-            'dir_name': directory, 
+            'dir_name': directory,
             'flight_name': [name_from_input],
             'date': stat_start.strftime('%Y%m%d'),
             'folder_ID': directory[:3],
             'start_time': stat_start.strftime('%H%M%S'),
             'end_time': stat_end.strftime('%H%M%S'),
-            'type': ['phantom-MS'],
-            'num_files':nr_files,
-            'num_dir':1
+            'type': 'phantom-MS',
+            'num_files': nr_files,
+            'num_dir': 1
         }
-
         self.flights_folders.append(flight_info)
 
-    def test_folder_for_TIF(self):
-        for folder in self.flights_folders:
-            if "MEDIA" in folder:
-                if 'TIF'not in os.listdir(os.path.join(self.input_path,folder)):
-                    logging.warning(f'Did not find any tif files on media folder:{folder}')
 
-            elif folder['type'] == 'Reflectance':
-                checklist = ["G.TIF","R.TIF","NIR.TIF","RE.TIF"]
-                for substring in checklist:
-                    if not any(substring in file for file in os.listdir(os.path.join(self.input_path,folder))):
-                        logging.warning(f'Did not find any tif files in reflectance folder:{folder}')
-        
-
-
-    def get_information(self):
-        """
-        Gathers information from the directories in the input path and populates
-        the flights_folders list with metadata for each directory.
-        """
-        try:
-            dirs = sorted(os.listdir(self.input_path))
-
-            for directory in dirs:
-                if 'FPLAN' in directory or 'MEDIA' in directory:
-                    #test for phantom data, if phantomdata implement system for it. 
-                    self.Phantomdata_system(directory)
-                else:
-                    dir_path = os.path.join(self.input_path, directory)
-                    start_time, end_time = self.collect_timestamp(directory)
-                    nr_files = len(os.listdir(dir_path))
-                    flight_info = {
-                        'dir_name': directory,
-                        'flight_name': directory.split("_")[3:],
-                        'date': directory.split("_")[1][:8],
-                        'folder_ID': directory.split("_")[2],
-                        'start_time': start_time,
-                        'end_time': end_time,
-                        'type': [('MS' if 'MS' in directory else 'Reflectance' if directory.count('_') == 2 else '3D')],
-                        'num_files':nr_files,
-                        'num_dir': 1
-                    }
-                    self.flights_folders.append(flight_info)
-
-                # Count each type of flight
-            for flight in self.flights_folders:
-                flight_type = flight['type'][0]
-                if flight_type in self.type_counts:
-                    self.type_counts[flight_type] += 1
-
-            logging.info("Successfully gathered flight information.")
-        except Exception as e:
-            logging.error(f"Error gathering flight information: {e}")
-
-
-    def collect_timestamp(self, directory):
-        """
-        Collects the start and end timestamps from the files in the given directory.
-
-        Args:
-            directory (str): The directory to collect timestamps from.
-
-        Returns:
-            tuple: A tuple containing the start and end timestamps.
-        """
-        try:
-            dir_path = os.path.join(self.input_path, directory)
-            files_sorted = sorted(os.listdir(dir_path))
-            start_time = files_sorted[4].split("_")[1][8:]
-            # Find the start time
-            '''
-            start_time = None
-            for file in files_sorted:
-                if 'JPG' in file:
-                    start_time = file.split("_")[1][8:]
-                    break
-            '''
-            # Find the end time
-            end_time = files_sorted[-2].split("_")[1][8:] #input a if test to see if it is a JPG
-
-            return start_time, end_time
-        except Exception as e:
-            logging.error(f"Error collecting timestamps for directory {directory}: {e}")
-            return None, None
-
-    def reflectance_types(self):
-        """
-        Determines the relationship between the number of reflectance panels and MS flights
-        and calls the appropriate logic for handling them.
-        """
-        try:
-            if self.type_counts['Reflectance'] == self.type_counts['MS'] and self.type_counts['MS']>0:
-                logging.info('Found equal number of MS flights and reflectance panels.')
-                self.reflectance_logic()
-            elif self.type_counts['Reflectance'] > self.type_counts['MS']:
-                self.reflectance_logic()
-            else:
-                if self.type_counts['Reflectance'] > 0:
-                    # make system to duplicate reflectansepanel, and implement a check for MS flight found but no reflectance panel. 
-                    logging.info('More MS flights than reflectance panel images. You may need to ignore or duplicate some.')
-                    self.reflectance_logic()
-                else:
-                    logging.info('No folder found for reflectance panel for the MS flight. Still continue?')
-        except Exception as e:
-            logging.error(f"Error in reflectance_types: {e}")
-
-
-    def reflectance_logic(self):
-        """
-        Handles the assignment of flight names to reflectance panels and vice versa
-        to ensure proper pairing between MS flights and reflectance panels.
-        """
-        # Improve system by implementing timestamp checks for the reflectance panel
         try:
             n = 0
             while self.type_counts['Reflectance'] > 0 or self.type_counts['MS'] > 0:
                 if n == 0:
                     n += 1
-                    self.type_counts[self.flights_folders[0]['type'][0]] -= 1
+                    self.type_counts[self.flights_folders[0]['type']] -= 1
 
-                current_type = self.flights_folders[n]['type'][0]
-                previous_type = self.flights_folders[n-1]['type'][0]
+                current_type = self.flights_folders[n]['type']
+                previous_type = self.flights_folders[n-1]['type']
 
                 if previous_type == 'Reflectance' and not self.flights_folders[n-1]['flight_name'] and current_type == 'MS':
                     self.flights_folders[n-1]['flight_name'] = self.flights_folders[n]['flight_name']
@@ -219,199 +143,281 @@ class FileTransfer:
 
                 self.type_counts[current_type] -= 1
                 n += 1
-
             logging.info("Reflectance logic applied successfully.")
         except Exception as e:
             logging.error(f"Error in reflectance_logic: {e}")
 
-    def check_and_update_csv(self, flight_route):
-        """
-        Checks if a flight route exists in the data overview CSV file.
-        If not, prompts the user to add the new flight route.
-
-        Args:
-            flight_route (str): The flight route to check.
-        """
-        # Improvments: Give suggestion base name and base path? 
+    def reflectance_logic_with_timestamps(self):
         try:
-            if not self.data_overview['FlightRoute'].str.contains(flight_route).any():
-                logging.info(f"New flight route detected: {flight_route}")
-                add_route = input(f"Do you want to add the flight route '{flight_route}' to the CSV file? (yes/no): ").strip().lower()
-                if add_route in ['yes', 'y']:
-                    base_name = input("Enter the corresponding base information for this flight route(foldername|drone|hight|type|overlap): ").strip()
-                    #base_path = input("Enter the corresponding base path for this flight route: ").strip()
-                    self.add_flight_route_to_csv(flight_route, base_name)
-                else:
-                    raise ValueError(f"Flight route '{flight_route}' not added. Please update the CSV file to continue.")
-            else:
-                logging.info(f"Flight route '{flight_route}' already exists in the CSV file.")
-        except Exception as e:
-            logging.error(f"Error checking and updating CSV for flight route '{flight_route}': {e}")
-            
-    def add_flight_route_to_csv(self, flight_route, base_info):
-        """
-        Adds a new flight route to the data overview CSV file.
+            required_tif_files = ["G.TIF", "R.TIF", "NIR.TIF", "RE.TIF"]
 
-        Args:
-            flight_route (str): The flight route to add.
-            base_path (str): The base path for the flight route.
-            base_name (str): The base name for the flight route.
-        """
+            # Validate reflectance panels
+            for folder in self.flights_folders:
+                if folder['type'] == 'Reflectance':
+                    if not self._has_required_tif_files(folder, required_tif_files):
+                        logging.warning(f"Missing required .tif files in reflectance folder: {folder['dir_name']}")
+                        folder['valid'] = False
+                    else:
+                        folder['valid'] = True
+
+            # Initialize 'reflectance_assigned' attribute for MS flights
+            for folder in self.flights_folders:
+                if folder['type'] == 'MS':
+                    folder['reflectance_assigned'] = False
+
+            # Sort by start time
+            self.flights_folders.sort(key=lambda x: datetime.strptime(x['start_time'], '%H%M%S'))
+
+            n = 0
+            while n < len(self.flights_folders):
+                current_type = self.flights_folders[n]['type']
+
+                if current_type == 'Reflectance' and self.flights_folders[n]['valid']:
+                    closest_ms_flight = None
+                    min_time_diff = float('inf')
+                    reflectance_panel = self.flights_folders[n]
+
+                    for ms_flight in self.flights_folders:
+                        if ms_flight['type'] == 'MS' and not ms_flight['reflectance_assigned']:
+                            panel_start_time = datetime.strptime(reflectance_panel['start_time'], '%H%M%S')
+                            panel_end_time = datetime.strptime(reflectance_panel['end_time'], '%H%M%S')
+                            ms_start_time = datetime.strptime(ms_flight['start_time'], '%H%M%S')
+                            ms_end_time = datetime.strptime(ms_flight['end_time'], '%H%M%S')
+
+                            if panel_end_time < ms_start_time:  # Panel ends before MS flight starts
+                                time_diff = (ms_start_time - panel_end_time).total_seconds()
+                            elif panel_start_time > ms_end_time:  # Panel starts after MS flight ends
+                                time_diff = (panel_start_time - ms_end_time).total_seconds()
+                            else:
+                                time_diff = 0  # Overlapping or same time
+
+                            if time_diff < min_time_diff:
+                                min_time_diff = time_diff
+                                closest_ms_flight = ms_flight
+
+                    if closest_ms_flight:
+                        reflectance_panel['flight_name'] = closest_ms_flight['flight_name']
+                        closest_ms_flight['reflectance_assigned'] = True
+                        logging.info(f"Assigned reflectance panel {reflectance_panel['dir_name']} to MS flight {closest_ms_flight['dir_name']}")
+                    else:
+                        logging.warning(f"No valid MS flight found for reflectance panel: {reflectance_panel['dir_name']}")
+
+                n += 1
+
+            logging.info("Reflectance logic with timestamps applied successfully.")
+        except Exception as e:
+            logging.error(f"Error in reflectance_logic_with_timestamps: {e}")
+
+    def _has_required_tif_files(self, folder, required_files):
+        folder_path = os.path.join(self.input_path, folder['dir_name'])
+        existing_files = os.listdir(folder_path)
+        return all(any(req_file in file for file in existing_files) for req_file in required_files)
+
+    def _suggest_duplicate_panel(self, ms_flight, reflectance_panels):
+        try:
+            closest_panel = None
+            min_time_diff = float('inf')
+            for panel in reflectance_panels:
+                time_diff = abs(datetime.strptime(ms_flight['start_time'], '%H%M%S') - datetime.strptime(panel['start_time'], '%H%M%S')).total_seconds()
+                if time_diff < min_time_diff:
+                    min_time_diff = time_diff
+                    closest_panel = panel
+
+            if closest_panel:
+                suggest_duplicate = input(f"Do you want to duplicate the nearest reflectance panel '{closest_panel['dir_name']}' for the MS flight '{ms_flight['dir_name']}'? (yes/no): ").strip().lower()
+                if suggest_duplicate in ['yes', 'y']:
+                    self._duplicate_reflectance_panel(ms_flight, closest_panel)
+        except Exception as e:
+            logging.error(f"Error in suggest_duplicate_panel: {e}")
+
+    def _duplicate_reflectance_panel(self, ms_flight, reflectance_panel):
+        try:
+            new_panel = reflectance_panel.copy()
+            new_panel['dir_name'] = f"{reflectance_panel['dir_name']}_duplicate"
+            self.flights_folders.append(new_panel)
+            ms_flight['flight_name'].extend(new_panel['flight_name'])
+            logging.info(f"Duplicated reflectance panel '{reflectance_panel['dir_name']}' for MS flight '{ms_flight['dir_name']}'.")
+        except Exception as e:
+            logging.error(f"Error in duplicate_reflectance_panel: {e}")
+
+    def _check_reflectance_panel_files(self):
+        required_files = ["G.TIF", "R.TIF", "NIR.TIF", "RE.TIF"]
+        for folder in self.flights_folders:
+            if folder['type'] == 'Reflectance':
+                files = os.listdir(os.path.join(self.input_path, folder['dir_name']))
+                missing_files = [f for f in required_files if not any(f in file for file in files)]
+                if missing_files:
+                    logging.warning(f'Missing {missing_files} in reflectance folder: {folder["dir_name"]}')
+
+    def detect_and_handle_new_routes(self):
+        try:
+            for folder in self.flights_folders:
+                flight_route = folder['flight_name']
+                if flight_route:
+                    self._check_and_update_csv(flight_route[0])
+            logging.info("Flight routes detected and handled successfully.")
+        except Exception as e:
+            logging.error(f"Error detecting and handling new routes: {e}")
+
+    def _check_and_update_csv(self, flight_route: str):
+        if not self.data_overview['FlightRoute'].str.contains(flight_route).any():
+            logging.info(f"New flight route detected: {flight_route}")
+            add_route = input(f"Do you want to add the flight route '{flight_route}' to the CSV file? (yes/no): ").strip().lower()
+            if add_route in ['yes', 'y']:
+                base_name = input("Enter the corresponding base information for this flight route(foldername|drone|height|type|overlap): ").strip()
+                self._add_flight_route_to_csv(flight_route, base_name)
+            else:
+                raise ValueError(f"Flight route '{flight_route}' not added. Please update the CSV file to continue.")
+        else:
+            logging.info(f"Flight route '{flight_route}' already exists in the CSV file.")
+
+    def _add_flight_route_to_csv(self, flight_route: str, base_info: str):
         try:
             info = base_info.split(" ")
             base_name = info[0]
             base_drone = info[1]
-            base_hight = info[2]
+            base_height = info[2]
             base_type = info[3]
             base_overlap = f'{info[4]} {info[5]}'
             base_path = f'{base_name}/{base_type}'
-            new_entry = pd.DataFrame([{'FlightRoute': flight_route, 'BasePath': base_path, 'BaseName': base_name, 'BaseDrone':base_drone, 'BaseHight':base_hight,'BaseType':base_type, 'BaseOverlap':base_overlap }])
+            new_entry = pd.DataFrame([{
+                'FlightRoute': flight_route, 'BasePath': base_path, 'BaseName': base_name,
+                'BaseDrone': base_drone, 'BaseHeight': base_height, 'BaseType': base_type, 'BaseOverlap': base_overlap
+            }])
             self.data_overview = pd.concat([self.data_overview, new_entry], ignore_index=True)
             self.data_overview.to_csv(self.data_overview_file, index=False)
             logging.info(f"Added new flight route '{flight_route}' with base path '{base_path}' and base name '{base_name}' to the CSV file.")
         except Exception as e:
             logging.error(f"Error adding flight route '{flight_route}' to CSV: {e}")
 
-    def detect_and_handle_new_routes(self):
-        """
-        Detects new flight routes from the flights_folders list and checks
-        and updates the CSV file accordingly.
-        """
-        try:
-            for folder in self.flights_folders:
-                flight_route = folder['flight_name']
-                if flight_route:  # Ensure flight_route is not empty
-                    self.check_and_update_csv(flight_route[0])
-            logging.info("Flight routes detected and handled successfully.")
-        except Exception as e:
-            logging.error(f"Error detecting and handling new routes: {e}")
-
     def match(self):
-        """
-        Matches flight folders with their corresponding output paths
-        based on the data overview.
-        """
         try:
             for i, folder in enumerate(self.flights_folders):
-                
-                info = self.data_overview.loc[self.data_overview['FlightRoute'] == folder['flight_name'][0]]
-                #logging.info(f'type:')
-                if not info.empty:
-                    output_path = os.path.join(self.output_path, str(info['BasePath'].values[0]), f"{str(folder['date'])} {str(info['BaseName'].values[0])} {str(info['BaseDrone'].values[0])} {str(info['BaseHight'].values[0])} {str(info['BaseType'].values[0])} {str(info['BaseOverlap'].values[0])}")
-                    self.flights_folders[i]['output_path'] = output_path
-                    self.flights_folders[i]['hight'] = info['BaseHight'].values[0]
+                if folder['flight_name'] != []:
+                    
+                    info = self.data_overview.loc[self.data_overview['FlightRoute'] == folder['flight_name'][0]]
+                    if not info.empty:
+                        output_path = os.path.join(self.output_path, str(info['BasePath'].values[0]), f"{str(folder['date'])} {str(info['BaseName'].values[0])} {str(info['BaseDrone'].values[0])} {str(info['BaseHeight'].values[0])} {str(info['BaseType'].values[0])} {str(info['BaseOverlap'].values[0])}")
+                        self.flights_folders[i]['output_path'] = output_path
+                        self.flights_folders[i]['height'] = info['BaseHeight'].values[0]
+                    else:
+                        logging.warning(f"No matching route found for flight folder: {folder['dir_name']}")
                 else:
-                    logging.warning(f"No matching route found for flight folder: {folder['dir_name']}")
+                    output_path = os.path.join(self.output_path,'_NO_MATCH')
+                    self.flights_folders[i]['output_path'] = output_path
+                    self.flights_folders[i]['flight_name'] = ['no_matching_name']
+                    self.flights_folders[i]['height'] = '0m' # update to metadata image height
+
             logging.info("Matching of flight folders with output paths completed successfully.")
         except Exception as e:
             logging.error(f"Error in matching flight folders: {e}")
+    
+    def refresh(self):
+        try:
+            self.__init__(self.input_path, self.output_path, self.data_overview_file, self.flight_log_file)
+            logging.info("The state has been refreshed.")
+        except Exception as e:
+            logging.error(f"Error in refresh: {e}")
 
-    def print(self):
-        """
-        Prints a summary for 
-        """
+    def print_summary(self):
         for i, flight in enumerate(self.flights_folders):
-                logging.info(f"{i}.Move: {flight['dir_name']:55} to location: {flight['output_path']}")
-            
+            logging.info(f"{i}. Move: {flight['dir_name']:55} to location: {flight['output_path']}")
 
     def summary(self):
-        """
-        Provides a summary of the entire process by calling other methods
-        and logging the results.
-        """
         try:
-            #self.merge_folders() #remove merge system
-            self.get_information()  #new logic in finding ms flights, detect phantom flight
-            self.test_folder_for_TIF()
-            self.reflectance_types()    #new logic in assigning the refleectanse panel
-            self.detect_and_handle_new_routes()     #include a trashcan initialisation
+            self.get_information()
+            self.reflectance_logic_with_timestamps()
+            self.detect_and_handle_new_routes()
             self.match()
 
-            #for i, flight in enumerate(self.flights_folders):
-            #    logging.info(f"{i}.Move: {flight['dir_name']:55} to location: {flight['output_path']}")
-            
             while True:
-                self.print()
-                edit = input("Do you want to edit any output paths? (yes/no): ").strip().lower() # add option to duplicate, trash, move
+                self.print_summary()
+                edit = input("Do you want to edit any output paths? (yes/no): ").strip().lower()
                 if edit in ['yes', 'y']:
-                    type_edit = input("do you want to move, duplicate, or trash? (move/duplicate/trash)")
-                    if type_edit in ['move', 'm']:
-                        try:
-                            flight_index = int(input("Enter the number corresponding to the flight you want to edit: "))
-                            new_path_index = int(input("Enter the number corresponding to the flight whose path you want to use: "))
-
-                            # Validate the indices
-                            if 0 <= flight_index < len(self.flights_folders) and 0 <= new_path_index < len(self.flights_folders):
-                                self.flights_folders[flight_index]['output_path'] = self.flights_folders[new_path_index]['output_path']
-                                logging.info(f"Updated: {self.flights_folders[flight_index]['dir_name']} to new location: {self.flights_folders[flight_index]['output_path']}")
-                            else:
-                                logging.warning("Invalid indices entered. Please try again.")
-                        except ValueError:
-                            logging.error("Invalid input. Please enter numbers corresponding to the flight indices.")
-                    elif type_edit in ['duplicate', 'd']:
-                        flight_index = int(input("Enter the number corresponding to the flight you want to duplicate: "))
-                        new_path_index = int(input("Enter the number corresponding to the flight whose path you want to use: "))
-                        # Validate the indices
-                        if 0 <= flight_index < len(self.flights_folders) and 0 <= new_path_index < len(self.flights_folders):
-                            
-                            temp = self.flights_folders[flight_index]
-                            #logging.info(self.flights_folders[flight_index]['output_path'])
-                            self.flights_folders.append(temp)
-                            self.flights_folders[-1]['output_path'] = self.flights_folders[new_path_index]['output_path']
-                            #logging.info(self.flights_folders[flight_index]['output_path']) #bugtesting
-                            
-                            logging.info(f"duplicated: {self.flights_folders[flight_index]['dir_name']} to new location: {self.flights_folders[flight_index]['output_path']}")
-                        else:
-                            logging.warning("Invalid indices entered. Please try again.")
-
-                    elif type_edit in ['trash', 't']:
-                        flight_index = int(input("Enter the number corresponding to the flight you want to trash: "))
-                        if 0 <= flight_index < len(self.flights_folders):
-                                info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name'][0]]
-                                output_path = os.path.join(self.output_path, '_TRASHCAN\\'+ str(info['BasePath'].values[0]), f"{self.flights_folders[flight_index]['date']} {str(info['BaseName'].values[0])} {str(info['BaseDrone'].values[0])} {str(info['BaseHight'].values[0])} {str(info['BaseType'].values[0])} {str(info['BaseOverlap'].values[0])}")
-                                self.flights_folders[flight_index]['output_path'] = output_path
-                                self.flights_folders[flight_index]['flight_name'] = [f"{self.flights_folders[flight_index]['flight_name'][0]}_trashed-flight"]
-
-                                logging.info(f"Updated: {self.flights_folders[flight_index]['dir_name']} to new location: {self.flights_folders[flight_index]['output_path']}")
-                        else:
-                            logging.warning("Invalid indices entered. Please try again.")
-
+                    self._edit_paths()
                 else:
                     break
-                
         except Exception as e:
             logging.error(f"Error in summary: {e}")
 
+    def _edit_paths(self):
+        try:
+            type_edit = input("Do you want to move, duplicate, trash or move to skyline folder? (move/duplicate/trash/skyline)").strip().lower()
+            if type_edit in ['move', 'm']:
+                self._move_path()
+            elif type_edit in ['duplicate', 'd']:
+                self._duplicate_path()
+            elif type_edit in ['trash', 't']:
+                self._trash_path()
+            elif type_edit in ['skyline','s']:
+                self._skyline_path()
+        except Exception as e:
+            logging.error(f"Error editing paths: {e}")
+
+    def _move_path(self):
+        try:
+            flight_index = int(input("Enter the number corresponding to the flight you want to edit: "))
+            new_path_index = int(input("Enter the number corresponding to the flight whose path you want to use: "))
+            if 0 <= flight_index < len(self.flights_folders) and 0 <= new_path_index < len(self.flights_folders):
+                self.flights_folders[flight_index]['output_path'] = self.flights_folders[new_path_index]['output_path']
+                logging.info(f"Updated: {self.flights_folders[flight_index]['dir_name']} to new location: {self.flights_folders[flight_index]['output_path']}")
+            else:
+                logging.warning("Invalid indices entered. Please try again.")
+        except ValueError:
+            logging.error("Invalid input. Please enter numbers corresponding to the flight indices.")
+
+    def _duplicate_path(self):
+        try:
+            flight_index = int(input("Enter the number corresponding to the flight you want to duplicate: "))
+            new_path_index = int(input("Enter the number corresponding to the flight whose path you want to use: "))
+            if 0 <= flight_index < len(self.flights_folders) and 0 <= new_path_index < len(self.flights_folders):
+                temp = copy.deepcopy(self.flights_folders[flight_index])
+                temp['output_path'] = self.flights_folders[new_path_index]['output_path']
+                self.flights_folders.append(temp)
+                logging.info(f"Duplicated: {self.flights_folders[flight_index]['dir_name']} to new location: {self.flights_folders[-1]['output_path']}")
+            else:
+                logging.warning("Invalid indices entered. Please try again.")
+        except ValueError:
+            logging.error("Invalid input. Please enter numbers corresponding to the flight indices.")
+
+    def _trash_path(self):
+        try:
+            flight_index = int(input("Enter the number corresponding to the flight you want to trash: "))
+            if 0 <= flight_index < len(self.flights_folders):
+                info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name'][0]]
+                output_path = os.path.join(self.output_path, '_TRASHCAN\\'+ str(info['BasePath'].values[0]), f"{self.flights_folders[flight_index]['date']} {str(info['BaseName'].values[0])} {str(info['BaseDrone'].values[0])} {str(info['BaseHeight'].values[0])} {str(info['BaseType'].values[0])} {str(info['BaseOverlap'].values[0])}")
+                self.flights_folders[flight_index]['output_path'] = output_path
+                self.flights_folders[flight_index]['flight_name'] = [f"{self.flights_folders[flight_index]['flight_name'][0]}_trashed-flight"]
+                logging.info(f"Trashed: {self.flights_folders[flight_index]['dir_name']} to new location: {self.flights_folders[flight_index]['output_path']}")
+            else:
+                logging.warning("Invalid indices entered. Please try again.")
+        except ValueError:
+            logging.error("Invalid input. Please enter numbers corresponding to the flight indices.")
+
+    def _skyline_path(self):
+        try:
+            flight_index = int(input("Enter the number corresponding to the flight you want to move to skyline: "))
+            if 0 <= flight_index < len(self.flights_folders):
+                info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name'][0]]
+                output_path = os.path.join(self.output_path, '_SKYLINE\\'+ str(info['BasePath'].values[0]), f"{self.flights_folders[flight_index]['date']} {str(info['BaseName'].values[0])} {str(info['BaseDrone'].values[0])} {str(info['BaseHeight'].values[0])} {str(info['BaseType'].values[0])} {str(info['BaseOverlap'].values[0])}")
+                self.flights_folders[flight_index]['output_path'] = output_path
+                self.flights_folders[flight_index]['flight_name'] = [f"{self.flights_folders[flight_index]['flight_name'][0]}_trashed-flight"]
+                logging.info(f"Moved to skyline: {self.flights_folders[flight_index]['dir_name']} to location: {self.flights_folders[flight_index]['output_path']}")
+            else:
+                logging.warning("Invalid index entered. Please try again.")
+        except Exception as e:
+            logging.error(f"Error in _skyline_path: {e}")
 
     @staticmethod
-    def move_directory(source_path, destination_path):
+    def move_directory(source_path: str, destination_path: str):
         try:
-            # Ensure the destination directory exists
             os.makedirs(os.path.dirname(destination_path), exist_ok=True)
-
-            # Execute the xcopy command
-            source_path = f'"{source_path}\\*"'  # Ensure the source path is quoted and includes all files
-            destination_path = f'"{destination_path}\\"'  # Ensure the destination path is quoted and has a trailing backslash
-            command = f'xcopy {source_path} {destination_path} /E /I /Y'
-            #print("Command to run:", command)  # Debugging output
-
-            # Execute the command
+            command = f'xcopy "{source_path}\\*" "{destination_path}\\" /E /I /Y'
             result = subprocess.run(command, shell=True, capture_output=True, text=True)
-
-
-            #result = subprocess.run(['xcopy', f'"{source_path}\\*"', f'"{destination_path}\\"'], capture_output=True, text=True)
             if result.returncode != 0:
                 logging.error(f"Error copying {source_path} to {destination_path}: {result.stderr}")
             else:
                 logging.info(f"Completed moving directory {source_path} to {destination_path}")
-                try:
-                    #shutil.rmtree(source_path)  # Use shutil.rmtree to delete directories
-                    #print(f"Successfully deleted source directory: {source_path}")
-                    pass
-                except Exception as e:
-                    print(f"Failed to delete source directory: {source_path}. Error: {e}")
-
-
         except Exception as e:
             logging.error(f"Exception moving {source_path} to {destination_path}: {e}")
 
@@ -420,10 +426,8 @@ class FileTransfer:
         q = Queue()
         threads = []
 
-        # Create a progress bar
         pbar = tqdm(total=total_folders, desc="Moving directories", unit="dir")
 
-        # Thread target function to perform the moves
         def worker():
             while not q.empty():
                 source_path, destination_path = q.get()
@@ -431,139 +435,145 @@ class FileTransfer:
                 pbar.update(1)
                 q.task_done()
 
-        # Queueing tasks
         for flight in self.flights_folders:
             source_path = os.path.join(self.input_path, flight['dir_name'])
             destination_path = os.path.join(flight['output_path'], flight['dir_name'])
             q.put((source_path, destination_path))
 
-        # Starting threads
-        for _ in range(min(10, total_folders)):  # Limit number of threads to prevent overloading
+        for _ in range(min(10, total_folders)):
             t = Thread(target=worker)
             t.start()
             threads.append(t)
 
-        # Wait for all threads to finish
         for t in threads:
             t.join()
 
         pbar.close()
-        self.save_flight_log()
-        final_user_input = input("Do you want to remove the files form the sd card?(yes/no)")
-        if final_user_input in ['yes', 'y']:
-            self.close_and_whipe_sd_cards()
-    
-    def save_flight_log(self):
+        self._save_flight_log()
         
+
+    def _save_flight_log(self):
         
-        df = pd.read_csv(self.flight_log_file)
-        #logging.info(f"initial csv {df} ")#to {self.flight_log}")
-        for flight in self.flights_folders:
-                dir_name = flight['dir_name']
-                flight_name = str(flight['flight_name'][0]).strip()
-                date = str(flight['date']).strip()
-                folder_ID = flight['folder_ID']
-                start_time = flight['start_time']
-                end_time = flight['end_time']
-                flight_type = flight['type'][0]
-                num_files = str(flight['num_files'])
-                num_dir = 1
-                output_path = flight['output_path']
-                hight = flight['hight']
+        try:
+            df = pd.read_csv(self.temp_log_file)
+            df['start_time'] = df['start_time'].astype(int)
+            df['end_time'] = df['end_time'].astype(int)
+            #logging.info(f"initial csv {df}")
 
-                # Find existing entry with the same date and flight name
+            for flight in self.flights_folders:
+                    #logging.info(f'to {flight}')
+                    dir_name = flight['dir_name']
+                    flight_name = str(flight['flight_name'][0])
+                    date = flight['date']
+                    folder_ID = flight['folder_ID']
+                    # Explicitly convert start_time and end_time to integers
+                    start_time = int(flight['start_time'])
+                    end_time = int(flight['end_time'])
+                    flight_type = flight['type']
+                    num_files = str(flight['num_files'])
+                    num_dir = 1
+                    output_path = flight['output_path']
+                    height = flight['height']
+                    # Find existing entry with the same date and flight name
+                    
+                    # Assuming 'date' should be treated as a string for comparison
+                    existing_entry = df[(df['date'].astype(str) == str(date)) & (df['flight_name'].astype(str) == str(flight_name))]
 
-                existing_entry = df[(df['date'] == date) & (df['flight_name'] == flight_name)]
+                    #logging.info(existing_entry)
+                    if not existing_entry.empty:
+                        # Update existing entry
+                        idx = existing_entry.index[0]
+                        df.at[idx, 'start_time'] = min(df.at[idx, 'start_time'], start_time)
+                        df.at[idx, 'end_time'] = max(df.at[idx, 'end_time'], end_time)
 
-                if not existing_entry.empty:
-                    # Update existing entry
-                    idx = existing_entry.index[0]
-                    df.at[idx, 'dir_name'] += f", {dir_name}"
-                    df.at[idx, 'folder_ID'] += f", {folder_ID}"
-                    df.at[idx, 'type'] += f", {flight_type}"
-                    df.at[idx, 'num_files'] += f", {num_files}"
-                    df.at[idx, 'num_dir'] += num_dir
+                        df.at[idx, 'dir_name'] += f", {dir_name}"
+                        df.at[idx, 'folder_ID'] += f", {folder_ID}"
+                        df.at[idx, 'type'] += f", {flight_type}"
+                        df.at[idx, 'num_files'] += f", {num_files}"
+                        df.at[idx, 'num_dir'] += num_dir
 
-                    # Compare and update start_time and end_time
-                    df.at[idx, 'start_time'] = min(df.at[idx, 'start_time'], start_time)
-                    df.at[idx, 'end_time'] = max(df.at[idx, 'end_time'], end_time)
-                else:
-                    # Add new entry
-                    new_entry = {
-                        "dir_name": dir_name,
-                        "flight_name": flight_name,
-                        "date": date,
-                        "folder_ID": folder_ID,
-                        "start_time": start_time,
-                        "end_time": end_time,
-                        "type": flight_type,
-                        "num_files": num_files,
-                        "num_dir": num_dir,
-                        "output_path": output_path,
-                        "hight": hight
-                    }
-                    new_entry = pd.DataFrame([new_entry])
-                    df = pd.concat([df,new_entry], ignore_index=True)
-        #logging.info(f"updated csv {df} ")
-            # Write the updated DataFrame back to the CSV file
-        df.to_csv(self.flight_log_file, index=False)
+                        # Compare and update start_time and end_time
+                    else:
+                        # Add new entry
+                        new_entry = {
+                            "dir_name": dir_name,
+                            "flight_name": flight_name,
+                            "date": date,
+                            "folder_ID": folder_ID,
+                            "start_time": start_time,
+                            "end_time": end_time,
+                            "type": flight_type,
+                            "num_files": num_files,
+                            "num_dir": num_dir,
+                            "output_path": output_path,
+                            "height": height
+                        }
+                        new_entry = pd.DataFrame([new_entry])
+                        df = pd.concat([df,new_entry], ignore_index=True)
+
+            df.to_csv(self.temp_log_file, index=False)
+            self._load_flight_log(self.temp_log_file)
+            logging.info("Flight log saved successfully.")
+        except Exception as e:
+            logging.error(f"Error saving flight log: {e}")
 
 
-    def close_and_whipe_sd_cards(self):
-        shutil.rmtree(self.input_path)  # Use shutil.rmtree to delete directories
+    def update_main_csv(self):
+        try:
+            temp_log = self._load_flight_log(self.temp_log_file)
+            main_log = self._load_flight_log(self.flight_log_file)
+            #---------------------------
+            # test can be preformed here
+            #---------------------------
+            new_log = pd.concat([main_log,temp_log],ignore_index=True)
+            new_log.to_csv(self.flight_log_file, index=False)
+
+            logging.info("Main flight log updated successfully.")
+        except Exception as e:
+            logging.error(f"Error updating main flight log: {e}")
+
+    def _close_and_wipe_sd_cards(self):
+        try:
+            shutil.rmtree(self.input_path)
+            logging.info("SD card wiped successfully.")
+        except Exception as e:
+            logging.error(f"Error wiping SD card: {e}")
 
 
 if __name__ == "__main__":
-
-    def detect_sd_cards2():
-        """
-        Detects available SD cards by checking known drive paths.
-        Returns a list of valid SD card paths.
-        """
+    def detect_sd_cards() -> List[str]:
         potential_paths = ["G:/DCIM", "I:/DCIM", "D:/DCIM"]
         available_paths = [path for path in potential_paths if os.path.exists(path)]
         return available_paths
-    
-    def detect_sd_cards():
-        """
-        Detects available SD cards by checking known drive paths.
-        Returns a list of valid SD card paths.
-        """
-        potential_paths = ["G:/DCIM", "I:/DCIM", "D:/DCIM"]
-        available_paths = []
 
-        for path in potential_paths:
-            try:
-                with os.scandir(path) as entries:
-                    if any(entries):
-                        available_paths.append(path)
-            except FileNotFoundError:
-                continue
-
-        return available_paths
-    # Initialize variables
     output_path = "P:\\PhenoCrop\\1_flights"
-    #output_path = "P:\\PhenoCrop\\Test_Folder\\Test_ISAK\\test_output"
     data_file = "P:\\PhenoCrop\\0_csv\\data_overview.csv"
     flight_log = "P:\\PhenoCrop\\0_csv\\flight_log.csv"
 
-    # Detect available SD cards
-    sd_card_paths = detect_sd_cards2()
-    logging.info(f'SD cards detected:{[p for p in sd_card_paths]}')
-    # List to store FileTransfer instances
-    file_transfers = []
+    sd_card_paths = detect_sd_cards()
+    logging.info(f'SD cards detected: {sd_card_paths}')
 
-    # Process each detected SD card
-    for sd_card_path in sd_card_paths:
-        ft = FileTransfer(input_path=sd_card_path, output_path=output_path, data_overview_file=data_file, flight_log=flight_log)
+    file_transfers = [FileTransfer(input_path=sd_card_path, output_path=output_path, data_overview_file=data_file, flight_log=flight_log) for sd_card_path in sd_card_paths]
+
+
+
+    for ft in file_transfers:
         ft.summary()
-        file_transfers.append(ft)
         
-    # Move files for all processed SD cards
+
     move = input('Do you want to move the files? (yes/no): ').strip().lower()
     if move in ['yes', 'y']:
         for ft in file_transfers:
+            logging.info('simulating moving the files')
             ft.move_files_to_output()
-        logging.info('Files moved successfully')
 
-# added functonality: sort the phantomdata, new reflectansepanel logic. write information to csv, for automatic infill of flight information. add better progressbar, folder size in metadata, uptade frequantly. 
+        logging.info('Files moved successfully')
+        final_user_input = input("Do you want to add flight to flight log?(yes/no)").strip().lower()
+        if final_user_input in ['yes', 'y']:
+            ft.update_main_csv()
+            laast = input("do you waant to wipe the sd cards?(yes/no)").strip().lower()
+            if laast in ['yes', 'y']:
+                for ft in file_transfers:
+                    ft._close_and_wipe_sd_cards()
+
+        
