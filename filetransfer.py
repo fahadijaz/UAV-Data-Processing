@@ -361,6 +361,7 @@ class FileTransfer:
             new_path_index = int(input("Enter the number corresponding to the flight whose path you want to use: "))
             if 0 <= flight_index < len(self.flights_folders) and 0 <= new_path_index < len(self.flights_folders):
                 self.flights_folders[flight_index]['output_path'] = self.flights_folders[new_path_index]['output_path']
+                self.flights_folders[flight_index]['flight_name'] =  [self.flights_folders[new_path_index]['flight_name'][0]]
                 logging.info(f"Updated: {self.flights_folders[flight_index]['dir_name']} to new location: {self.flights_folders[flight_index]['output_path']}")
             else:
                 logging.warning("Invalid indices entered. Please try again.")
@@ -374,6 +375,7 @@ class FileTransfer:
             if 0 <= flight_index < len(self.flights_folders) and 0 <= new_path_index < len(self.flights_folders):
                 temp = copy.deepcopy(self.flights_folders[flight_index])
                 temp['output_path'] = self.flights_folders[new_path_index]['output_path']
+                temp['flight_name'] =  [self.flights_folders[new_path_index]['flight_name'][0]]
                 self.flights_folders.append(temp)
                 logging.info(f"Duplicated: {self.flights_folders[flight_index]['dir_name']} to new location: {self.flights_folders[-1]['output_path']}")
             else:
@@ -402,7 +404,7 @@ class FileTransfer:
                 info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name'][0]]
                 output_path = os.path.join(self.output_path, '_SKYLINE\\'+ str(info['BasePath'].values[0]), f"{self.flights_folders[flight_index]['date']} {str(info['BaseName'].values[0])} {str(info['BaseDrone'].values[0])} {str(info['BaseHeight'].values[0])} {str(info['BaseType'].values[0])} {str(info['BaseOverlap'].values[0])}")
                 self.flights_folders[flight_index]['output_path'] = output_path
-                self.flights_folders[flight_index]['flight_name'] = [f"{self.flights_folders[flight_index]['flight_name'][0]}_trashed-flight"]
+                self.flights_folders[flight_index]['flight_name'] = [f"{self.flights_folders[flight_index]['flight_name'][0]}_skyline"]
                 logging.info(f"Moved to skyline: {self.flights_folders[flight_index]['dir_name']} to location: {self.flights_folders[flight_index]['output_path']}")
             else:
                 logging.warning("Invalid index entered. Please try again.")
@@ -545,7 +547,7 @@ class FileTransfer:
 
 if __name__ == "__main__":
     def detect_sd_cards() -> List[str]:
-        potential_paths = ["G:/DCIM", "I:/DCIM", "D:/DCIM"]
+        potential_paths = ["G:/DCIM", "I:/DCIM", "D:/DCIM", "E:/DCIM"]
         available_paths = [path for path in potential_paths if os.path.exists(path)]
         return available_paths
 
@@ -567,14 +569,15 @@ if __name__ == "__main__":
     move = input('Do you want to move the files? (yes/no): ').strip().lower()
     if move in ['yes', 'y']:
         for ft in file_transfers:
-            logging.info('simulating moving the files')
+            #logging.info('simulating moving the files')
             ft.move_files_to_output()
+            
 
         logging.info('Files moved successfully')
         final_user_input = input("Do you want to add flight to flight log?(yes/no)").strip().lower()
         if final_user_input in ['yes', 'y']:
             ft.update_main_csv()
-            laast = input("do you waant to wipe the sd cards?(yes/no)").strip().lower()
+            laast = input("do you want to wipe the sd cards?(yes/no)").strip().lower()
             if laast in ['yes', 'y']:
                 for ft in file_transfers:
                     ft._close_and_wipe_sd_cards()
