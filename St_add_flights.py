@@ -12,7 +12,7 @@ def load_file_transfers():
     st.session_state.data_loaded = False
 
     output_path = "P:\\PhenoCrop\\1_flights"
-    data_file = "P:\\PhenoCrop\\0_csv\\data_overview.csv"
+    data_file = "P:\\PhenoCrop\\0_csv\\flight_routes.csv"
     flight_log = "P:\\PhenoCrop\\0_csv\\flight_log.csv"
     sd_card_paths = ["G:/DCIM", "I:/DCIM", "D:/DCIM"]
     sd_card_paths = [path for path in sd_card_paths if os.path.exists(path)]
@@ -39,19 +39,12 @@ if 'data_loaded' not in st.session_state:
 def display_file_transfers():
     if st.session_state.file_transfers:
             ft = st.session_state.file_transfers[st.session_state.current_index]
-            st.text(f"SD Card {st.session_state.current_index + 1} - Path: {ft.input_path}")
-            st.text(len(st.session_state.file_transfers))
 
-            col1, col2 = st.columns([1, 2])  # Adjust the ratio as needed for your data
-            for i, flight in enumerate(ft.flights_folders):
-                with col1:
-                    st.text(f"{i}. from: {flight['dir_name']}")
-                with col2:
-                    st.text(f"to: {flight['output_path']}")
-
+            #st.text(len(st.session_state.file_transfers))
+            print_display(ft)
             if st.button('Edit this SD Card'):
                 st.session_state.edit_mode = True  # Toggle edit mode on
-                st.experimental_rerun()
+                st.rerun()
 
             if st.button('Next SD Card', on_click=lambda: next_sd_card()):
                 st.rerun()
@@ -61,6 +54,37 @@ def next_sd_card():
     if st.session_state.current_index < len(st.session_state.file_transfers) - 1:
         st.session_state.current_index += 1
         st.session_state.edit_mode = False  # Reset edit mode when moving to next card
+
+def print_display(ft):
+    st.text(f"SD Card {st.session_state.current_index + 1} - Path: {ft.input_path}")
+    col1, col2 = st.columns([1, 2])  # Adjust the ratio as needed for your data
+    for i, flight in enumerate(ft.flights_folders):
+        with col1:
+            st.text(f"{i}. from: {flight['dir_name']}")
+        with col2:
+            st.text(f"to: {flight['output_path']}")
+
+def edit_current_obj():
+    if st.session_state.file_transfers:
+            ft = st.session_state.file_transfers[st.session_state.current_index]
+            print_display(ft)
+            col1, col2, col3, col4, col5 = st.columns([1,1.5,1.5,4,8])
+            with col1:
+                if st.button("move"):
+                    pass
+            with col2:
+                if st.button("trash a folder"):
+                    pass
+            with col3:
+                if st.button("duplicate a folder"):
+                    pass
+            with col4:
+                if st.button("move to skyline"):
+                    pass
+            with col5:
+                if st.button("continue"):
+                    st.session_state.edit_mode = False
+                    st.rerun()
 
 def main():
     st.title("SD Card File Transfer Management")
@@ -75,9 +99,11 @@ def main():
         # Display all file transfers with an option to edit
         if st.session_state.file_transfers and not st.session_state.edit_mode:
             display_file_transfers()
-        
+
+        if st.session_state.edit_mode:
+            edit_current_obj()
         # Button to confirm all edits are done and ready to move files
-        if st.session_state.file_transfers and not st.session_state.ready_to_move and st.session_state.current_index == (len(st.session_state.file_transfers)-1):
+        if st.session_state.file_transfers and not st.session_state.ready_to_move and st.session_state.current_index == (len(st.session_state.file_transfers)-1) and not st.session_state.edit_mode:
             if st.button("Confirm All Edits"):
                 st.session_state.ready_to_move = True
                 st.success("Ready to move files. Please proceed with the final operation.")

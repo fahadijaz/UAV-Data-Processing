@@ -552,7 +552,7 @@ if __name__ == "__main__":
         return available_paths
 
     output_path = "P:\\PhenoCrop\\1_flights"
-    data_file = "P:\\PhenoCrop\\0_csv\\data_overview.csv"
+    data_file = "P:\\PhenoCrop\\0_csv\\flight_routes.csv"
     flight_log = "P:\\PhenoCrop\\0_csv\\flight_log.csv"
 
     sd_card_paths = detect_sd_cards()
