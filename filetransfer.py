@@ -43,8 +43,9 @@ class FileTransfer:
             logging.warning("Data overview file not found. Created a new CSV file.")
 
     @staticmethod
-    def _load_flight_log(log_file):
-        if os.path.exists(log_file):
+    def _load_flight_log(log_file, whipe_index=False):
+
+        if os.path.exists(log_file) and whipe_index is False:
             flight_log = pd.read_csv(log_file)
         else:
             flight_log = pd.DataFrame(columns=[
@@ -527,6 +528,8 @@ class FileTransfer:
             #---------------------------
             new_log = pd.concat([main_log,temp_log],ignore_index=True)
             new_log.to_csv(self.flight_log_file, index=False)
+            self._load_flight_log(self.temp_log_file,whipe_index=True)
+
 
             logging.info("Main flight log updated successfully.")
         except Exception as e:
