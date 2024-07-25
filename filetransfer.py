@@ -307,7 +307,7 @@ class FileTransfer:
                     else:
                         logging.warning(f"No matching route found for flight folder: {folder['dir_name']}")
                 else:
-                    output_path = os.path.join(self.output_path,'_NO_MATCH')
+                    output_path = os.path.join(self.output_path,'_TRASHCAN\\_NO_MATCH')
                     self.flights_folders[i]['output_path'] = output_path
                     self.flights_folders[i]['flight_name'] = ['no_matching_name']
                     self.flights_folders[i]['height'] = '0m' # update to metadata image height
@@ -482,59 +482,60 @@ class FileTransfer:
 
             for flight in self.flights_folders:
                     #logging.info(f'to {flight}')
-                    dir_name = flight['dir_name']
-                    flight_name = str(flight['flight_name'][0])
-                    date = flight['date']
-                    folder_ID = flight['folder_ID']
-                    # Explicitly convert start_time and end_time to integers
-                    start_time = int(flight['start_time'])
-                    end_time = int(flight['end_time'])
-                    flight_type = flight['type']
-                    num_files = str(flight['num_files'])
-                    num_dir = 1
-                    output_path = flight['output_path']
-                    height = flight['height']
-                    # Find existing entry with the same date and flight name
-                    
-                    # Assuming 'date' should be treated as a string for comparison
-                    existing_entry = df[(df['date'].astype(str) == str(date)) & (df['flight_name'].astype(str) == str(flight_name))]
+                    if flight['flight_name'][0] != 'no_matching_name':
+                        dir_name = flight['dir_name']
+                        flight_name = str(flight['flight_name'][0])
+                        date = flight['date']
+                        folder_ID = flight['folder_ID']
+                        # Explicitly convert start_time and end_time to integers
+                        start_time = int(flight['start_time'])
+                        end_time = int(flight['end_time'])
+                        flight_type = flight['type']
+                        num_files = str(flight['num_files'])
+                        num_dir = 1
+                        output_path = flight['output_path']
+                        height = flight['height']
+                        # Find existing entry with the same date and flight name
+                        
+                        # Assuming 'date' should be treated as a string for comparison
+                        existing_entry = df[(df['date'].astype(str) == str(date)) & (df['flight_name'].astype(str) == str(flight_name))]
 
-                    #logging.info(existing_entry)
-                    
-                    if not existing_entry.empty:
-                        # Update existing entry
-                        idx = existing_entry.index[0]
-                        df.at[idx, 'start_time'] = min(df.at[idx, 'start_time'], start_time)
-                        df.at[idx, 'end_time'] = max(df.at[idx, 'end_time'], end_time)
+                        #logging.info(existing_entry)
+                        
+                        if not existing_entry.empty:
+                            # Update existing entry
+                            idx = existing_entry.index[0]
+                            df.at[idx, 'start_time'] = min(df.at[idx, 'start_time'], start_time)
+                            df.at[idx, 'end_time'] = max(df.at[idx, 'end_time'], end_time)
 
-                        df.at[idx, 'dir_name'] += f", {dir_name}"
-                        df.at[idx, 'folder_ID'] += f", {folder_ID}"
-                        df.at[idx, 'type'] += f", {flight_type}"
-                        df.at[idx, 'num_files'] += f", {num_files}"
-                        df.at[idx, 'num_dir'] += num_dir
+                            df.at[idx, 'dir_name'] += f", {dir_name}"
+                            df.at[idx, 'folder_ID'] += f", {folder_ID}"
+                            df.at[idx, 'type'] += f", {flight_type}"
+                            df.at[idx, 'num_files'] += f", {num_files}"
+                            df.at[idx, 'num_dir'] += num_dir
 
-                        # Compare and update start_time and end_time
-                    else:
-                        # Add new entry
-                        flight_ID = uuid.uuid4()
-                        new_entry = {
-                            "flight_ID":flight_ID,
-                            "dir_name": dir_name,
-                            "flight_name": flight_name,
-                            "date": date,
-                            "folder_ID": folder_ID,
-                            "start_time": start_time,
-                            "end_time": end_time,
-                            "type": flight_type,
-                            "num_files": num_files,
-                            "num_dir": num_dir,
-                            "output_path": output_path,
-                            "height": height,
-                            "drone_pilot":"",
-                            "drone":""
-                        }
-                        new_entry = pd.DataFrame([new_entry])
-                        df = pd.concat([df,new_entry], ignore_index=True)
+                            # Compare and update start_time and end_time
+                        else:
+                            # Add new entry
+                            flight_ID = uuid.uuid4()
+                            new_entry = {
+                                "flight_ID":flight_ID,
+                                "dir_name": dir_name,
+                                "flight_name": flight_name,
+                                "date": date,
+                                "folder_ID": folder_ID,
+                                "start_time": start_time,
+                                "end_time": end_time,
+                                "type": flight_type,
+                                "num_files": num_files,
+                                "num_dir": num_dir,
+                                "output_path": output_path,
+                                "height": height,
+                                "drone_pilot":"",
+                                "drone":""
+                            }
+                            new_entry = pd.DataFrame([new_entry])
+                            df = pd.concat([df,new_entry], ignore_index=True)
 
             df.to_csv(self.temp_log_file, index=False)
             self._load_flight_log(self.temp_log_file)
@@ -591,9 +592,9 @@ if __name__ == "__main__":
     move = input('Do you want to move the files? (yes/no): ').strip().lower()
     if move in ['yes', 'y']:
         for ft in file_transfers:
-            logging.info('simulating moving the files')
-            #ft.move_files_to_output()
-            ft._save_flight_log()
+            #logging.info('simulating moving the files')
+            ft.move_files_to_output()
+            #ft._save_flight_log()
             
 
         logging.info('Files moved successfully')
