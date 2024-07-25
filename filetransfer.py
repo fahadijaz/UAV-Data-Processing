@@ -9,6 +9,7 @@ from threading import Thread
 from queue import Queue
 from datetime import datetime
 from typing import List, Tuple
+import uuid
 
 
 # Configure logging
@@ -38,7 +39,7 @@ class FileTransfer:
             self.data_overview = pd.read_csv(self.data_overview_file)
             logging.info(f"Csv loaded successfully: {self.data_overview_file}")
         else:
-            self.data_overview = pd.DataFrame(columns=['FlightRoute', 'BasePath', 'BaseName'])
+            self.data_overview = pd.DataFrame(columns=['FlightRoute', 'BasePath', 'BaseName', 'BaseDrone', 'BaseHeight', 'BaseType', 'BaseOverlap','CameraAngle','Speed'])
             self.data_overview.to_csv(self.data_overview_file, index=False)
             logging.warning("Data overview file not found. Created a new CSV file.")
 
@@ -49,7 +50,7 @@ class FileTransfer:
             flight_log = pd.read_csv(log_file)
         else:
             flight_log = pd.DataFrame(columns=[
-                "dir_name", "flight_name", "date", "folder_ID", "start_time",
+                "flight_ID","dir_name", "flight_name", "date", "folder_ID", "start_time",
                 "end_time", "type", "num_files", "num_dir", "output_path", "height"
             ])
             flight_log.to_csv(log_file, index=False)
@@ -265,7 +266,7 @@ class FileTransfer:
             logging.info(f"New flight route detected: {flight_route}")
             add_route = input(f"Do you want to add the flight route '{flight_route}' to the CSV file? (yes/no): ").strip().lower()
             if add_route in ['yes', 'y']:
-                base_name = input("Enter the corresponding base information for this flight route(foldername|drone|height|type|overlap): ").strip()
+                base_name = input("Enter the corresponding base information for this flight route(foldername|drone|height|type|overlap|camera angle|speed): ").strip()
                 self._add_flight_route_to_csv(flight_route, base_name)
             else:
                 raise ValueError(f"Flight route '{flight_route}' not added. Please update the CSV file to continue.")
@@ -280,10 +281,12 @@ class FileTransfer:
             base_height = info[2]
             base_type = info[3]
             base_overlap = f'{info[4]} {info[5]}'
+            Camera_angle = info[6]
+            speed = info[7]
             base_path = f'{base_name}/{base_type}'
             new_entry = pd.DataFrame([{
                 'FlightRoute': flight_route, 'BasePath': base_path, 'BaseName': base_name,
-                'BaseDrone': base_drone, 'BaseHeight': base_height, 'BaseType': base_type, 'BaseOverlap': base_overlap
+                'BaseDrone': base_drone, 'BaseHeight': base_height, 'BaseType': base_type, 'BaseOverlap': base_overlap, 'CameraAngle': Camera_angle, 'Speed':speed
             }])
             self.data_overview = pd.concat([self.data_overview, new_entry], ignore_index=True)
             self.data_overview.to_csv(self.data_overview_file, index=False)
@@ -355,10 +358,14 @@ class FileTransfer:
         except Exception as e:
             logging.error(f"Error editing paths: {e}")
 
-    def _move_path(self):
+    def _move_path(self, streamlit_mode=False, flight_index=None, new_path_index=None):
         try:
-            flight_index = int(input("Enter the number corresponding to the flight you want to edit: "))
-            new_path_index = int(input("Enter the number corresponding to the flight whose path you want to use: "))
+            if streamlit_mode:
+                flight_index = flight_index
+                new_path_index = new_path_index
+            else:
+                flight_index = int(input("Enter the number corresponding to the flight you want to edit: "))
+                new_path_index = int(input("Enter the number corresponding to the flight whose path you want to use: "))
             if 0 <= flight_index < len(self.flights_folders) and 0 <= new_path_index < len(self.flights_folders):
                 self.flights_folders[flight_index]['output_path'] = self.flights_folders[new_path_index]['output_path']
                 self.flights_folders[flight_index]['flight_name'] =  [self.flights_folders[new_path_index]['flight_name'][0]]
@@ -368,10 +375,14 @@ class FileTransfer:
         except ValueError:
             logging.error("Invalid input. Please enter numbers corresponding to the flight indices.")
 
-    def _duplicate_path(self):
+    def _duplicate_path(self, streamlit_mode=False, flight_index=None, new_path_index=None):
         try:
-            flight_index = int(input("Enter the number corresponding to the flight you want to duplicate: "))
-            new_path_index = int(input("Enter the number corresponding to the flight whose path you want to use: "))
+            if streamlit_mode:
+                flight_index = flight_index
+                new_path_index = new_path_index
+            else:
+                flight_index = int(input("Enter the number corresponding to the flight you want to duplicate: "))
+                new_path_index = int(input("Enter the number corresponding to the flight whose path you want to use: "))
             if 0 <= flight_index < len(self.flights_folders) and 0 <= new_path_index < len(self.flights_folders):
                 temp = copy.deepcopy(self.flights_folders[flight_index])
                 temp['output_path'] = self.flights_folders[new_path_index]['output_path']
@@ -383,9 +394,12 @@ class FileTransfer:
         except ValueError:
             logging.error("Invalid input. Please enter numbers corresponding to the flight indices.")
 
-    def _trash_path(self):
+    def _trash_path(self, streamlit_mode=False, flight_index=None):
         try:
-            flight_index = int(input("Enter the number corresponding to the flight you want to trash: "))
+            if streamlit_mode:
+                flight_index = flight_index
+            else:
+                flight_index = int(input("Enter the number corresponding to the flight you want to trash: "))
             if 0 <= flight_index < len(self.flights_folders):
                 info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name'][0]]
                 output_path = os.path.join(self.output_path, '_TRASHCAN\\'+ str(info['BasePath'].values[0]), f"{self.flights_folders[flight_index]['date']} {str(info['BaseName'].values[0])} {str(info['BaseDrone'].values[0])} {str(info['BaseHeight'].values[0])} {str(info['BaseType'].values[0])} {str(info['BaseOverlap'].values[0])}")
@@ -397,9 +411,12 @@ class FileTransfer:
         except ValueError:
             logging.error("Invalid input. Please enter numbers corresponding to the flight indices.")
 
-    def _skyline_path(self):
+    def _skyline_path(self, streamlit_mode=False, flight_index=None):
         try:
-            flight_index = int(input("Enter the number corresponding to the flight you want to move to skyline: "))
+            if streamlit_mode:
+                flight_index = flight_index
+            else:
+                flight_index = int(input("Enter the number corresponding to the flight you want to move to skyline: "))
             if 0 <= flight_index < len(self.flights_folders):
                 info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name'][0]]
                 output_path = os.path.join(self.output_path, '_SKYLINE\\'+ str(info['BasePath'].values[0]), f"{self.flights_folders[flight_index]['date']} {str(info['BaseName'].values[0])} {str(info['BaseDrone'].values[0])} {str(info['BaseHeight'].values[0])} {str(info['BaseType'].values[0])} {str(info['BaseOverlap'].values[0])}")
@@ -483,6 +500,7 @@ class FileTransfer:
                     existing_entry = df[(df['date'].astype(str) == str(date)) & (df['flight_name'].astype(str) == str(flight_name))]
 
                     #logging.info(existing_entry)
+                    
                     if not existing_entry.empty:
                         # Update existing entry
                         idx = existing_entry.index[0]
@@ -498,7 +516,9 @@ class FileTransfer:
                         # Compare and update start_time and end_time
                     else:
                         # Add new entry
+                        flight_ID = uuid.uuid4()
                         new_entry = {
+                            "flight_ID":flight_ID,
                             "dir_name": dir_name,
                             "flight_name": flight_name,
                             "date": date,
@@ -509,7 +529,9 @@ class FileTransfer:
                             "num_files": num_files,
                             "num_dir": num_dir,
                             "output_path": output_path,
-                            "height": height
+                            "height": height,
+                            "drone_pilot":"",
+                            "drone":""
                         }
                         new_entry = pd.DataFrame([new_entry])
                         df = pd.concat([df,new_entry], ignore_index=True)
@@ -569,8 +591,9 @@ if __name__ == "__main__":
     move = input('Do you want to move the files? (yes/no): ').strip().lower()
     if move in ['yes', 'y']:
         for ft in file_transfers:
-            #logging.info('simulating moving the files')
-            ft.move_files_to_output()
+            logging.info('simulating moving the files')
+            #ft.move_files_to_output()
+            ft._save_flight_log()
             
 
         logging.info('Files moved successfully')
