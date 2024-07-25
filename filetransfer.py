@@ -4,7 +4,7 @@ import logging
 import pandas as pd
 import copy
 import subprocess
-from tqdm import tqdm
+#from tqdm import tqdm
 from threading import Thread
 from queue import Queue
 from datetime import datetime
@@ -446,13 +446,13 @@ class FileTransfer:
         q = Queue()
         threads = []
 
-        pbar = tqdm(total=total_folders, desc="Moving directories", unit="dir")
+        #pbar = tqdm(total=total_folders, desc="Moving directories", unit="dir")
 
         def worker():
             while not q.empty():
                 source_path, destination_path = q.get()
                 self.move_directory(source_path, destination_path)
-                pbar.update(1)
+                #pbar.update(1)
                 q.task_done()
 
         for flight in self.flights_folders:
@@ -468,7 +468,7 @@ class FileTransfer:
         for t in threads:
             t.join()
 
-        pbar.close()
+        #pbar.close()
         self._save_flight_log()
         
 
