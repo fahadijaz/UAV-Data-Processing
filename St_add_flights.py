@@ -220,5 +220,5 @@ def main():
                     ft.update_main_csv()
                     ft._close_and_wipe_sd_cards()
 
-if __name__ == "__main__":
-    main()
+
+main()
