@@ -40,6 +40,13 @@ if 'data_loaded' not in st.session_state:
     st.session_state.data_loaded = False
 if 'move_mode' not in st.session_state:
     st.session_state.move_mode = False
+if 'dupe_mode' not in st.session_state:
+    st.session_state.dupe_mode = False
+if 'trash_mode' not in st.session_state:
+    st.session_state.trash_mode = False
+if 'skyline_mode' not in st.session_state:
+    st.session_state.skyline_mode = False
+
 
 
 def display_file_transfers():
@@ -87,13 +94,20 @@ def edit_current_obj():
                 
             with col2:
                 if st.button("trash a folder"):
-                    pass
+                    st.session_state.edit_mode = False
+                    st.session_state.trash_mode = True
+                    st.rerun()
             with col3:
                 if st.button("duplicate a folder"):
-                    pass
+                    st.session_state.edit_mode = False
+                    st.session_state.dupe_mode = True
+                    st.rerun()
+    
             with col4:
                 if st.button("move to skyline"):
-                    pass
+                    st.session_state.edit_mode = False
+                    st.session_state.skyline_mode = True
+                    st.rerun()
             with col5:
                 if st.button("continue"):
                     st.session_state.edit_mode = False
@@ -113,6 +127,49 @@ def move():
             st.session_state.move_mode = False
             st.rerun()
 
+
+def trash():
+    if st.session_state.file_transfers:
+        ft = st.session_state.file_transfers[st.session_state.current_index]
+        print_display(ft)
+        
+        
+        flight_index = st.text_input('Flight to trash:')
+
+        if st.button('confirm') and flight_index:
+            ft._trash_path(streamlit_mode=True, flight_index=int(flight_index))
+            st.session_state.edit_mode = True
+            st.session_state.trash_mode = False
+            st.rerun()
+def dupe():
+    if st.session_state.file_transfers:
+        ft = st.session_state.file_transfers[st.session_state.current_index]
+        print_display(ft)
+        col01, col02 = st.columns(2)
+        with col01:
+            flight_index = st.text_input('From:')
+        with col02:
+            new_path_index = st.text_input('To:')
+        if st.button('confirm') and flight_index and new_path_index:
+            ft._duplicate_path(streamlit_mode=True, flight_index=int(flight_index),new_path_index=int(new_path_index))
+            st.session_state.edit_mode = True
+            st.session_state.dupe_mode = False
+            st.rerun()
+
+def skyline():
+    if st.session_state.file_transfers:
+        ft = st.session_state.file_transfers[st.session_state.current_index]
+        print_display(ft)
+
+
+        flight_index = st.text_input('Flight move to skyline:')
+
+        if st.button('confirm') and flight_index:
+            ft._skyline_path(streamlit_mode=True, flight_index=int(flight_index))
+            st.session_state.edit_mode = True
+            st.session_state.skyline_mode = False
+            st.rerun()
+
 def main():
     st.title("SD Card File Transfer Management")
     
@@ -125,8 +182,17 @@ def main():
 
     if st.session_state.data_loaded:
         # Display all file transfers with an option to edit
-        if st.session_state.file_transfers and not st.session_state.edit_mode and not st.session_state.move_mode:
+        if st.session_state.file_transfers and not st.session_state.edit_mode and not st.session_state.move_mode and not st.session_state.dupe_mode and not st.session_state.trash_mode and not st.session_state.skyline_mode:
             display_file_transfers()
+
+        if st.session_state.skyline_mode:
+            skyline()
+
+        if st.session_state.trash_mode:
+            trash()
+
+        if st.session_state.dupe_mode:
+            dupe()
 
         if st.session_state.move_mode:
             move()
@@ -143,11 +209,16 @@ def main():
         if st.session_state.ready_to_move:
             if st.button("Move All Files"): #### add check if session index == len( objs -1)!!!
                 for ft in st.session_state.file_transfers:
-                    ft.move_files_to_output()
+                    st.text('simulating moving files')
+                    #ft.move_files_to_output()
+                    ft._save_flight_log()
                 st.success("Files moved successfully. Process completed.")
                 # Optionally reset the application or close operations
                 st.session_state.file_transfers = []
                 st.session_state.ready_to_move = False
+                if st.button('save log and whipe sd card'):
+                    ft.update_main_csv()
+                    ft._close_and_wipe_sd_cards()
 
 if __name__ == "__main__":
     main()
