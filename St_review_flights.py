@@ -1,36 +1,30 @@
 import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
+from modules.flight_log_preprocessing import preprocessing
 
+df_flight_log, df_flight_routes, df_fields, df_flight_log_merged = preprocessing()
 
-# Loading and preprocessing dataset
-flight_log = pd.read_csv("Flight Log.csv")
+#df_flight_log_merged
 
-flight_log = flight_log.rename(columns={"ID": "Field ID"})
-
-flight_log['Index'] = range(1, len(flight_log) + 1)
-
-flight_log_selection = flight_log.copy()
-
-# Fixing the date formatting
-flight_log_selection["Flight Date"] = pd.to_datetime(flight_log_selection["Flight Date"] + "-2024", format="%d-%b-%Y").dt.date
-
+flight_log_selection = df_flight_log_merged.copy()
 
 # Options for input fields
-field_IDs = ("PHENO", "PROTVOLL", "DIVERSITY", "FRONTIERS", "PILOT", "E166", "SØRÅS", "HIGHGRASS", "FABA")
-route_types = ("3D", "MS")
+excluded_field_IDs = ["Proteinbar NAPE", "GENE2BREAD", "High Grass", "Faba Bean"]
+field_IDs = [value for value in df_fields["LongName"] if value not in excluded_field_IDs]
+route_types = ("3D", "MS", "phantom-MS")
 drone_pilots = ("Fahad", "Isak", "Sindre")
 
 # Creating input fields
-input_field = st.selectbox("Field ID", field_IDs, index=None, placeholder="Field ID", label_visibility="collapsed")
+input_field = st.selectbox("Field", field_IDs, index=None, placeholder="Field", label_visibility="collapsed")
 input_date_start = st.date_input("Date from")
 input_date_end = st.date_input("Date to")
 input_type = st.selectbox("Route Type", route_types, index=None, placeholder="Route Type", label_visibility="collapsed")
 input_pilot = st.selectbox("Drone Pilot", drone_pilots, index=None, placeholder="Drone Pilot", label_visibility="collapsed")
 
 # Storing the user inputs in a dictionary
-inputs_dict = {"Field ID": input_field, "Flight Date": [input_date_start, input_date_end], 
-                "Route type": input_type, "Drone Pilot": input_pilot}
+inputs_dict = {"LongName": input_field, "date": [input_date_start, input_date_end], 
+                "image_type_keyword": input_type, "drone_pilot": input_pilot}
 
 # Changing the dataset flight_log_selection in accordance with user inputs
 for input_name in inputs_dict:
@@ -40,7 +34,7 @@ for input_name in inputs_dict:
         #if input != None & input != input_date_start & input != input_date_end:
             flight_log_selection = flight_log_selection[flight_log_selection[input_name] == input]
 
-#st.write(flight_log_selection[["Field ID", "Flight Date", "Route type", "Drone Pilot"]], escape=False, unsafe_allow_html=True)
+#st.write(flight_log_selection[["Field ID", "date", "Route type", "Drone Pilot"]], escape=False, unsafe_allow_html=True)
 
 
 # Displaying the selected drone flights
@@ -96,9 +90,8 @@ css = """
 """
 
 html_content = css
-
 html_content += """<table class='flight_log_table' border=1><tr class="flight_log_header"><th></th>"""
-for name in flight_log_selection[["Field ID", "Flight Date", "Route type", "Drone Pilot"]].columns:
+for name in ["Field", "Date", "Image Type", "Drone Pilot"]:
     html_content += f"""
         <td class="flight_log_header_cell">{name}</th>
     """
@@ -106,14 +99,14 @@ for name in flight_log_selection[["Field ID", "Flight Date", "Route type", "Dron
 html_content += """</tr>"""
 
 
-for index, row in flight_log_selection[["Index", "Field ID", "Flight Date", "Route type", "Drone Pilot"]].iterrows():
+for index, row in flight_log_selection.iterrows():
     html_content += f"""
         <tr class="flight_log_entry">
-            <td class="flight_log_link_cell"><a href="http://localhost:8502?Index={row['Index']}" target="_blank"><img src="https://cdn-icons-png.flaticon.com/128/3388/3388930.png"></a></td>
-            <td class="flight_log_cell">{row['Field ID']}</td>
-            <td class="flight_log_cell">{row['Flight Date']}</td>
-            <td class="flight_log_cell">{row['Route type']}</td>
-            <td class="flight_log_cell">{row['Drone Pilot']}</td>
+            <td class="flight_log_link_cell"><a href="http://localhost:8502?Index={row['flight_ID']}" target="_blank"><img src="https://cdn-icons-png.flaticon.com/128/3388/3388930.png"></a></td>
+            <td class="flight_log_cell">{row['LongName']}</td>
+            <td class="flight_log_cell">{row['date']}</td>
+            <td class="flight_log_cell">{row['image_type_keyword']}</td>
+            <td class="flight_log_cell">{row['drone_pilot']}</td>
         </tr>
         """
 

@@ -5,7 +5,7 @@ import os
 st.set_page_config(layout="wide")
 
 def look_for_sd_cards():
-    sd_card_paths = ["G:/DCIM", "I:/DCIM", "D:/DCIM"]
+    sd_card_paths = ["G:/DCIM", "I:/DCIM", "D:/DCIM", "E:/DCIM"]
     return [path for path in sd_card_paths if os.path.exists(path)]
 
 def load_file_transfers():
@@ -220,5 +220,4 @@ def main():
                     ft.update_main_csv()
                     ft._close_and_wipe_sd_cards()
 
-if __name__ == "__main__":
-    main()
+main()
