@@ -220,4 +220,5 @@ def main():
                     ft.update_main_csv()
                     ft._close_and_wipe_sd_cards()
 
+
 main()
