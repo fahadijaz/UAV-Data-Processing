@@ -38,6 +38,9 @@ if 'edit_mode' not in st.session_state:
     st.session_state.edit_mode = False
 if 'data_loaded' not in st.session_state:
     st.session_state.data_loaded = False
+if 'move_mode' not in st.session_state:
+    st.session_state.move_mode = False
+
 
 def display_file_transfers():
     if st.session_state.file_transfers:
@@ -78,14 +81,9 @@ def edit_current_obj():
             col1, col2, col3, col4, col5 = st.columns([1,1.5,1.5,4,8])
             with col1:
                 if st.button("move"):
-                    col01, col02 = st.columns(2)
-                    with col01:
-                        flight_index = st.number_input('From:', min_value=0)
-                    with col02:
-                        new_path_index = st.number_input('To:',min_value=0)
-                    if st.button('confirm'):
-                        ft._move_path(streamlit_mode=True, flight_index=int(flight_index),new_path_index=int(new_path_index))
-                        st.rerun()
+                    st.session_state.edit_mode = False
+                    st.session_state.move_mode = True
+                    st.rerun()
                 
             with col2:
                 if st.button("trash a folder"):
@@ -100,6 +98,20 @@ def edit_current_obj():
                 if st.button("continue"):
                     st.session_state.edit_mode = False
                     st.rerun()
+def move():
+    if st.session_state.file_transfers:
+        ft = st.session_state.file_transfers[st.session_state.current_index]
+        print_display(ft)
+        col01, col02 = st.columns(2)
+        with col01:
+            flight_index = st.text_input('From:')
+        with col02:
+            new_path_index = st.text_input('To:')
+        if st.button('confirm') and flight_index and new_path_index:
+            ft._move_path(streamlit_mode=True, flight_index=int(flight_index),new_path_index=int(new_path_index))
+            st.session_state.edit_mode = True
+            st.session_state.move_mode = False
+            st.rerun()
 
 def main():
     st.title("SD Card File Transfer Management")
@@ -113,8 +125,11 @@ def main():
 
     if st.session_state.data_loaded:
         # Display all file transfers with an option to edit
-        if st.session_state.file_transfers and not st.session_state.edit_mode:
+        if st.session_state.file_transfers and not st.session_state.edit_mode and not st.session_state.move_mode:
             display_file_transfers()
+
+        if st.session_state.move_mode:
+            move()
 
         if st.session_state.edit_mode:
             edit_current_obj()
