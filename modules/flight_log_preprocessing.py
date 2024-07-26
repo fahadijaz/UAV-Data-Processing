@@ -11,11 +11,10 @@ def preprocessing():
     # Fixing the date formatting
     df_flight_log['date'] = pd.to_datetime(df_flight_log['date'], format='%Y%m%d').dt.date
 
-    """
+    
     # Function to convert HHMMSS to datetime.time
     def convert_to_time(time_str):
-        time_str2 = str(time_str)
-        time_str = str(time_str)
+        time_str = str(time_str).zfill(6) # Fixes the fact that sometimes, the start_time in the csv only has 5 digits.
         # Ensure the string is of the correct length and format
         if len(time_str) == 6:
             hours = int(time_str[:2])
@@ -23,13 +22,13 @@ def preprocessing():
             seconds = int(time_str[4:])
             return time(hour=hours, minute=minutes, second=seconds)
         else:
-            print(time_str2)
             print(time_str)
             raise ValueError("Time string must be in HHMMSS format")
     
     # Fixing the time formatting by applying the function
     df_flight_log['start_time'] = df_flight_log['start_time'].apply(convert_to_time)
-    """
+    df_flight_log['end_time'] = df_flight_log['end_time'].apply(convert_to_time)
+    
 
     # Merging dataframes
     df_merged_flight_log_flight_routes = pd.merge(df_flight_log, df_flight_routes, left_on='flight_name', right_on='FlightRoute')

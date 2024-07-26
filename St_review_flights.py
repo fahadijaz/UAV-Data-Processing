@@ -2,6 +2,7 @@ import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 from modules.flight_log_preprocessing import preprocessing
+import datetime
 
 df_flight_log, df_flight_routes, df_fields, df_flight_log_merged = preprocessing()
 
@@ -17,7 +18,7 @@ drone_pilots = ("Fahad", "Isak", "Sindre")
 
 # Creating input fields
 input_field = st.selectbox("Field", field_IDs, index=None, placeholder="Field", label_visibility="collapsed")
-input_date_start = st.date_input("Date from")
+input_date_start = st.date_input("Date from", datetime.date(datetime.datetime.now().year, 1, 1))
 input_date_end = st.date_input("Date to")
 input_type = st.selectbox("Route Type", route_types, index=None, placeholder="Route Type", label_visibility="collapsed")
 input_pilot = st.selectbox("Drone Pilot", drone_pilots, index=None, placeholder="Drone Pilot", label_visibility="collapsed")
@@ -33,6 +34,8 @@ for input_name in inputs_dict:
         if type(input) is not list:
         #if input != None & input != input_date_start & input != input_date_end:
             flight_log_selection = flight_log_selection[flight_log_selection[input_name] == input]
+        else:
+            flight_log_selection = flight_log_selection[(flight_log_selection['date'] >= input[0]) & (flight_log_selection['date'] <= input[1])]
 
 #st.write(flight_log_selection[["Field ID", "date", "Route type", "Drone Pilot"]], escape=False, unsafe_allow_html=True)
 
