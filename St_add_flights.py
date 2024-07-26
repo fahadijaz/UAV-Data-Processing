@@ -1,5 +1,6 @@
 import streamlit as st
 from filetransfer import FileTransfer
+import subprocess
 import os
 
 st.set_page_config(layout="wide")
@@ -46,7 +47,6 @@ if 'trash_mode' not in st.session_state:
     st.session_state.trash_mode = False
 if 'skyline_mode' not in st.session_state:
     st.session_state.skyline_mode = False
-
 
 
 def display_file_transfers():
@@ -169,14 +169,16 @@ def skyline():
             st.session_state.edit_mode = True
             st.session_state.skyline_mode = False
             st.rerun()
+    
+
 
 def main():
     st.title("SD Card File Transfer Management")
-    
     with st.sidebar:
+        
         st.header("Drone Details")
-        st.session_state.drone_pilot = st.selectbox('Select Drone Pilot', ['Sindre', 'Isak', 'Fahad'])
-        st.session_state.drone_model = st.selectbox('Select Drone Model', ['M3M-1', 'M3M-2', 'P4M-1', 'P4M-2', 'P4M-3'])
+        st.session_state.drone_pilot = st.selectbox('Select Drone Pilot', ['choose a drone pilot', 'Mathias','Sindre', 'Isak', 'Fahad'], index=0)
+        st.session_state.drone_model = st.selectbox('Select Drone Model', ['choose a drone','M3M-1', 'M3M-2', 'P4M-1', 'P4M-2', 'P4M-3'], index=0)
 
     # Button to load SD cards
     if st.button("Load SD Cards"):
@@ -216,7 +218,7 @@ def main():
                 for ft in st.session_state.file_transfers:
                     st.text('simulating moving files')
                     ft.move_files_to_output(streamlit_mode=True)
-                    ft._save_flight_log(streamlit_mode=True)
+                    ft._save_flight_log(streamlit_mode=True, drone_pilot=st.session_state.drone_pilot, drone=st.session_state.drone_model)
                 st.success("Files moved successfully. Process completed.")
                 # Optionally reset the application or close operations
                 st.session_state.file_transfers = []
