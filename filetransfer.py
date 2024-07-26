@@ -180,7 +180,7 @@ class FileTransfer:
                     reflectance_panel = self.flights_folders[n]
 
                     for ms_flight in self.flights_folders:
-                        if ms_flight['type'] == 'MS' and not ms_flight['reflectance_assigned']:
+                        if ms_flight['type'] == 'MS': # and not ms_flight['reflectance_assigned']:  assing to the closest no matter if the flight has reflectanse assigned.# make test to se if all ms has reflectanse
                             panel_start_time = datetime.strptime(reflectance_panel['start_time'], '%H%M%S')
                             panel_end_time = datetime.strptime(reflectance_panel['end_time'], '%H%M%S')
                             ms_start_time = datetime.strptime(ms_flight['start_time'], '%H%M%S')
@@ -418,11 +418,17 @@ class FileTransfer:
             else:
                 flight_index = int(input("Enter the number corresponding to the flight you want to move to skyline: "))
             if 0 <= flight_index < len(self.flights_folders):
-                info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name'][0]]
-                output_path = os.path.join(self.output_path, '_SKYLINE\\'+ str(info['BasePath'].values[0]), f"{self.flights_folders[flight_index]['date']} {str(info['BaseName'].values[0])} {str(info['BaseDrone'].values[0])} {str(info['BaseHeight'].values[0])} {str(info['BaseType'].values[0])} {str(info['BaseOverlap'].values[0])}")
-                self.flights_folders[flight_index]['output_path'] = output_path
-                self.flights_folders[flight_index]['flight_name'] = [f"{self.flights_folders[flight_index]['flight_name'][0]}_skyline"]
-                logging.info(f"Moved to skyline: {self.flights_folders[flight_index]['dir_name']} to location: {self.flights_folders[flight_index]['output_path']}")
+                if self.flights_folders[flight_index]['flight_name'][0]!='no_matching_name':
+                    info = self.data_overview.loc[self.data_overview['FlightRoute'] == self.flights_folders[flight_index]['flight_name'][0]]
+                    output_path = os.path.join(self.output_path, '_SKYLINE\\'+ str(info['BasePath'].values[0]), f"{self.flights_folders[flight_index]['date']} {str(info['BaseName'].values[0])} {str(info['BaseDrone'].values[0])} {str(info['BaseHeight'].values[0])} {str(info['BaseType'].values[0])} {str(info['BaseOverlap'].values[0])}")
+                    self.flights_folders[flight_index]['output_path'] = output_path
+                    self.flights_folders[flight_index]['flight_name'] = [f"{self.flights_folders[flight_index]['flight_name'][0]}_skyline"]
+                    logging.info(f"Moved to skyline: {self.flights_folders[flight_index]['dir_name']} to location: {self.flights_folders[flight_index]['output_path']}")
+                else:
+                    output_path = os.path.join(self.output_path, '_SKYLINE', self.flights_folders[flight_index]['date'])
+                    self.flights_folders[flight_index]['output_path'] = output_path
+                    self.flights_folders[flight_index]['flight_name'] = [f"{self.flights_folders[flight_index]['flight_name'][0]}_skyline"]
+                    logging.info(f"Moved to skyline: {self.flights_folders[flight_index]['dir_name']} to location: {self.flights_folders[flight_index]['output_path']}")
             else:
                 logging.warning("Invalid index entered. Please try again.")
         except Exception as e:
@@ -441,7 +447,7 @@ class FileTransfer:
         except Exception as e:
             logging.error(f"Exception moving {source_path} to {destination_path}: {e}")
 
-    def move_files_to_output(self):
+    def move_files_to_output(self, streamlit_mode=False):
         total_folders = len(self.flights_folders)
         q = Queue()
         threads = []
@@ -469,10 +475,11 @@ class FileTransfer:
             t.join()
 
         #pbar.close()
-        self._save_flight_log()
+        if not streamlit_mode:
+            self._save_flight_log()
         
 
-    def _save_flight_log(self):
+    def _save_flight_log(self, streamlit_mode=False, drone_pilot=None,drone=None):
         
         try:
             df = pd.read_csv(self.temp_log_file)
@@ -518,25 +525,45 @@ class FileTransfer:
                         else:
                             # Add new entry
                             flight_ID = uuid.uuid4()
-                            new_entry = {
-                                "flight_ID":flight_ID,
-                                "dir_name": dir_name,
-                                "flight_name": flight_name,
-                                "date": date,
-                                "folder_ID": folder_ID,
-                                "start_time": start_time,
-                                "end_time": end_time,
-                                "type": flight_type,
-                                "num_files": num_files,
-                                "num_dir": num_dir,
-                                "output_path": output_path,
-                                "height": height,
-                                "drone_pilot":"",
-                                "drone":""
-                            }
+                            if streamlit_mode:
+                                new_entry = {
+                                    "flight_ID":flight_ID,
+                                    "dir_name": dir_name,
+                                    "flight_name": flight_name,
+                                    "date": date,
+                                    "folder_ID": folder_ID,
+                                    "start_time": start_time,
+                                    "end_time": end_time,
+                                    "type": flight_type,
+                                    "num_files": num_files,
+                                    "num_dir": num_dir,
+                                    "output_path": output_path,
+                                    "height": height,
+                                    "drone_pilot":drone_pilot,
+                                    "drone":drone
+                                }
+                            else:
+                                new_entry = {
+                                    "flight_ID":flight_ID,
+                                    "dir_name": dir_name,
+                                    "flight_name": flight_name,
+                                    "date": date,
+                                    "folder_ID": folder_ID,
+                                    "start_time": start_time,
+                                    "end_time": end_time,
+                                    "type": flight_type,
+                                    "num_files": num_files,
+                                    "num_dir": num_dir,
+                                    "output_path": output_path,
+                                    "height": height,
+                                    "drone_pilot":"",
+                                    "drone":""
+                                }
                             new_entry = pd.DataFrame([new_entry])
                             df = pd.concat([df,new_entry], ignore_index=True)
-
+            for row in df:
+                row['start_time'] = str(row['start_time']).zfill(6)
+                row['end_time'] = str(row['end_time']).zfill(6)
             df.to_csv(self.temp_log_file, index=False)
             self._load_flight_log(self.temp_log_file)
             logging.info("Flight log saved successfully.")
