@@ -85,26 +85,26 @@ def edit_current_obj():
     if st.session_state.file_transfers:
             ft = st.session_state.file_transfers[st.session_state.current_index]
             print_display(ft)
-            col1, col2, col3, col4, col5 = st.columns([1,1.5,1.5,4,8])
+            col1, col2, col3, col4, col5 = st.columns([1,1,1,1,6])
             with col1:
-                if st.button("move"):
+                if st.button("Move"):
                     st.session_state.edit_mode = False
                     st.session_state.move_mode = True
                     st.rerun()
                 
             with col2:
-                if st.button("trash a folder"):
+                if st.button("Trash"):
                     st.session_state.edit_mode = False
                     st.session_state.trash_mode = True
                     st.rerun()
             with col3:
-                if st.button("duplicate a folder"):
+                if st.button("Duplicate"):
                     st.session_state.edit_mode = False
                     st.session_state.dupe_mode = True
                     st.rerun()
     
             with col4:
-                if st.button("move to skyline"):
+                if st.button("_SKYLINE"):
                     st.session_state.edit_mode = False
                     st.session_state.skyline_mode = True
                     st.rerun()
@@ -173,6 +173,11 @@ def skyline():
 def main():
     st.title("SD Card File Transfer Management")
     
+    with st.sidebar:
+        st.header("Drone Details")
+        st.session_state.drone_pilot = st.selectbox('Select Drone Pilot', ['Sindre', 'Isak', 'Fahad'])
+        st.session_state.drone_model = st.selectbox('Select Drone Model', ['M3M-1', 'M3M-2', 'P4M-1', 'P4M-2', 'P4M-3'])
+
     # Button to load SD cards
     if st.button("Load SD Cards"):
         
@@ -210,8 +215,8 @@ def main():
             if st.button("Move All Files"): #### add check if session index == len( objs -1)!!!
                 for ft in st.session_state.file_transfers:
                     st.text('simulating moving files')
-                    #ft.move_files_to_output()
-                    ft._save_flight_log()
+                    ft.move_files_to_output(streamlit_mode=True)
+                    ft._save_flight_log(streamlit_mode=True)
                 st.success("Files moved successfully. Process completed.")
                 # Optionally reset the application or close operations
                 st.session_state.file_transfers = []
