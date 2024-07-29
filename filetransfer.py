@@ -561,9 +561,9 @@ class FileTransfer:
                                 }
                             new_entry = pd.DataFrame([new_entry])
                             df = pd.concat([df,new_entry], ignore_index=True)
-            for row in df:
-                row['start_time'] = str(row['start_time']).zfill(6)
-                row['end_time'] = str(row['end_time']).zfill(6)
+            
+
+                
             df.to_csv(self.temp_log_file, index=False)
             self._load_flight_log(self.temp_log_file)
             logging.info("Flight log saved successfully.")

@@ -216,7 +216,7 @@ def main():
         if st.session_state.ready_to_move:
             if st.button("Move All Files"): #### add check if session index == len( objs -1)!!!
                 for ft in st.session_state.file_transfers:
-                    st.text('simulating moving files')
+                    #st.text('simulating moving files')
                     ft.move_files_to_output(streamlit_mode=True)
                     ft._save_flight_log(streamlit_mode=True, drone_pilot=st.session_state.drone_pilot, drone=st.session_state.drone_model)
                 st.success("Files moved successfully. Process completed.")
@@ -226,6 +226,7 @@ def main():
                 if st.button('save log and whipe sd card'):
                     ft.update_main_csv()
                     ft._close_and_wipe_sd_cards()
+
 
 
 main()
