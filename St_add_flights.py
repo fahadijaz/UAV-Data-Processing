@@ -47,6 +47,8 @@ if 'trash_mode' not in st.session_state:
     st.session_state.trash_mode = False
 if 'skyline_mode' not in st.session_state:
     st.session_state.skyline_mode = False
+if 'update_and_whipe' not in st.session_state:
+    st.session_state.update_and_whipe = False
 
 
 def display_file_transfers():
@@ -169,7 +171,24 @@ def skyline():
             st.session_state.edit_mode = True
             st.session_state.skyline_mode = False
             st.rerun()
-    
+
+def update_and_whipe():
+    if st.session_state.file_transfers:
+        
+        ft = st.session_state.file_transfers[st.session_state.current_index]
+        #st.text('prepping to updated')
+        ft.update_main_csv()
+        #st.text('updateded')
+        for ft in st.session_state.file_transfers:
+            #st.text('preppingto whipe')
+            ft._close_and_wipe_sd_cards()
+            #st.text('wiped')
+        st.session_state.file_transfers = []
+        st.session_state.update_and_whipe = False
+        st.rerun()
+    else:
+        st.write('No file transfers found or incorrect state.')
+        
 
 
 def main():
@@ -181,6 +200,8 @@ def main():
         st.session_state.drone_model = st.selectbox('Select Drone Model', ['choose a drone','M3M-1', 'M3M-2', 'P4M-1', 'P4M-2', 'P4M-3'], index=0)
 
     # Button to load SD cards
+
+
     if st.button("Load SD Cards"):
         
         st.session_state.file_transfers = load_file_transfers()
@@ -189,8 +210,11 @@ def main():
 
     if st.session_state.data_loaded:
         # Display all file transfers with an option to edit
-        if st.session_state.file_transfers and not st.session_state.edit_mode and not st.session_state.move_mode and not st.session_state.dupe_mode and not st.session_state.trash_mode and not st.session_state.skyline_mode:
+        if st.session_state.file_transfers and not st.session_state.edit_mode and not st.session_state.move_mode and not st.session_state.dupe_mode and not st.session_state.trash_mode and not st.session_state.skyline_mode and not st.session_state.update_and_whipe:
             display_file_transfers()
+
+        if st.session_state.update_and_whipe:
+            update_and_whipe()
 
         if st.session_state.skyline_mode:
             skyline()
@@ -216,17 +240,23 @@ def main():
         if st.session_state.ready_to_move:
             if st.button("Move All Files"): #### add check if session index == len( objs -1)!!!
                 for ft in st.session_state.file_transfers:
-                    #st.text('simulating moving files')
+                    st.text('simulating moving files and saving them')
                     ft.move_files_to_output(streamlit_mode=True)
                     ft._save_flight_log(streamlit_mode=True, drone_pilot=st.session_state.drone_pilot, drone=st.session_state.drone_model)
-                st.success("Files moved successfully. Process completed.")
+                    st.text('finished')
+                    st.session_state.update_and_whipe = True
+                    st.success("Files moved successfully. Process completed.")
+ 
                 # Optionally reset the application or close operations
-                st.session_state.file_transfers = []
-                st.session_state.ready_to_move = False
-                if st.button('save log and whipe sd card'):
-                    ft.update_main_csv()
-                    ft._close_and_wipe_sd_cards()
+                
+                if st.button('Update main log and Wipe SD Cards'):
+                    for ft in st.session_state.file_transfers:
+                        #st.text('whiping')
+                        st.session_state.ready_to_move = False
 
+
+    st.write('Current State:')
+    st.json(st.session_state)
 
 
 main()

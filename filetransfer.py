@@ -54,7 +54,7 @@ class FileTransfer:
                 "end_time", "type", "num_files", "num_dir", "output_path", "height"
             ])
             flight_log.to_csv(log_file, index=False)
-            logging.warning("Flight log file not found. Created a new CSV file.")
+            #logging.warning("Flight log file not found. Created a new CSV file.")
         return flight_log
 
     def _list_directories(self):
@@ -582,6 +582,7 @@ class FileTransfer:
             #---------------------------
             # test can be preformed here
             #---------------------------
+            logging.info('here is the error')
             new_log = pd.concat([main_log,temp_log],ignore_index=True)
             new_log.to_csv(self.flight_log_file, index=False)
             self._load_flight_log(self.temp_log_file,whipe_index=True)
