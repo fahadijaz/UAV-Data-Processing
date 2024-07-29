@@ -92,8 +92,12 @@ class FileTransfer:
         try:
             dir_path = os.path.join(self.input_path, directory)
             files_sorted = sorted(os.listdir(dir_path))
-            start_time = files_sorted[4].split("_")[1][8:]
-            end_time = files_sorted[-2].split("_")[1][8:]
+            if len(files_sorted)> 5:
+                start_time = files_sorted[4].split("_")[1][8:]
+                end_time = files_sorted[-2].split("_")[1][8:]
+            else:
+                start_time = files_sorted[1].split("_")[1][8:]
+                end_time = files_sorted[-1].split("_")[1][8:]
             return start_time, end_time
         except Exception as e:
             logging.error(f"Error collecting timestamps for directory {directory}: {e}")
