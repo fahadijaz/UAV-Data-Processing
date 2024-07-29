@@ -255,8 +255,8 @@ def main():
                         st.session_state.ready_to_move = False
 
 
-    st.write('Current State:')
-    st.json(st.session_state)
+    #st.write('Current State:')
+    #st.json(st.session_state)
 
 
 main()
