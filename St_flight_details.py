@@ -14,7 +14,7 @@ df_flight_log, df_flight_routes, df_fields, df_flight_log_merged = preprocessing
 df_flight_log_merged['Index'] = range(1, len(df_flight_log_merged) + 1) # Creating a column telling whether the flight is the first, second, third, etc...
 
 flight_details = df_flight_log_merged[df_flight_log_merged["flight_ID"] == current_flight_ID].iloc[0]
-flight_details
+#flight_details
 
 title_col_1, title_col_2 = st.columns([0.88,0.12])
 with title_col_1:
@@ -59,8 +59,8 @@ if (edit_mode == "📖"):
         link_path = rf'{flight_details["output_path"]}'
         #link_path = rf'P:\PhenoCrop\1_flights\{flight_details["Field ID"]}\{flight_details["BaseType"]}'
         if st.button('Go to image folder'):
-            open_folder(link_path)
             #st.write(f"Opened folder: {link_path}")
+            open_folder(link_path)
 
     with body_column_2:
         st.write("#### Field")
@@ -79,3 +79,12 @@ if (edit_mode == "✍"):
         st.table(flight_details_col_2)
 
 st.write("#### Processing status")
+
+def check_pix4D_processing_status(flight_details):
+    pix4d_path = rf'P:\PhenoCrop\2_pix4d\{flight_details["Field ID"]}\{flight_details["BaseType"]}'
+    flight_folder_name = os.path.basename(flight_details["output_path"])
+    project_folder_paths = [rf'{pix4d_path}\{flight_folder_name}', rf'{pix4d_path}\{flight_folder_name}\{flight_folder_name}']
+    st.write(project_folder_paths)
+    # Write code to check for report, RGB mosaic, DSM and indices in the project folder paths.
+
+check_pix4D_processing_status(flight_details)
