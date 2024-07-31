@@ -84,7 +84,24 @@ def check_pix4D_processing_status(flight_details):
     pix4d_path = rf'P:\PhenoCrop\2_pix4d\{flight_details["Field ID"]}\{flight_details["BaseType"]}'
     flight_folder_name = os.path.basename(flight_details["output_path"])
     project_folder_paths = [rf'{pix4d_path}\{flight_folder_name}', rf'{pix4d_path}\{flight_folder_name}\{flight_folder_name}']
-    st.write(project_folder_paths)
+    project_path = ""
+    report_path = ""
+    for project_path_check in project_folder_paths:
+        if os.path.isdir(project_path_check):
+            project_path = project_path_check
+    
+    if project_path == "":
+        st.write("Project folder does not exist")
+    else:
+        if st.button('Pix4DMapper folder'):
+            open_folder(project_path)
+        report_path = rf'{project_path}\1_initial\report\html\index.html'
+    
+    if report_path == "":
+        st.write("Report does not exist")
+    else:
+        if st.button('Report'):
+            open_folder(report_path)
     # Write code to check for report, RGB mosaic, DSM and indices in the project folder paths.
 
 check_pix4D_processing_status(flight_details)
