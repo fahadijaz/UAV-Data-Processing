@@ -93,7 +93,9 @@ def find_tif_file(folder_path):
 # Function to find the tif file in a given folder's subfolders (but not their subfolders)
 def find_tif_files_in_subfolders(folder_path):
     tif_files = []
+    tif_folders = []
     if os.path.isdir(folder_path):
+        tif_folders = os.listdir(folder_path)
         # List all items in the given folder_path
         for item in os.listdir(folder_path):
             # Construct full path
@@ -108,13 +110,13 @@ def find_tif_files_in_subfolders(folder_path):
     # Return list of .tif files found, or [""] if none were found
     if tif_files == []:
         tif_files = [""]
-    return tif_files
+    return tif_files, tif_folders
 
 def check_processing_status(flight_details):
     pix4d_path = rf'P:\PhenoCrop\2_pix4d\{flight_details["Field ID"]}\{flight_details["BaseType"]}'
     flight_folder_name = os.path.basename(flight_details["output_path"])
     project_folder_paths = [rf'{pix4d_path}\{flight_folder_name}', rf'{pix4d_path}\{flight_folder_name}\{flight_folder_name}']
-    processing_paths = {"project": "", "report": "", "orthomosaic": "", "DSM": "", "indices": [], "stats": ""}
+    processing_paths = {"project": "", "report": "", "orthomosaic": "", "DSM": "", "indices": [], "indices_names": [], "stats": ""}
 
     # Finding project path
     for project_path_check in project_folder_paths:
@@ -128,7 +130,7 @@ def check_processing_status(flight_details):
         processing_paths["report"] = rf'{processing_paths["project"]}\1_initial\report\html\index.html'
         processing_paths["orthomosaic"] = find_tif_file(rf'{processing_paths["project"]}\3_dsm_ortho\2_mosaic')[0]
         processing_paths["DSM"] = find_tif_file(rf'{processing_paths["project"]}\3_dsm_ortho\1_dsm')[0]
-        processing_paths["indices"] = find_tif_files_in_subfolders(rf'{processing_paths["project"]}\4_index\indices')
+        processing_paths["indices"], processing_paths["indices_names"] = find_tif_files_in_subfolders(rf'{processing_paths["project"]}\4_index\indices')
         
         # Displaying
         if st.button('Pix4DMapper folder'):
@@ -139,8 +141,13 @@ def check_processing_status(flight_details):
                 st.write(rf"{processing_name} does not exist")
             else:
                 if isinstance(processing_paths[processing_name], list):
-                    st.write(rf"{processing_name} exists")
-                    st.write(processing_paths["indices"])
+                    indices_names = ""
+                    for index, indice_name in enumerate(processing_paths["indices_names"]):
+                        if index == 0:
+                            indices_names = rf"{indice_name}"
+                        else:
+                            indices_names = rf"{indices_names}, {indice_name}"
+                    st.write(rf"{processing_name} ({indices_names}) exists")
                 else:
                     if st.button(processing_name):
                         open_folder(processing_paths[processing_name])
