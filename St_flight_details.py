@@ -3,6 +3,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from modules.flight_log_preprocessing import preprocessing
 import subprocess
+import glob
 import os
 import sys
 
@@ -80,28 +81,70 @@ if (edit_mode == "✍"):
 
 st.write("#### Processing status")
 
-def check_pix4D_processing_status(flight_details):
+# Function to find the tif file in a given folder
+def find_tif_file(folder_path):
+    tif_files = []
+    tif_files.extend(glob.glob(os.path.join(folder_path, "**", "*.tif"), recursive=True))
+
+    if tif_files == []:
+        tif_files = [""]
+    return tif_files
+
+# Function to find the tif file in a given folder's subfolders (but not their subfolders)
+def find_tif_files_in_subfolders(folder_path):
+    tif_files = []
+    if os.path.isdir(folder_path):
+        # List all items in the given folder_path
+        for item in os.listdir(folder_path):
+            # Construct full path
+            subdir_path = rf"{folder_path}\{item}"
+
+            # Check if the item is a directory
+            if os.path.isdir(subdir_path):
+                # Look for .tif files in the current subdirectory
+                found_tifs = glob.glob(os.path.join(subdir_path, "*.tif"))
+                tif_files.extend(found_tifs)
+
+    # Return list of .tif files found, or [""] if none were found
+    if tif_files == []:
+        tif_files = [""]
+    return tif_files
+
+def check_processing_status(flight_details):
     pix4d_path = rf'P:\PhenoCrop\2_pix4d\{flight_details["Field ID"]}\{flight_details["BaseType"]}'
     flight_folder_name = os.path.basename(flight_details["output_path"])
     project_folder_paths = [rf'{pix4d_path}\{flight_folder_name}', rf'{pix4d_path}\{flight_folder_name}\{flight_folder_name}']
-    project_path = ""
-    report_path = ""
+    processing_paths = {"project": "", "report": "", "orthomosaic": "", "DSM": "", "indices": [], "stats": ""}
+
+    # Finding project path
     for project_path_check in project_folder_paths:
         if os.path.isdir(project_path_check):
-            project_path = project_path_check
+            processing_paths["project"] = project_path_check
     
-    if project_path == "":
+    if processing_paths["project"] == "":
         st.write("Project folder does not exist")
     else:
+        # Finding the other processing paths based on the project path
+        processing_paths["report"] = rf'{processing_paths["project"]}\1_initial\report\html\index.html'
+        processing_paths["orthomosaic"] = find_tif_file(rf'{processing_paths["project"]}\3_dsm_ortho\2_mosaic')[0]
+        processing_paths["DSM"] = find_tif_file(rf'{processing_paths["project"]}\3_dsm_ortho\1_dsm')[0]
+        processing_paths["indices"] = find_tif_files_in_subfolders(rf'{processing_paths["project"]}\4_index\indices')
+        
+        # Displaying
         if st.button('Pix4DMapper folder'):
-            open_folder(project_path)
-        report_path = rf'{project_path}\1_initial\report\html\index.html'
-    
-    if report_path == "":
-        st.write("Report does not exist")
-    else:
-        if st.button('Report'):
-            open_folder(report_path)
+            open_folder(processing_paths["project"])
+
+        for processing_name in ["report", "orthomosaic", "DSM", "indices"]:
+            if processing_paths[processing_name] == "" or processing_paths[processing_name] == [""]:
+                st.write(rf"{processing_name} does not exist")
+            else:
+                if isinstance(processing_paths[processing_name], list):
+                    st.write(rf"{processing_name} exists")
+                    st.write(processing_paths["indices"])
+                else:
+                    if st.button(processing_name):
+                        open_folder(processing_paths[processing_name])
+
     # Write code to check for report, RGB mosaic, DSM and indices in the project folder paths.
 
-check_pix4D_processing_status(flight_details)
+check_processing_status(flight_details)
