@@ -69,6 +69,32 @@ if (edit_mode == "✍"):
         st.table(flight_details_col_2)
 
 st.write("#### Processing status")
+processing_paths = check_processing_status(flight_details)
 
+def display_processing_status(processing_paths):
+    if processing_paths["project"] == "":
+        st.write("Project folder does not exist")
+        return
+    
+    # Displaying processing status
+    if st.button('Pix4DMapper folder'):
+        open_folder(processing_paths["project"])
+    
+    # Looping through each of the potential processing outputs and displaying their status
+    for processing_name in ["report", "orthomosaic", "DSM", "indices"]:
+        if processing_paths[processing_name] == "" or processing_paths[processing_name] == [""]:
+            st.write(rf"{processing_name} does not exist")
+        else:
+            if isinstance(processing_paths[processing_name], list):
+                indices_names = ""
+                for index, indice_name in enumerate(processing_paths["indices_names"]):
+                    if index == 0:
+                        indices_names = rf"{indice_name}"
+                    else:
+                        indices_names = rf"{indices_names}, {indice_name}"
+                st.write(rf"{processing_name} ({indices_names}) exists")
+            else:
+                if st.button(processing_name):
+                    open_folder(processing_paths[processing_name])
 
-check_processing_status(flight_details)
+display_processing_status(processing_paths)
