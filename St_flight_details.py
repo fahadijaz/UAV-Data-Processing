@@ -13,7 +13,7 @@ df_flight_log, df_flight_routes, df_fields, df_flight_log_merged = preprocessing
 df_flight_log_merged['Index'] = range(1, len(df_flight_log_merged) + 1) # Creating a column telling whether the flight is the first, second, third, etc...
 
 flight_details = df_flight_log_merged[df_flight_log_merged["flight_ID"] == current_flight_ID].iloc[0]
-#flight_details
+#st.write(flight_details)
 
 title_col_1, title_col_2 = st.columns([0.88,0.12])
 with title_col_1:
@@ -81,7 +81,7 @@ def display_processing_status(processing_paths):
         open_folder(processing_paths["project"])
     
     # Looping through each of the potential processing outputs and displaying their status
-    for processing_name in ["report", "orthomosaic", "DSM", "indices"]:
+    for processing_name in ["report", "orthomosaics", "DSM", "indices"]:
         if processing_paths[processing_name] == "" or processing_paths[processing_name] == [""]:
             st.write(rf"{processing_name} does not exist")
         else:
