@@ -15,9 +15,9 @@ def open_folder(path):
 
 
 # Function to find the tif files in a given folder
-def find_tif_file(folder_path):
+def find_tif_files(folder_path):
     tif_files = []
-    tif_files.extend(glob.glob(os.path.join(folder_path, "**", "*.tif"), recursive=True))
+    tif_files.extend(glob.glob(os.path.join(folder_path, "*.tif"), recursive=False))
 
     if tif_files == []:
         tif_files = [""]

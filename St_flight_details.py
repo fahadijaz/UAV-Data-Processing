@@ -82,17 +82,18 @@ def display_processing_status(processing_paths):
     
     # Looping through each of the potential processing outputs and displaying their status
     for processing_name in ["report", "orthomosaics", "DSM", "indices"]:
-        if processing_paths[processing_name] == "" or processing_paths[processing_name] == [""]:
+        if processing_paths[processing_name] == "" or processing_paths[processing_name] == [""] or processing_paths[processing_name] == []:
             st.write(rf"{processing_name} does not exist")
         else:
             if isinstance(processing_paths[processing_name], list):
-                indices_names = ""
-                for index, indice_name in enumerate(processing_paths["indices_names"]):
+                names = ""
+                names_key = f"{processing_name}_names"
+                for index, name in enumerate(processing_paths[names_key]):
                     if index == 0:
-                        indices_names = rf"{indice_name}"
+                        names = rf"{name}"
                     else:
-                        indices_names = rf"{indices_names}, {indice_name}"
-                st.write(rf"{processing_name} ({indices_names}) exists")
+                        names = rf"{names}, {name}"
+                st.write(rf"{processing_name} ({names}) exists")
             else:
                 if st.button(processing_name):
                     open_folder(processing_paths[processing_name])

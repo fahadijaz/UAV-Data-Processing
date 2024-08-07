@@ -1,4 +1,5 @@
 import os
+import streamlit as st
 
 # A function to check which processing outputs exist for a flight.
 # It returns a dictionary with information lik e.g. paths.
@@ -6,7 +7,7 @@ def check_processing_status(flight_details):
     pix4d_path = rf'P:\PhenoCrop\2_pix4d\{flight_details["Field ID"]}\{flight_details["BaseType"]}'
     flight_folder_name = os.path.basename(flight_details["output_path"])
     project_folder_paths = [rf'{pix4d_path}\{flight_folder_name}', rf'{pix4d_path}\{flight_folder_name}\{flight_folder_name}']
-    processing_paths = {"project": "", "report": "", "orthomosaics": "", "DSM": "", "indices": [], "indices_names": [], "stats": ""}
+    processing_paths = {"project": "", "report": "", "orthomosaics": [], "orthomosaics_names": [], "DSM": "", "indices": [], "indices_names": [], "stats": ""}
 
     # Finding project path
     for project_path_check in project_folder_paths:
@@ -16,9 +17,17 @@ def check_processing_status(flight_details):
     if processing_paths["project"] != "":
         # Finding the other processing paths based on the project path
         processing_paths["report"] = rf'{processing_paths["project"]}\1_initial\report\html\index.html'
-        processing_paths["orthomosaics"] = find_tif_file(rf'{processing_paths["project"]}\3_dsm_ortho\2_mosaic')[0]
-        processing_paths["DSM"] = find_tif_file(rf'{processing_paths["project"]}\3_dsm_ortho\1_dsm')[0]
+        #processing_paths["orthomosaics"] = find_tif_files(rf'{processing_paths["project"]}\3_dsm_ortho\2_mosaic')[0]
+        processing_paths["orthomosaics"] = find_tif_files(rf'{processing_paths["project"]}\3_dsm_ortho\2_mosaic')
+        processing_paths["DSM"] = find_tif_files(rf'{processing_paths["project"]}\3_dsm_ortho\1_dsm')[0]
         processing_paths["indices"], processing_paths["indices_names"] = find_tif_files_in_subfolders(rf'{processing_paths["project"]}\4_index\indices')
+
+        # This loops through processing_paths["orthomosaics"] to find the names of the orthomosaics
+        for ortho_path in processing_paths["orthomosaics"]:
+            # Splits the filename based on underscores and takes the last part
+            ortho_name = ortho_path.split('_')[-1]
+            ortho_name = ortho_name.replace('.tif', '')
+            processing_paths["orthomosaics_names"].append(ortho_name)
     
     return processing_paths
 
@@ -41,12 +50,12 @@ def update_all_flights():
 if __name__ == "__main__":
     import pandas as pd
     import streamlit as st
-    from file_system_functions import find_tif_file
+    from file_system_functions import find_tif_files
     from file_system_functions import find_tif_files_in_subfolders
     from flight_log_preprocessing import preprocessing
 
     update_all_flights()
 else:
-    from .file_system_functions import find_tif_file
+    from .file_system_functions import find_tif_files
     from .file_system_functions import find_tif_files_in_subfolders
     from .flight_log_preprocessing import preprocessing
