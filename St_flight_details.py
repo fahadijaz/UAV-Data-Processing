@@ -99,3 +99,4 @@ def display_processing_status(processing_paths):
                     open_folder(processing_paths[processing_name])
 
 display_processing_status(processing_paths)
+st.write(processing_paths)

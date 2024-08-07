@@ -1,8 +1,9 @@
 import os
 import streamlit as st
+import time
 
 # A function to check which processing outputs exist for a flight.
-# It returns a dictionary with information lik e.g. paths.
+# It returns a dictionary with information like e.g. paths.
 def check_processing_status(flight_details):
     pix4d_path = rf'P:\PhenoCrop\2_pix4d\{flight_details["Field ID"]}\{flight_details["BaseType"]}'
     flight_folder_name = os.path.basename(flight_details["output_path"])
@@ -32,20 +33,25 @@ def check_processing_status(flight_details):
     return processing_paths
 
 def update_all_flights():
+    start_time = time.time()
     # This function is going to go through all flights and update their processing status
     df_flight_log, df_flight_routes, df_fields, df_flight_log_merged = preprocessing()
     df_processing_status = pd.read_csv("P:\\PhenoCrop\\0_csv\\processing_status.csv")
 
-    st.write(df_flight_log_merged)
-
     # Iterate over each row in df_flight_log
     for index, row in df_flight_log_merged.iterrows():
         processing_result = check_processing_status(row)
-        new_row = [row["output_path"], processing_result["project"], processing_result["report"], processing_result["orthomosaics"],
-                    processing_result["DSM"], processing_result["indices"], processing_result["indices_names"], processing_result["stats"]]
-        df_processing_status = pd.concat([df_processing_status, processing_result], ignore_index=True)
+        new_row = pd.DataFrame([{"flight_output_path": row["output_path"], "ProjectFolderPath": processing_result["project"], "Report": processing_result["report"],
+                    "Orthomosaics": processing_result["orthomosaics"], "Orthomosaics_names": processing_result["orthomosaics_names"], "DSM_Path": processing_result["DSM"],
+                    "Indices": processing_result["indices"], "Indices_names": processing_result["indices_names"], "Stats": processing_result["stats"]}])
+        #st.write(new_row)
+        df_processing_status = pd.concat([df_processing_status, new_row], ignore_index=True)
     
+    time_spent = round(time.time()-start_time, 2)
+    st.write(f"Spent {time_spent}s going through {df_flight_log_merged.shape[0]} flights")
     st.write(df_processing_status)
+    df_processing_status.to_csv("P:/PhenoCrop/0_csv/processing_status.csv", index=False)
+
 
 if __name__ == "__main__":
     import pandas as pd
