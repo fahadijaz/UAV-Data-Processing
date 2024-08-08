@@ -81,7 +81,7 @@ def display_section_main_1():
 
     body_column_1, body_column_2 = st.columns(2)
     body_column_3, body_column_4 = st.columns(2)
-    
+
     #body_column_1_content = ["Step 1 Quality Check", "Quality checked by", "Workable Data", "Ready for next step (step 2 and 3)", "Ready for next step - person",
     #                         "Step 2 processing", "Step 3 Image Stitching", "Processed by", "QGIS", "QGIS person"]
 
@@ -125,7 +125,7 @@ def display_section_processing_status():
     st.write("#### Processing status")
 
     display_processing_status(processing_paths)
-    st.write(processing_paths)
+    #st.write(processing_paths)
     update_this_processing_status(df_processing_status, flight_details, processing_paths)
 
 display_section_title()
