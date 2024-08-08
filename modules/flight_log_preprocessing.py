@@ -1,5 +1,6 @@
 import pandas as pd
 from datetime import datetime, time
+import re
 
 def preprocessing():
     # Loading and preprocessing datasets
@@ -52,3 +53,30 @@ def preprocessing():
 
 
     return df_flight_log, df_flight_routes, df_fields, df_flight_log_merged_unique, df_processing_status
+
+def import_log_file(log_file_path):
+    # Define the regular expression pattern to extract components from each log entry
+    log_pattern = re.compile(r'\[(?P<Timestamp>[^\]]+)\]\[ (?P<RAM>[^\]]+)\]\[ (?P<CPU>[^\]]+)\]\[(?P<LogLevel>[^\]]+)\]: (?P<Message>.*)')
+
+    def parse_log_line(line):
+        """Parse a single line of the log file and return a dictionary of extracted fields."""
+        match = log_pattern.match(line)
+        if match:
+            return match.groupdict()
+        return {}
+
+    # Initialize a list to store parsed data
+    data = []
+
+    # Read and parse the log file line by line
+    with open(log_file_path, 'r') as file:
+        for line in file:
+            parsed_line = parse_log_line(line)
+            if parsed_line:
+                data.append(parsed_line)
+
+    # Create a DataFrame from the parsed data
+    df = pd.DataFrame(data)
+
+    # Convert the 'Timestamp' column to datetime
+    df['Timestamp'] = pd.to_datetime(df['Timestamp'], format='%Y.%m.%d %H:%M:%S')

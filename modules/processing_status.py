@@ -24,6 +24,8 @@ def check_processing_status(flight_details):
         processing_paths["DSM"] = find_tif_files(rf'{processing_paths["project"]}\3_dsm_ortho\1_dsm')[0]
         processing_paths["indices"], processing_paths["indices_names"] = find_tif_files_in_subfolders(rf'{processing_paths["project"]}\4_index\indices')
 
+        #df_log_file = import_log_file(rf'{processing_paths["project"]}\1_initial\report\html\index.html')
+
         # This loops through processing_paths["orthomosaics"] to find the names of the orthomosaics
         for ortho_path in processing_paths["orthomosaics"]:
             # Splits the filename based on underscores and takes the last part
@@ -73,9 +75,11 @@ if __name__ == "__main__":
     from file_system_functions import find_tif_files
     from file_system_functions import find_tif_files_in_subfolders
     from flight_log_preprocessing import preprocessing
+    from flight_log_preprocessing import import_log_file
 
     update_all_flights()
 else:
     from .file_system_functions import find_tif_files
     from .file_system_functions import find_tif_files_in_subfolders
     from .flight_log_preprocessing import preprocessing
+    from .flight_log_preprocessing import import_log_file
