@@ -72,11 +72,26 @@ css = """
     border-collapse: collapse;
     border-radius: 0.5rem;
 }
-.flight_log_header {
-    background-color: rgb(250, 250, 250, 0.05);
+.flight_log_header_1 {
+    background-color: rgb(26, 29, 34);
+}
+.flight_log_header_2 {
+    background-color: rgb(26, 29, 34);
 }
 .flight_log_header_cell {
     padding: 0.5rem;
+    text-align: left;
+}
+
+/* Make the table header sticky */
+.flight_log_header_2 {
+    position: sticky;
+    top: 0;
+    z-index: 2; /* Ensure the header stays above the table rows */
+}
+
+.sharp-left-border {
+    border-left: 3px solid rgb(250, 250, 250, 0.1); /* Adjust the width and color as needed */
 }
 .flight_log_entry {
 }
@@ -93,16 +108,27 @@ css = """
 """
 
 html_content = css
-html_content += """<table class='flight_log_table' border=1><tr class="flight_log_header"><th></th>"""
-for name in ["Field", "Date", "Image Type", "Drone Pilot"]:
+html_content += """
+    <table class='flight_log_table' border=1>
+        <tr class="flight_log_header_1">
+            <th colspan="5"></th>
+            <th colspan="7" class="flight_log_header_cell sharp-left-border">&nbsp;Processed</th>
+        </tr>
+        <tr class="flight_log_header_2"><th></th>"""
+for name in ["Field", "Date", "Image Type", "Drone Pilot", "DSM", "Blue", "Green", "NDVI", "NIR", "Red Edge", "Red"]:
     html_content += f"""
-        <td class="flight_log_header_cell">{name}</th>
+            <th class="flight_log_header_cell"""
+    if name == "DSM":
+        html_content += " sharp-left-border"
+    html_content += f"""
+            ">{name}</th>
     """
 
 html_content += """</tr>"""
 
 
 for index, row in flight_log_selection.iterrows():
+    dsm_exists = 1 if row['DSM_Path'] else 0
     html_content += f"""
         <tr class="flight_log_entry">
             <td class="flight_log_link_cell"><a href="http://localhost:8502?Index={row['flight_ID']}" target="_blank"><img src="https://cdn-icons-png.flaticon.com/128/3388/3388930.png"></a></td>
@@ -110,6 +136,13 @@ for index, row in flight_log_selection.iterrows():
             <td class="flight_log_cell">{row['date']}</td>
             <td class="flight_log_cell">{row['image_type_keyword']}</td>
             <td class="flight_log_cell">{row['drone_pilot']}</td>
+            <td class="flight_log_cell sharp-left-border">{int(dsm_exists)}</td>
+            <td class="flight_log_cell">{int(row['Indice_blue'])}</td>
+            <td class="flight_log_cell">{int(row['Indice_green'])}</td>
+            <td class="flight_log_cell">{int(row['Indice_ndvi'])}</td>
+            <td class="flight_log_cell">{int(row['Indice_nir'])}</td>
+            <td class="flight_log_cell">{int(row['Indice_red_edge'])}</td>
+            <td class="flight_log_cell">{int(row['Indice_red'])}</td>
         </tr>
         """
 
