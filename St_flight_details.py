@@ -3,6 +3,7 @@ import streamlit as st
 import streamlit.components.v1 as components
 from modules.flight_log_preprocessing import preprocessing
 from modules.processing_status import check_processing_status
+from modules.processing_status import create_new_row_for_processing_status
 from modules.file_system_functions import open_folder
 
 current_flight_ID = st.query_params["Index"]
@@ -49,9 +50,7 @@ def update_this_processing_status(df_processing_status, flight_details, processi
     old_processing_status = df_processing_status[df_processing_status["flight_output_path"] == flight_details["output_path"]]
 
     # Create new_processing_status DataFrame with one row
-    new_processing_status = pd.DataFrame([{"flight_output_path": flight_details["output_path"], "ProjectFolderPath": processing_paths["project"], "Report": processing_paths["report"],
-                        "Orthomosaics": processing_paths["orthomosaics"], "Orthomosaics_names": processing_paths["orthomosaics_names"], "DSM_Path": processing_paths["DSM"],
-                        "Indices": processing_paths["indices"], "Indices_names": processing_paths["indices_names"], "Stats": processing_paths["stats"]}])
+    new_processing_status = create_new_row_for_processing_status(flight_details, processing_paths)
 
     # Find the index of the row that matches 'flight_output_path'
     index_to_replace = df_processing_status[df_processing_status["flight_output_path"] == flight_details["output_path"]].index
