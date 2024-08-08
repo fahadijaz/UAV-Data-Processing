@@ -4,7 +4,7 @@ import streamlit.components.v1 as components
 from modules.flight_log_preprocessing import preprocessing
 import datetime
 
-df_flight_log, df_flight_routes, df_fields, df_flight_log_merged = preprocessing()
+df_flight_log, df_flight_routes, df_fields, df_flight_log_merged, df_processing_status = preprocessing()
 
 #df_flight_log_merged
 

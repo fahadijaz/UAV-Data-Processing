@@ -35,8 +35,8 @@ def check_processing_status(flight_details):
 def update_all_flights():
     start_time = time.time()
     # This function is going to go through all flights and update their processing status
-    df_flight_log, df_flight_routes, df_fields, df_flight_log_merged = preprocessing()
-    df_processing_status = pd.read_csv("P:\\PhenoCrop\\0_csv\\processing_status.csv")
+    df_flight_log, df_flight_routes, df_fields, df_flight_log_merged, df_processing_status = preprocessing()
+    df_processing_status = df_processing_status.head(0)
 
     # Iterate over each row in df_flight_log
     for index, row in df_flight_log_merged.iterrows():

@@ -7,6 +7,7 @@ def preprocessing():
     df_flight_log = pd.read_csv("P:\\PhenoCrop\\0_csv\\flight_log.csv")
     df_flight_routes = pd.read_csv("P:\\PhenoCrop\\0_csv\\flight_routes.csv")
     df_fields = pd.read_csv("P:\\PhenoCrop\\0_csv\\fields.csv")
+    df_processing_status = pd.read_csv("P:\\PhenoCrop\\0_csv\\processing_status.csv")
 
     # Fixing the date formatting
     df_flight_log['date'] = pd.to_datetime(df_flight_log['date'], format='%Y%m%d').dt.date
@@ -45,5 +46,8 @@ def preprocessing():
     # Applying the function to the 'type' column to create a new column with the extracted image type keywords
     df_flight_log_merged['image_type_keyword'] = df_flight_log_merged['type'].apply(extract_image_type_keyword)
 
+    # Removing rows which have are part of the same flight (e.g. if a 3D flight have both a horizontal row and a vertical row, then I am removing the vertical)
+    df_flight_log_merged_unique = df_flight_log_merged.drop_duplicates(subset='output_path', keep='first')
 
-    return df_flight_log, df_flight_routes, df_fields, df_flight_log_merged
+
+    return df_flight_log, df_flight_routes, df_fields, df_flight_log_merged_unique, df_processing_status
