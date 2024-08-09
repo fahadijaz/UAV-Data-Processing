@@ -21,7 +21,7 @@ input_col_1, input_col_2, input_col_3 = st.columns(3)
 with input_col_1:
     input_field = st.selectbox("Field", field_IDs, index=None, placeholder="Field", label_visibility="collapsed")
 with input_col_2:
-    input_type = st.selectbox("Route Type", route_types, index=None, placeholder="Route Type", label_visibility="collapsed")
+    input_type = st.selectbox("Flight Type", route_types, index=None, placeholder="Flight Type", label_visibility="collapsed")
 with input_col_3:
     input_pilot = st.selectbox("Drone Pilot", drone_pilots, index=None, placeholder="Drone Pilot", label_visibility="collapsed")
 date_col_1, date_col_2 = st.columns([0.5,0.5])
@@ -140,7 +140,6 @@ def display_flight_table(flight_log_selection):
             dsm_exists = 0
         else:
             dsm_exists = 1
-        #dsm_exists = 1 if row['DSM_Path'] else 0
         html_content += f"""
             <tr class="flight_log_entry">
                 <td class="flight_log_link_cell"><a href="http://localhost:8502?Index={row['flight_ID']}" target="_blank"><img src="https://cdn-icons-png.flaticon.com/128/3388/3388930.png"></a></td>
