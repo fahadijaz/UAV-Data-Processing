@@ -136,7 +136,11 @@ def display_flight_table(flight_log_selection):
 
 
     for index, row in flight_log_selection.iterrows():
-        dsm_exists = 1 if row['DSM_Path'] else 0
+        if pd.isna(row['DSM_Path']) or pd.isnull(row['DSM_Path']):
+            dsm_exists = 0
+        else:
+            dsm_exists = 1
+        #dsm_exists = 1 if row['DSM_Path'] else 0
         html_content += f"""
             <tr class="flight_log_entry">
                 <td class="flight_log_link_cell"><a href="http://localhost:8502?Index={row['flight_ID']}" target="_blank"><img src="https://cdn-icons-png.flaticon.com/128/3388/3388930.png"></a></td>
