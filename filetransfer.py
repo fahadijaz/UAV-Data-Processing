@@ -602,7 +602,7 @@ class FileTransfer:
 
 if __name__ == "__main__":
     def detect_sd_cards() -> List[str]:
-        potential_paths = ["G:/DCIM", "I:/DCIM", "D:/DCIM", "E:/DCIM"]
+        potential_paths = ["D:/DCIM", "E:/DCIM", "F:/DCIM", "G:/DCIM", "I:/DCIM"]
         available_paths = [path for path in potential_paths if os.path.exists(path)]
         return available_paths
 
