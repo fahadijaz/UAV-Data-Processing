@@ -55,8 +55,11 @@ def update_this_processing_status(df_processing_status, flight_details, processi
     # Find the index of the row that matches 'flight_output_path'
     index_to_replace = df_processing_status[df_processing_status["flight_output_path"] == flight_details["output_path"]].index
 
-    # Replace the row(s) at the found index with the new data
-    df_processing_status.loc[index_to_replace, :] = new_processing_status.values
+    if (df_processing_status["flight_output_path"] == flight_details["output_path"]).any():
+        # Replace the row(s) at the found index with the new data
+        df_processing_status.loc[index_to_replace, :] = new_processing_status.values
+    else:
+        df_processing_status = pd.concat([df_processing_status, new_processing_status], ignore_index=True)
     
     # Save the updated DataFrame back to the CSV file
     df_processing_status.to_csv("P:/PhenoCrop/0_csv/processing_status.csv", index=False)
