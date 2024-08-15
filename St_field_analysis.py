@@ -12,11 +12,49 @@ df_flight_log, df_flight_routes, df_fields, df_flight_log_merged, df_processing_
 
 flight_log_selection = df_flight_log_merged.copy()
 
+
+# Reading the excel files (these are test files)
+df0 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230614.xlsx"))
+df1 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230622.xlsx"))
+df2 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230628.xlsx"))
+df3 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230708.xlsx"))
+df4 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230714.xlsx"))
+
+dates = ['20230614', '20230622', '20230628', '20230708', '20230714']
+
+
+# Returns (a) a list containing the selected indices for the user-selected indices, and (b) a list containing the corresponding indice column names.
+def indices_get_selected(input_indices, indices_column_names, input_data_type):
+    # Makes a dictionary with the indices as keys and the corresponding column names as values based on the selected data type
+    indices_to_selected_data_type = dict(zip(indices_column_names["Indices"], indices_column_names[input_data_type]))
+    
+    if "All" in input_indices:
+        selected_indices = indices_column_names["Indices"]
+        selected_indice_column_names = list(indices_to_selected_data_type.values())
+    else:
+        selected_indices = [indice for indice in input_indices if indice in indices_to_selected_data_type]
+        selected_indice_column_names = [indices_to_selected_data_type[indice] for indice in input_indices if indice in indices_to_selected_data_type]
+    
+    return selected_indices, selected_indice_column_names
+
+# Checks if the indices have corresponding columns in the statistics files
+def indices_check_if_exist(indices, indice_column_names, df_stat_file):
+    final_indices_column_names = []
+    final_indices = []
+    for idx, indice_column_name in enumerate(indice_column_names):
+        if indice_column_name in df_stat_file.columns:
+            final_indices_column_names.append(indice_column_name)
+            final_indices.append(indices[idx])
+    
+    return final_indices, final_indices_column_names
+
 # A dictionary containing the indices' column names in the files for the zonal statistics
 indices_column_names = {"Indices": ["Blue", "Green", "NDVI", "NIR", "Red Edge", "Red"],
                         "Mean": ["blue_mean", "green_mean", "ndvi_mean", "nir_mean", "red_edge_mean", "red_mean"],
                         "Median": ["blue_median", "green_median", "ndvi_median", "nir_median", "red_edge_median", "red_median"],
                         "Standard Deviation": ["blue_stdev", "green_stdev", "ndvi_stdev", "nir_stdev", "red_edge_stdev", "red_stdev"]}
+
+indices_check_if_exist(indices_column_names["Indices"], indices_column_names, df0)
 
 # Options for input fields
 excluded_field_IDs = ["Proteinbar NAPE", "GENE2BREAD", "High Grass", "Faba Bean"]
@@ -43,15 +81,6 @@ with input_col_5:
 
 
 
-# Reading the excel files (these are test files)
-df0 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230614.xlsx"))
-df1 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230622.xlsx"))
-df2 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230628.xlsx"))
-df3 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230708.xlsx"))
-df4 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230714.xlsx"))
-
-dates = ['20230614', '20230622', '20230628', '20230708', '20230714']
-
 def display_statistics_boxplot():
     # Check if the necessary input fields are non-empty
     ok_display_statistics_boxplot = 1
@@ -60,19 +89,12 @@ def display_statistics_boxplot():
     ok_display_statistics_boxplot = 0 if input_indices == [] else ok_display_statistics_boxplot
 
     if ok_display_statistics_boxplot == 1:
-        # Makes a dictionary with the indices as keys and the corresponding column names as values based on the selected data type
-        indices_to_selected_data_type = dict(zip(indices_column_names["Indices"], indices_column_names[input_data_type]))
 
-        # Makes a list containing the indice column names for the selected indices
-        if "All" in input_indices:
-            selected_indices = indices_column_names["Indices"]
-            selected_indice_column_names = indices_to_selected_data_type
-        else:
-            selected_indices = [indice for indice in input_indices if indice in indices_to_selected_data_type]
-            selected_indice_column_names = [indices_to_selected_data_type[indice] for indice in input_indices if indice in indices_to_selected_data_type]
+        selected_indices, selected_indice_column_names = indices_get_selected(input_indices, indices_column_names, input_data_type)
+        final_indices, final_indices_column_names = indices_check_if_exist(selected_indices, selected_indice_column_names, df0)
 
-        #st.write(selected_indices)
-        #st.write(selected_indice_column_names)
+        #st.write(final_indices)
+        #st.write(final_indices_column_names)
 
         # Creating grid
         def create_grid(length, columns_per_row):
@@ -89,10 +111,10 @@ def display_statistics_boxplot():
             return row, col
 
         # Oppretter et rutenett for plottene
-        grid = create_grid(len(selected_indices), 2)
+        grid = create_grid(len(final_indices), 2)
         
         # Plotter plottene i rutenettet
-        for idx, selected_indice_column_name in enumerate(selected_indice_column_names):
+        for idx, selected_indice_column_name in enumerate(final_indices_column_names):
             # new dataframe for holding all red mean values
             df_stats = pd.DataFrame()
             df_stats[dates[0]]=df0[selected_indice_column_name]
@@ -105,7 +127,7 @@ def display_statistics_boxplot():
             plt.figure(figsize=(8, 5))  # width=8, height=5
 
             sns.set(style='whitegrid')
-            sns.boxplot(data=df_stats).set(title=f'Phenocrop M3MS {input_data_type} {selected_indices[idx]}')
+            sns.boxplot(data=df_stats).set(title=f'Phenocrop M3MS {input_data_type} {final_indices[idx]}')
             
             # Showing the plot in the correct cell of the grid
             row, col = get_grid_position(idx, 2)

@@ -34,7 +34,7 @@ def preprocessing():
     # Merging dataframes
     df_merged_flight_log_flight_routes = pd.merge(df_flight_log, df_flight_routes, left_on='flight_name', right_on='FlightRoute')
     df_merged_flight_log_flight_routes_fields = pd.merge(df_merged_flight_log_flight_routes, df_fields, left_on='BaseName', right_on='Field ID')
-    df_flight_log_merged = pd.merge(df_merged_flight_log_flight_routes_fields, df_processing_status, left_on='output_path', right_on='flight_output_path')
+    df_flight_log_merged = pd.merge(df_merged_flight_log_flight_routes_fields, df_processing_status, left_on='output_path', right_on='flight_output_path', how='left')
 
     
     # Function to extract the image type keyword from a cell

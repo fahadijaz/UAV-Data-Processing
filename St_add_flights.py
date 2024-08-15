@@ -6,7 +6,7 @@ import os
 st.set_page_config(layout="wide")
 
 def look_for_sd_cards():
-    sd_card_paths = ["G:/DCIM", "I:/DCIM", "D:/DCIM", "E:/DCIM"]
+    sd_card_paths = ["D:/DCIM", "E:/DCIM", "F:/DCIM", "G:/DCIM", "I:/DCIM"]
     return [path for path in sd_card_paths if os.path.exists(path)]
 
 def load_file_transfers():

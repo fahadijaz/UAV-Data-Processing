@@ -147,13 +147,13 @@ def display_flight_table(flight_log_selection):
                 <td class="flight_log_cell">{row['date']}</td>
                 <td class="flight_log_cell">{row['image_type_keyword']}</td>
                 <td class="flight_log_cell">{row['drone_pilot']}</td>
-                <td class="flight_log_cell sharp-left-border">{int(dsm_exists)}</td>
-                <td class="flight_log_cell">{int(row['Indice_blue'])}</td>
-                <td class="flight_log_cell">{int(row['Indice_green'])}</td>
-                <td class="flight_log_cell">{int(row['Indice_ndvi'])}</td>
-                <td class="flight_log_cell">{int(row['Indice_nir'])}</td>
-                <td class="flight_log_cell">{int(row['Indice_red_edge'])}</td>
-                <td class="flight_log_cell">{int(row['Indice_red'])}</td>
+                <td class="flight_log_cell sharp-left-border">{int(dsm_exists) if not pd.isna(dsm_exists) else '?'}</td>
+                <td class="flight_log_cell">{int(row['Indice_blue']) if not pd.isna(row['Indice_blue']) else '?'}</td>
+                <td class="flight_log_cell">{int(row['Indice_green']) if not pd.isna(row['Indice_green']) else '?'}</td>
+                <td class="flight_log_cell">{int(row['Indice_ndvi']) if not pd.isna(row['Indice_ndvi']) else '?'}</td>
+                <td class="flight_log_cell">{int(row['Indice_nir']) if not pd.isna(row['Indice_nir']) else '?'}</td>
+                <td class="flight_log_cell">{int(row['Indice_red_edge']) if not pd.isna(row['Indice_red_edge']) else '?'}</td>
+                <td class="flight_log_cell">{int(row['Indice_red']) if not pd.isna(row['Indice_red']) else '?'}</td>
             </tr>
             """
 
