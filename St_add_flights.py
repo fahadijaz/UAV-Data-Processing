@@ -190,7 +190,7 @@ def update_and_whipe():
         st.write('No file transfers found or incorrect state.')
         
 
-
+# check terminal for username ? 
 def main():
     st.title("SD Card File Transfer Management")
     with st.sidebar:
@@ -240,7 +240,7 @@ def main():
         if st.session_state.ready_to_move:
             if st.button("Move All Files"): #### add check if session index == len( objs -1)!!!
                 for ft in st.session_state.file_transfers:
-                    st.text('simulating moving files and saving them')
+                    #st.text('simulating moving files and saving them')
                     ft.move_files_to_output(streamlit_mode=True)
                     ft._save_flight_log(streamlit_mode=True, drone_pilot=st.session_state.drone_pilot, drone=st.session_state.drone_model)
                     st.text('finished')
@@ -257,6 +257,7 @@ def main():
 
     #st.write('Current State:')
     #st.json(st.session_state)
+    # add route method, or add csv. some kind of add route system
 
 
 main()

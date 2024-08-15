@@ -21,11 +21,20 @@ logging.basicConfig(
 
 class FileTransfer:
     def __init__(self, input_path: str, output_path: str, data_overview_file: str, flight_log: str):
+        '''
+        Input:
+            input_path: str
+            output_path: str
+            data_overview_file: str
+            flight_log: str
+        Comment:
+            Initializes file paths and loads initial data and configurations.
+        '''
         self.input_path = input_path
         self.output_path = output_path
         self.data_overview_file = data_overview_file
         self.flight_log_file = flight_log
-        self.temp_log_file = "P:\\PhenoCrop\\0_csv\\temp_flight_log.csv"
+        self.temp_log_file = "P:\\PhenoCrop\\0_csv\\temp_flight_log.csv" #add as variable insted of hardcoded
         self.type_counts = {'MS': 0, '3D': 0, 'Reflectance': 0, 'phantom-MS': 0}
         self.flights_folders = []
 
@@ -35,6 +44,10 @@ class FileTransfer:
         self._list_directories()
 
     def _load_data_overview(self):
+        '''
+        Comment:
+            Loads data overview from CSV file. Provide new .csv if path dont exist.
+        '''
         if os.path.exists(self.data_overview_file):
             self.data_overview = pd.read_csv(self.data_overview_file)
             logging.info(f"Csv loaded successfully: {self.data_overview_file}")
@@ -45,6 +58,12 @@ class FileTransfer:
 
     @staticmethod
     def _load_flight_log(log_file, whipe_index=False):
+        '''
+        Input: 
+            whipe_index: bool
+        Comment:
+            Loads flight log data from a CSV file. Returns DataFrame. If whipe_index is true overwrite the existing csv with new blank csv. 
+        '''
 
         if os.path.exists(log_file) and whipe_index is False:
             flight_log = pd.read_csv(log_file)
@@ -58,10 +77,18 @@ class FileTransfer:
         return flight_log
 
     def _list_directories(self):
+        '''
+        Comment:
+            Lists directories in the input path and calculates their count.
+        '''
         self.direct = os.listdir(self.input_path)
         self.number_of_elements = len(self.direct)
 
     def get_information(self):
+        '''
+        Comment:
+            Gathers flight information by processing directories.
+        '''
         dirs = sorted(os.listdir(self.input_path))
         for directory in dirs:
             if 'FPLAN' in directory or 'MEDIA' in directory:
@@ -72,6 +99,12 @@ class FileTransfer:
         logging.info("Successfully gathered flight information.")
 
     def _process_directory(self, directory: str):
+        '''
+        Input:
+            directory: str
+        Comment:
+            Processes individual directories to collect flight data.
+        '''
         dir_path = os.path.join(self.input_path, directory)
         start_time, end_time = self._collect_timestamp(directory)
         nr_files = len(os.listdir(dir_path))
@@ -89,6 +122,14 @@ class FileTransfer:
         self.flights_folders.append(flight_info)
 
     def _collect_timestamp(self, directory: str) -> Tuple[str, str]:
+        '''
+        Input:
+            directory: str
+        Output:
+            return: tuple[str,str]
+        Comment:
+            Collects start and end timestamps from directory files.
+        '''
         try:
             dir_path = os.path.join(self.input_path, directory)
             files_sorted = sorted(os.listdir(dir_path))
@@ -104,6 +145,10 @@ class FileTransfer:
             return None, None
 
     def _count_flight_types(self):
+        '''
+        Comment:
+            Counts different types of flight data. Invokes check for reflectance panel files.
+        '''
         for flight in self.flights_folders:
             flight_type = flight['type']
             if flight_type in self.type_counts:
@@ -111,6 +156,12 @@ class FileTransfer:
         self._check_reflectance_panel_files()
 
     def Phantomdata_system(self, directory: str):
+        '''
+        Input:
+            directory: str
+        Comment:
+            Processes Phantom system data and integrates it into flight information.
+        '''
         name_from_input = 'phantom-phenocrop-2024'
         dir_path = os.path.join(self.input_path, directory)
         start_file = os.listdir(dir_path)[4]
@@ -154,6 +205,10 @@ class FileTransfer:
             logging.error(f"Error in reflectance_logic: {e}")
 
     def reflectance_logic_with_timestamps(self):
+        '''
+        Comment:
+            Applies logic to link reflectance panels with flight data based on type.
+        '''
         try:
             required_tif_files = ["G.TIF", "R.TIF", "NIR.TIF", "RE.TIF"]
 
@@ -215,11 +270,20 @@ class FileTransfer:
             logging.error(f"Error in reflectance_logic_with_timestamps: {e}")
 
     def _has_required_tif_files(self, folder, required_files):
+        '''
+        Input:
+            folder: str
+            required_files: list[str]
+        Output:
+            return bool
+        Comment:
+            Checks for the presence of required .tif files in directories.
+        '''
         folder_path = os.path.join(self.input_path, folder['dir_name'])
         existing_files = os.listdir(folder_path)
         return all(any(req_file in file for file in existing_files) for req_file in required_files)
 
-    def _suggest_duplicate_panel(self, ms_flight, reflectance_panels):
+    def _suggest_duplicate_panel(self, ms_flight, reflectance_panels): #remove?
         try:
             closest_panel = None
             min_time_diff = float('inf')
@@ -236,7 +300,7 @@ class FileTransfer:
         except Exception as e:
             logging.error(f"Error in suggest_duplicate_panel: {e}")
 
-    def _duplicate_reflectance_panel(self, ms_flight, reflectance_panel):
+    def _duplicate_reflectance_panel(self, ms_flight, reflectance_panel): #remove?
         try:
             new_panel = reflectance_panel.copy()
             new_panel['dir_name'] = f"{reflectance_panel['dir_name']}_duplicate"
@@ -246,7 +310,7 @@ class FileTransfer:
         except Exception as e:
             logging.error(f"Error in duplicate_reflectance_panel: {e}")
 
-    def _check_reflectance_panel_files(self):
+    def _check_reflectance_panel_files(self): #remove?
         required_files = ["G.TIF", "R.TIF", "NIR.TIF", "RE.TIF"]
         for folder in self.flights_folders:
             if folder['type'] == 'Reflectance':
@@ -256,6 +320,10 @@ class FileTransfer:
                     logging.warning(f'Missing {missing_files} in reflectance folder: {folder["dir_name"]}')
 
     def detect_and_handle_new_routes(self):
+        '''
+        Comment:
+            Detects new flight routes and updates CSV files.
+        '''
         try:
             for folder in self.flights_folders:
                 flight_route = folder['flight_name']
@@ -266,6 +334,12 @@ class FileTransfer:
             logging.error(f"Error detecting and handling new routes: {e}")
 
     def _check_and_update_csv(self, flight_route: str):
+        '''
+        Input:
+            flight_route: str
+        Comment:
+            Checks and updates CSV files with new flight routes based on user input.
+        '''
         if not self.data_overview['FlightRoute'].str.contains(flight_route).any():
             logging.info(f"New flight route detected: {flight_route}")
             add_route = input(f"Do you want to add the flight route '{flight_route}' to the CSV file? (yes/no): ").strip().lower()
@@ -278,6 +352,13 @@ class FileTransfer:
             logging.info(f"Flight route '{flight_route}' already exists in the CSV file.")
 
     def _add_flight_route_to_csv(self, flight_route: str, base_info: str):
+        '''
+        Input:
+            flight_route: str
+            base_info: str
+        Comment:
+            Adds a new flight route to the CSV file.
+        '''
         try:
             info = base_info.split(" ")
             base_name = info[0]
@@ -299,6 +380,10 @@ class FileTransfer:
             logging.error(f"Error adding flight route '{flight_route}' to CSV: {e}")
 
     def match(self):
+        '''
+        Comment:
+            Matches flight folders with output paths based on existing flight route data.
+        '''
         try:
             for i, folder in enumerate(self.flights_folders):
                 if folder['flight_name'] != []:
@@ -320,7 +405,7 @@ class FileTransfer:
         except Exception as e:
             logging.error(f"Error in matching flight folders: {e}")
     
-    def refresh(self):
+    def refresh(self): #remove ?
         try:
             self.__init__(self.input_path, self.output_path, self.data_overview_file, self.flight_log_file)
             logging.info("The state has been refreshed.")
@@ -328,10 +413,18 @@ class FileTransfer:
             logging.error(f"Error in refresh: {e}")
 
     def print_summary(self):
+        '''
+        Comment:
+            Prints a summary of flights and their designated output locations.
+        '''
         for i, flight in enumerate(self.flights_folders):
             logging.info(f"{i}. Move: {flight['dir_name']:55} to location: {flight['output_path']}")
 
     def summary(self):
+        '''
+        Comment:
+            Runs a series of methods to process and finalize flight data management.
+        '''
         try:
             self.get_information()
             self.reflectance_logic_with_timestamps()
@@ -349,6 +442,10 @@ class FileTransfer:
             logging.error(f"Error in summary: {e}")
 
     def _edit_paths(self):
+        '''
+        Comment:
+            Allows the user to edit flight paths through a series of input prompts.
+        '''
         try:
             type_edit = input("Do you want to move, duplicate, trash or move to skyline folder? (move/duplicate/trash/skyline)").strip().lower()
             if type_edit in ['move', 'm']:
@@ -363,6 +460,14 @@ class FileTransfer:
             logging.error(f"Error editing paths: {e}")
 
     def _move_path(self, streamlit_mode=False, flight_index=None, new_path_index=None):
+        '''
+        Input: 
+            streamlit_mode: bool
+            flight_index: int
+            new_path_index: int
+        Comment:
+            Updates the flight directory based on user input or parameters in streamlit mode.
+        '''
         try:
             if streamlit_mode:
                 flight_index = flight_index
@@ -380,6 +485,14 @@ class FileTransfer:
             logging.error("Invalid input. Please enter numbers corresponding to the flight indices.")
 
     def _duplicate_path(self, streamlit_mode=False, flight_index=None, new_path_index=None):
+        '''
+        Input: 
+            streamlit_mode: bool
+            flight_index: int
+            new_path_index: int
+        Comment:
+            Duplicates the flight directory based on user input or parameters in streamlit mode.
+        '''
         try:
             if streamlit_mode:
                 flight_index = flight_index
@@ -399,6 +512,13 @@ class FileTransfer:
             logging.error("Invalid input. Please enter numbers corresponding to the flight indices.")
 
     def _trash_path(self, streamlit_mode=False, flight_index=None):
+        '''
+        Input: 
+            streamlit_mode: bool
+            flight_index: int
+        Comment:
+            Trashes the flight directory based on user input or parameters in streamlit mode.
+        '''
         try:
             if streamlit_mode:
                 flight_index = flight_index
@@ -416,6 +536,13 @@ class FileTransfer:
             logging.error("Invalid input. Please enter numbers corresponding to the flight indices.")
 
     def _skyline_path(self, streamlit_mode=False, flight_index=None):
+        '''
+        Input: 
+            streamlit_mode: bool
+            flight_index: int
+        Comment:
+            Moves the flight directory to a 'skyline' based on user input or parameters in streamlit mode.
+        '''
         try:
             if streamlit_mode:
                 flight_index = flight_index
@@ -440,6 +567,13 @@ class FileTransfer:
 
     @staticmethod
     def move_directory(source_path: str, destination_path: str):
+        '''
+        Input: 
+            source_path: str
+            destination_path: str
+        Comment:
+            Moves a directory from source to destination. Handles errors internally.
+        '''
         try:
             os.makedirs(os.path.dirname(destination_path), exist_ok=True)
             command = f'xcopy "{source_path}\\*" "{destination_path}\\" /E /I /Y'
@@ -452,6 +586,12 @@ class FileTransfer:
             logging.error(f"Exception moving {source_path} to {destination_path}: {e}")
 
     def move_files_to_output(self, streamlit_mode=False):
+        '''
+        Input: 
+            streamlit_mode: bool
+        Comment:
+            Manages moving of flight directories to designated output paths in a threaded manner.
+        '''
         total_folders = len(self.flights_folders)
         q = Queue()
         threads = []
@@ -484,7 +624,14 @@ class FileTransfer:
         
 
     def _save_flight_log(self, streamlit_mode=False, drone_pilot=None,drone=None):
-        
+        '''
+        Input: 
+            streamlit_mode: bool
+            drone_pilot: str
+            drone: str
+        Comment:
+            Saves and updates the flight log to a CSV file after flights are processed.
+        '''
         try:
             df = pd.read_csv(self.temp_log_file)
             df['start_time'] = df['start_time'].astype(int)
@@ -576,11 +723,15 @@ class FileTransfer:
 
 
     def update_main_csv(self):
+        '''
+        Comment:
+            Updates the main CSV file with new flight logs.
+        '''
         try:
             temp_log = self._load_flight_log(self.temp_log_file)
             main_log = self._load_flight_log(self.flight_log_file)
             #---------------------------
-            # test can be preformed here
+            # more test can be preformed here
             #---------------------------
             logging.info('here is the error')
             new_log = pd.concat([main_log,temp_log],ignore_index=True)
@@ -593,6 +744,10 @@ class FileTransfer:
             logging.error(f"Error updating main flight log: {e}")
 
     def _close_and_wipe_sd_cards(self):
+        '''
+        Comment:
+            Securely wipes the SD card data. 
+        '''
         try:
             shutil.rmtree(self.input_path)
             logging.info("SD card wiped successfully.")
