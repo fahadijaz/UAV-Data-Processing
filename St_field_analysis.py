@@ -12,15 +12,22 @@ df_flight_log, df_flight_routes, df_fields, df_flight_log_merged, df_processing_
 
 flight_log_selection = df_flight_log_merged.copy()
 
-
 # Reading the excel files (these are test files)
-df0 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230614.xlsx"))
-df1 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230622.xlsx"))
-df2 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230628.xlsx"))
-df3 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230708.xlsx"))
-df4 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230714.xlsx"))
+#df0 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230614.xlsx"))
+#df1 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230622.xlsx"))
+#df2 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230628.xlsx"))
+#df3 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230708.xlsx"))
+#df4 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230714.xlsx"))
+df0 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240607 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+df1 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240612 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+df2 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240620 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+df3 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240624 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+df4 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240703 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+df5 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240708 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+df6 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240806 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+df7 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240812 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
 
-dates = ['20230614', '20230622', '20230628', '20230708', '20230714']
+dates = ['20240607', '20240612', '20240620', '20240624', '20240703', '20240708', '20240806', '20240812']
 
 
 # Returns (a) a list containing the selected indices for the user-selected indices, and (b) a list containing the corresponding indice column names.
@@ -122,12 +129,16 @@ def display_statistics_boxplot():
             df_stats[dates[2]]=df2[selected_indice_column_name]
             df_stats[dates[3]]=df3[selected_indice_column_name]
             df_stats[dates[4]]=df4[selected_indice_column_name]
+            df_stats[dates[5]]=df5[selected_indice_column_name]
+            df_stats[dates[6]]=df6[selected_indice_column_name]
+            df_stats[dates[7]]=df7[selected_indice_column_name]
 
             # Set the figure size
             plt.figure(figsize=(8, 5))  # width=8, height=5
 
             sns.set(style='whitegrid')
-            sns.boxplot(data=df_stats).set(title=f'Phenocrop M3MS {input_data_type} {final_indices[idx]}')
+            #sns.boxplot(data=df_stats).set(title=f'Phenocrop M3MS {input_data_type} {final_indices[idx]}')
+            sns.boxplot(data=df_stats).set(title=f'PROTEINBAR VOLLEBEKK M3MS {input_data_type} {final_indices[idx]}')
             
             # Showing the plot in the correct cell of the grid
             row, col = get_grid_position(idx, 2)
