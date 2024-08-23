@@ -47,6 +47,27 @@ for input_name in inputs_dict:
 #st.write(flight_log_selection[["Field ID", "date", "Route type", "Drone Pilot"]], escape=False, unsafe_allow_html=True)
 
 
+# Goes through the flight_log and returns a dictionary of percentages for each column
+def flight_log_percentages(flight_log_selection, columns_to_calculate):
+    value_percentages = {}
+    for column in columns_to_calculate:
+        # Calculate the total number of entries in the column
+        total_entries = len(flight_log_selection[column])
+        # Calculate the percentage of each unique value
+        percentages = flight_log_selection[column].value_counts(normalize=True) * 100
+        
+        # Store the percentages in the dictionary
+        value_percentages[column] = percentages
+    
+    return value_percentages
+
+flight_log_percentages_columns = ["LongName", "image_type_keyword", "drone_pilot", "Indice_blue", "Indice_green", "Indice_ndvi", "Indice_nir", "Indice_red_edge", "Indice_red"]
+flight_log_percentages_columns_names = ["Field", "Image Type", "Drone Pilot", "Blue", "Green", "NDVI", "NIR", "Red Edge", "Red"]
+
+column_percentages = flight_log_percentages(flight_log_selection, flight_log_percentages_columns)
+
+#st.write(column_percentages)
+
 # Displaying the selected drone flights
 def display_flight_table(flight_log_selection):
     css = """
@@ -112,15 +133,38 @@ def display_flight_table(flight_log_selection):
         height: 1.3em;
         filter: invert(0.5);
     }
+    .extra_info {
+        display: none; /* Hide by default */
+    }
+    /* Container for the button to position it absolutely within the <th> */
+    .button-container {
+        position: absolute; /* Position it relative to the <th> */
+        left: 0; /* Align to the left edge */
+        top: 50%; /* Center vertically */
+        transform: translateY(-50%); /* Adjust vertical alignment */
+    }
+
+    /* Make sure the <th> has a position relative to contain the absolute positioning */
+    .flight_log_header_cell_wide {
+        position: relative; /* Create a positioning context for child elements */
+    }
     </style>
     """
 
     html_content = css
-    html_content += """
+    html_content += f"""
         <table class='flight_log_table' border=1>
             <tr class="flight_log_header_1">
-                <th colspan="5"></th>
-                <th colspan="7" class="flight_log_header_cell sharp-left-border">&nbsp;Processed</th>
+                <th colspan="5" class="flight_log_header_cell_wide">
+                    <!-- Button to toggle extra info -->
+                    <div class="button-container">
+                        <button id="toggle_extra_info">Show</button>
+                    </div>
+                    <span class="extra_info">{len(flight_log_selection)} flights</span>
+                </th>
+                <th colspan="7" class="flight_log_header_cell sharp-left-border">&nbsp;Processed
+                    <span class="extra_info"> ()</span>
+                </th>
             </tr>
             <tr class="flight_log_header_2"><th></th>"""
     for name in ["Field", "Date", "Image Type", "Drone Pilot", "DSM", "Blue", "Green", "NDVI", "NIR", "Red Edge", "Red"]:
@@ -129,8 +173,17 @@ def display_flight_table(flight_log_selection):
         if name == "DSM":
             html_content += " sharp-left-border"
         html_content += f"""
-                ">{name}</th>
-        """
+                ">{name}"""
+        
+        if name in flight_log_percentages_columns_names:
+            index_of_column = flight_log_percentages_columns_names.index(name)
+            column_name_in_df = flight_log_percentages_columns[index_of_column]
+            if 1 in column_percentages[column_name_in_df].index:
+                percentage = round(column_percentages[column_name_in_df][1])
+                html_content += f"""
+                        <span class="extra_info"> ({percentage}%)</span>
+                """
+        html_content += f"</th>"
 
     html_content += """</tr>"""
 
@@ -158,6 +211,23 @@ def display_flight_table(flight_log_selection):
             """
 
     html_content += "</table>"
+    html_content += """
+        <script>
+            // JavaScript to toggle visibility of extra_info spans
+            document.addEventListener('DOMContentLoaded', function() {
+                var button = document.getElementById('toggle_extra_info');
+                var extraInfoElements = document.querySelectorAll('.extra_info');
+                var isVisible = false; // Track visibility state
+
+                button.addEventListener('click', function() {
+                    isVisible = !isVisible; // Toggle the state
+                    extraInfoElements.forEach(function(element) {
+                        element.style.display = isVisible ? 'inline' : 'none'; // Toggle visibility
+                    });
+                });
+            });
+        </script>
+        """
     components.html(html_content, height=700, scrolling=True)
     #st.markdown(html_content, unsafe_allow_html=True)
 
