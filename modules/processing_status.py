@@ -19,9 +19,9 @@ def check_processing_status(flight_details):
     if processing_paths["project"] != "":
         # Finding the other processing paths based on the project path
         processing_paths["report"] = rf'{processing_paths["project"]}\1_initial\report\html\index.html'
-        #processing_paths["orthomosaics"] = find_tif_files(rf'{processing_paths["project"]}\3_dsm_ortho\2_mosaic')[0]
-        processing_paths["orthomosaics"] = find_tif_files(rf'{processing_paths["project"]}\3_dsm_ortho\2_mosaic')
-        processing_paths["DSM"] = find_tif_files(rf'{processing_paths["project"]}\3_dsm_ortho\1_dsm')[0]
+        #processing_paths["orthomosaics"] = find_files_in_folder(rf'{processing_paths["project"]}\3_dsm_ortho\2_mosaic', 'tif')[0]
+        processing_paths["orthomosaics"] = find_files_in_folder(rf'{processing_paths["project"]}\3_dsm_ortho\2_mosaic', 'tif')
+        processing_paths["DSM"] = find_files_in_folder(rf'{processing_paths["project"]}\3_dsm_ortho\1_dsm', 'tif')[0]
         processing_paths["indices"], processing_paths["indices_names"] = find_tif_files_in_subfolders(rf'{processing_paths["project"]}\4_index\indices')
 
         #df_log_file = import_log_file(rf'{processing_paths["project"]}\1_initial\report\html\index.html')
@@ -72,14 +72,14 @@ def create_new_row_for_processing_status(flight_details, processing_result):
 if __name__ == "__main__":
     import pandas as pd
     import streamlit as st
-    from file_system_functions import find_tif_files
+    from file_system_functions import find_files_in_folder
     from file_system_functions import find_tif_files_in_subfolders
     from flight_log_preprocessing import preprocessing
     from flight_log_preprocessing import import_log_file
 
     update_all_flights()
 else:
-    from .file_system_functions import find_tif_files
+    from .file_system_functions import find_files_in_folder
     from .file_system_functions import find_tif_files_in_subfolders
     from .flight_log_preprocessing import preprocessing
     from .flight_log_preprocessing import import_log_file

@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from modules.flight_log_preprocessing import preprocessing
+from modules.file_system_functions import find_files_in_folder
 import datetime
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -11,6 +12,8 @@ df_flight_log, df_flight_routes, df_fields, df_flight_log_merged, df_processing_
 #df_flight_log_merged
 
 flight_log_selection = df_flight_log_merged.copy()
+
+qgis_folder_path = "P:/PhenoCrop/3_qgis"
 
 # Reading the excel files (these are test files)
 #df0 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230614.xlsx"))
@@ -29,6 +32,28 @@ df7 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M
 
 dates = ['20240607', '20240612', '20240620', '20240624', '20240703', '20240708', '20240806', '20240812']
 
+# Returns a list of paths to the qgis result files and a list of their dates
+def get_qgis_results(qgis_folder_path, selected_field):
+    qgis_results_dates = []
+    selected_field_ID = df_fields.loc[df_fields["LongName"] == selected_field, "Field ID"].values[0]
+
+    qgis_field_folder = rf"{qgis_folder_path}/{selected_field_ID}"
+
+    qgis_results_file_paths = find_files_in_folder(qgis_field_folder, 'csv')
+    
+    # Only runs the next part if there exists results files
+    if qgis_results_file_paths == []:
+        qgis_results_dates = [path.split("\\")[1].split(" ")[0] for path in qgis_results_file_paths]
+
+        # Makes dataframes from the paths
+        qgis_results_files = []
+        for path in qgis_results_file_paths:
+            qgis_file = pd.DataFrame(pd.read_csv(path))
+            qgis_results_files.append(qgis_file)
+    else:
+        qgis_results_files = []
+    
+    return qgis_results_files, qgis_results_dates
 
 # Returns (a) a list containing the selected indices for the user-selected indices, and (b) a list containing the corresponding indice column names.
 def indices_get_selected(input_indices, indices_column_names, input_data_type):
@@ -61,8 +86,6 @@ indices_column_names = {"Indices": ["Blue", "Green", "NDVI", "NIR", "Red Edge", 
                         "Median": ["blue_median", "green_median", "ndvi_median", "nir_median", "red_edge_median", "red_median"],
                         "Standard Deviation": ["blue_stdev", "green_stdev", "ndvi_stdev", "nir_stdev", "red_edge_stdev", "red_stdev"]}
 
-indices_check_if_exist(indices_column_names["Indices"], indices_column_names, df0)
-
 # Options for input fields
 excluded_field_IDs = ["Proteinbar NAPE", "GENE2BREAD", "High Grass", "Faba Bean"]
 field_IDs = [value for value in df_fields["LongName"] if value not in excluded_field_IDs]
@@ -85,6 +108,9 @@ with input_col_4:
     input_data_type = st.selectbox("Data Type", data_types, index=None, placeholder="*Data Type", label_visibility="collapsed")
 with input_col_5:
     input_indices = st.multiselect("Indices", indices_options, placeholder="*Indices", label_visibility="collapsed")
+
+
+qgis_results_files, qgis_results_dates = get_qgis_results(qgis_folder_path, input_field)
 
 
 
@@ -124,14 +150,9 @@ def display_statistics_boxplot():
         for idx, selected_indice_column_name in enumerate(final_indices_column_names):
             # new dataframe for holding all red mean values
             df_stats = pd.DataFrame()
-            df_stats[dates[0]]=df0[selected_indice_column_name]
-            df_stats[dates[1]]=df1[selected_indice_column_name]
-            df_stats[dates[2]]=df2[selected_indice_column_name]
-            df_stats[dates[3]]=df3[selected_indice_column_name]
-            df_stats[dates[4]]=df4[selected_indice_column_name]
-            df_stats[dates[5]]=df5[selected_indice_column_name]
-            df_stats[dates[6]]=df6[selected_indice_column_name]
-            df_stats[dates[7]]=df7[selected_indice_column_name]
+            for idy, result_date in enumerate(qgis_results_dates):
+                result_file = qgis_results_files[idy]
+                df_stats[result_date] = result_file[selected_indice_column_name]
 
             # Set the figure size
             plt.figure(figsize=(8, 5))  # width=8, height=5
@@ -145,6 +166,6 @@ def display_statistics_boxplot():
             with grid[row][col]:
                 st.pyplot(plt, clear_figure=True)
     else:
-        st.write("Fill the input fields")
+        st.write("Fill the necessary input fields")
 
 display_statistics_boxplot()
