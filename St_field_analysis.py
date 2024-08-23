@@ -16,19 +16,14 @@ flight_log_selection = df_flight_log_merged.copy()
 qgis_folder_path = "P:/PhenoCrop/3_qgis"
 
 # Reading the excel files (these are test files)
-#df0 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230614.xlsx"))
-#df1 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230622.xlsx"))
-#df2 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230628.xlsx"))
-#df3 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230708.xlsx"))
-#df4 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230714.xlsx"))
-df0 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240607 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
-df1 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240612 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
-df2 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240620 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
-df3 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240624 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
-df4 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240703 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
-df5 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240708 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
-df6 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240806 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
-df7 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240812 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df0 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240607 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df1 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240612 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df2 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240620 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df3 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240624 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df4 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240703 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df5 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240708 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df6 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240806 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df7 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240812 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
 
 dates = ['20240607', '20240612', '20240620', '20240624', '20240703', '20240708', '20240806', '20240812']
 
@@ -42,7 +37,7 @@ def get_qgis_results(qgis_folder_path, selected_field):
     qgis_results_file_paths = find_files_in_folder(qgis_field_folder, 'csv')
     
     # Only runs the next part if there exists results files
-    if qgis_results_file_paths == []:
+    if qgis_results_file_paths != [""]:
         qgis_results_dates = [path.split("\\")[1].split(" ")[0] for path in qgis_results_file_paths]
 
         # Makes dataframes from the paths
@@ -117,14 +112,15 @@ qgis_results_files, qgis_results_dates = get_qgis_results(qgis_folder_path, inpu
 def display_statistics_boxplot():
     # Check if the necessary input fields are non-empty
     ok_display_statistics_boxplot = 1
-    ok_display_statistics_boxplot = 0 if input_field is None else ok_display_statistics_boxplot
-    ok_display_statistics_boxplot = 0 if input_data_type is None else ok_display_statistics_boxplot
-    ok_display_statistics_boxplot = 0 if input_indices == [] else ok_display_statistics_boxplot
+    error_message = ""
+    ok_display_statistics_boxplot, error_message = (0, "Fill the necessary input fields") if input_field is None else (ok_display_statistics_boxplot, error_message)
+    ok_display_statistics_boxplot, error_message = (0, "Fill the necessary input fields") if input_data_type is None else (ok_display_statistics_boxplot, error_message)
+    ok_display_statistics_boxplot, error_message = (0, "Fill the necessary input fields") if input_indices is None else (ok_display_statistics_boxplot, error_message)
+    ok_display_statistics_boxplot, error_message = (0, "This field has no statistics yet") if qgis_results_files == [] else (ok_display_statistics_boxplot, error_message)
 
     if ok_display_statistics_boxplot == 1:
-
         selected_indices, selected_indice_column_names = indices_get_selected(input_indices, indices_column_names, input_data_type)
-        final_indices, final_indices_column_names = indices_check_if_exist(selected_indices, selected_indice_column_names, df0)
+        final_indices, final_indices_column_names = indices_check_if_exist(selected_indices, selected_indice_column_names, qgis_results_files[0])
 
         #st.write(final_indices)
         #st.write(final_indices_column_names)
@@ -166,6 +162,6 @@ def display_statistics_boxplot():
             with grid[row][col]:
                 st.pyplot(plt, clear_figure=True)
     else:
-        st.write("Fill the necessary input fields")
+        st.write(error_message)
 
 display_statistics_boxplot()
