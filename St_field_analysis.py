@@ -29,24 +29,23 @@ dates = ['20240607', '20240612', '20240620', '20240624', '20240703', '20240708',
 
 # Returns a list of paths to the qgis result files and a list of their dates
 def get_qgis_results(qgis_folder_path, selected_field):
+    qgis_results_files = []
     qgis_results_dates = []
-    selected_field_ID = df_fields.loc[df_fields["LongName"] == selected_field, "Field ID"].values[0]
+    if selected_field != None:
+        selected_field_ID = df_fields.loc[df_fields["LongName"] == selected_field, "Field ID"].values[0]
 
-    qgis_field_folder = rf"{qgis_folder_path}/{selected_field_ID}"
+        qgis_field_folder = rf"{qgis_folder_path}/{selected_field_ID}"
 
-    qgis_results_file_paths = find_files_in_folder(qgis_field_folder, 'csv')
-    
-    # Only runs the next part if there exists results files
-    if qgis_results_file_paths != [""]:
-        qgis_results_dates = [path.split("\\")[1].split(" ")[0] for path in qgis_results_file_paths]
+        qgis_results_file_paths = find_files_in_folder(qgis_field_folder, 'csv')
+        
+        # Only runs the next part if there exists results files
+        if qgis_results_file_paths != [""]:
+            qgis_results_dates = [path.split("\\")[1].split(" ")[0] for path in qgis_results_file_paths]
 
-        # Makes dataframes from the paths
-        qgis_results_files = []
-        for path in qgis_results_file_paths:
-            qgis_file = pd.DataFrame(pd.read_csv(path))
-            qgis_results_files.append(qgis_file)
-    else:
-        qgis_results_files = []
+            # Makes dataframes from the paths
+            for path in qgis_results_file_paths:
+                qgis_file = pd.DataFrame(pd.read_csv(path))
+                qgis_results_files.append(qgis_file)
     
     return qgis_results_files, qgis_results_dates
 
@@ -113,10 +112,10 @@ def display_statistics_boxplot():
     # Check if the necessary input fields are non-empty
     ok_display_statistics_boxplot = 1
     error_message = ""
-    ok_display_statistics_boxplot, error_message = (0, "Fill the necessary input fields") if input_field is None else (ok_display_statistics_boxplot, error_message)
     ok_display_statistics_boxplot, error_message = (0, "Fill the necessary input fields") if input_data_type is None else (ok_display_statistics_boxplot, error_message)
     ok_display_statistics_boxplot, error_message = (0, "Fill the necessary input fields") if input_indices is None else (ok_display_statistics_boxplot, error_message)
     ok_display_statistics_boxplot, error_message = (0, "This field has no statistics yet") if qgis_results_files == [] else (ok_display_statistics_boxplot, error_message)
+    ok_display_statistics_boxplot, error_message = (0, "Fill the necessary input fields") if input_field is None else (ok_display_statistics_boxplot, error_message)
 
     if ok_display_statistics_boxplot == 1:
         selected_indices, selected_indice_column_names = indices_get_selected(input_indices, indices_column_names, input_data_type)
