@@ -2,6 +2,7 @@ import os
 import streamlit as st
 import time
 import pandas as pd
+import streamlit as st
 
 # A function to check which processing outputs exist for a flight.
 # It returns a dictionary with information like e.g. paths.
@@ -59,7 +60,7 @@ def create_new_row_for_processing_status(flight_details, processing_result):
     indice_ndvi_exists = 1 if any("ndvi" in name.lower() for name in processing_result["indices_names"]) else 0
     indice_nir_exists = 1 if any("nir" in name.lower() for name in processing_result["indices_names"]) else 0
     indice_red_edge_exists = 1 if any("red_edge" in name.lower() for name in processing_result["indices_names"]) else 0
-    indice_red_exists = 1 if any(name.lower() == "Red_red" for name in processing_result["indices_names"]) else 0
+    indice_red_exists = 1 if any("red_red" in name.lower() for name in processing_result["indices_names"]) else 0
     onging_status = 1 if flight_details["ongoing"] == 1 else 0
 
     new_row = pd.DataFrame([{"flight_output_path": flight_details["output_path"], "ProjectFolderPath": processing_result["project"], "Report": processing_result["report"],
