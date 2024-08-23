@@ -124,11 +124,24 @@ def display_section_main_1():
             st.table(flight_details_col_2)
 
 def display_section_processing_status():
-    st.write("#### Processing status")
+    # Sets the default value for the ongoing status field
+    default_value = ""  # Default to empty string if condition is not met
+    if flight_details["ongoing"] == 1:
+        default_value = "ongoing"
 
-    display_processing_status(processing_paths)
-    #st.write(processing_paths)
+    processing_title_column_1, processing_title_column_2 = st.columns([0.82, 0.18])
+    with processing_title_column_1:
+        st.write("#### Processing status")
+    
+    with processing_title_column_2:
+        input_ongoing = st.selectbox("Route Type", ["","ongoing"], label_visibility="collapsed", index=["", "ongoing"].index(default_value))
+    
+    if input_ongoing == "ongoing":
+        flight_details["ongoing"] = 1
+        update_this_processing_status(df_processing_status, flight_details, processing_paths)
+
     update_this_processing_status(df_processing_status, flight_details, processing_paths)
+    display_processing_status(processing_paths)
 
 display_section_title()
 display_section_main_1()

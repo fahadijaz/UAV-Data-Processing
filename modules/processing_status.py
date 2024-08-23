@@ -60,12 +60,13 @@ def create_new_row_for_processing_status(flight_details, processing_result):
     indice_nir_exists = 1 if any("nir" in name.lower() for name in processing_result["indices_names"]) else 0
     indice_red_edge_exists = 1 if any("red_edge" in name.lower() for name in processing_result["indices_names"]) else 0
     indice_red_exists = 1 if any(name.lower() == "Red_red" for name in processing_result["indices_names"]) else 0
+    onging_status = 1 if flight_details["ongoing"] == 1 else 0
 
     new_row = pd.DataFrame([{"flight_output_path": flight_details["output_path"], "ProjectFolderPath": processing_result["project"], "Report": processing_result["report"],
                 "Orthomosaics": processing_result["orthomosaics"], "Orthomosaics_names": processing_result["orthomosaics_names"], "DSM_Path": processing_result["DSM"],
                 "Indices": processing_result["indices"], "Indices_names": processing_result["indices_names"], "Stats": processing_result["stats"],
                 "Indice_blue": indice_blue_exists, "Indice_green": indice_green_exists, "Indice_ndvi": indice_ndvi_exists,
-                "Indice_nir": indice_nir_exists, "Indice_red_edge": indice_red_edge_exists, "Indice_red": indice_red_exists}])
+                "Indice_nir": indice_nir_exists, "Indice_red_edge": indice_red_edge_exists, "Indice_red": indice_red_exists, "ongoing": onging_status}])
     
     return new_row
 
