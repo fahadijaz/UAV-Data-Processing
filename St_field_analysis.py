@@ -38,10 +38,18 @@ def get_qgis_results(qgis_folder_path, selected_field):
         
         # Only runs the next part if there exists results files
         if qgis_results_file_paths != [""]:
-            qgis_results_dates = [path.split("\\")[1].split(" ")[0] for path in qgis_results_file_paths]
+            #qgis_results_dates = [path.split("\\")[1].split(" ")[0][4:] for path in qgis_results_file_paths]
             qgis_results_details = qgis_results_file_paths[0].split("\\")[1].split(" ")
             qgis_results_drone = qgis_results_details[2]
             qgis_results_year = qgis_results_details[0][:4]
+
+            # Makes a list of the dates for the qgis result files in the format dd.mm
+            qgis_results_dates = []
+            for path in qgis_results_file_paths:
+                mm = path.split("\\")[1].split(" ")[0][4:6]
+                dd = path.split("\\")[1].split(" ")[0][6:]
+                date = rf"{dd}.{mm}"
+                qgis_results_dates.append(date)
 
             # Makes dataframes from the paths
             for path in qgis_results_file_paths:
