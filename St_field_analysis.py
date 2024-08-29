@@ -25,8 +25,6 @@ qgis_folder_path = "P:/PhenoCrop/3_qgis"
 #df6 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240806 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
 #df7 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240812 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
 
-dates = ['20240607', '20240612', '20240620', '20240624', '20240703', '20240708', '20240806', '20240812']
-
 # Returns a list of paths to the qgis result files and a list of their dates
 def get_qgis_results(qgis_folder_path, selected_field):
     qgis_results_files = []
@@ -41,13 +39,15 @@ def get_qgis_results(qgis_folder_path, selected_field):
         # Only runs the next part if there exists results files
         if qgis_results_file_paths != [""]:
             qgis_results_dates = [path.split("\\")[1].split(" ")[0] for path in qgis_results_file_paths]
+            qgis_results_drone = qgis_results_file_paths[0].split("\\")[1].split(" ")[2]
+            qgis_results_details = qgis_results_file_paths[0].split("\\")[1].split(" ")
 
             # Makes dataframes from the paths
             for path in qgis_results_file_paths:
                 qgis_file = pd.DataFrame(pd.read_csv(path))
                 qgis_results_files.append(qgis_file)
     
-    return qgis_results_files, qgis_results_dates
+    return qgis_results_files, qgis_results_dates, qgis_results_drone
 
 # Returns (a) a list containing the selected indices for the user-selected indices, and (b) a list containing the corresponding indice column names.
 def indices_get_selected(input_indices, indices_column_names, input_data_type):
@@ -104,7 +104,7 @@ with input_col_5:
     input_indices = st.multiselect("Indices", indices_options, placeholder="*Indices", label_visibility="collapsed")
 
 
-qgis_results_files, qgis_results_dates = get_qgis_results(qgis_folder_path, input_field)
+qgis_results_files, qgis_results_dates, qgis_results_drone = get_qgis_results(qgis_folder_path, input_field)
 
 
 
@@ -154,7 +154,7 @@ def display_statistics_boxplot():
 
             sns.set(style='whitegrid')
             #sns.boxplot(data=df_stats).set(title=f'Phenocrop M3MS {input_data_type} {final_indices[idx]}')
-            sns.boxplot(data=df_stats).set(title=f'PROTEINBAR VOLLEBEKK M3MS {input_data_type} {final_indices[idx]}')
+            sns.boxplot(data=df_stats).set(title=f'{input_field} {qgis_results_drone} MS {input_data_type} {final_indices[idx]}')
             
             # Showing the plot in the correct cell of the grid
             row, col = get_grid_position(idx, 2)
