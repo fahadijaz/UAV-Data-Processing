@@ -61,8 +61,8 @@ def flight_log_percentages(flight_log_selection, columns_to_calculate):
     
     return value_percentages
 
-flight_log_percentages_columns = ["LongName", "image_type_keyword", "drone_pilot", "Indice_blue", "Indice_green", "Indice_ndvi", "Indice_nir", "Indice_red_edge", "Indice_red"]
-flight_log_percentages_columns_names = ["Field", "Image Type", "Drone Pilot", "Blue", "Green", "NDVI", "NIR", "Red Edge", "Red"]
+flight_log_percentages_columns = ["LongName", "image_type_keyword", "drone_pilot", "processed"]
+flight_log_percentages_columns_names = ["Field", "Image Type", "Drone Pilot", "Processed"]
 
 column_percentages = flight_log_percentages(flight_log_selection, flight_log_percentages_columns)
 
@@ -115,7 +115,7 @@ def display_flight_table(flight_log_selection):
     /* Make the table header sticky */
     .flight_log_header_2 {
         position: sticky;
-        top: 0;
+        top: -1px;
         z-index: 2; /* Ensure the header stays above the table rows */
     }
 
@@ -154,26 +154,15 @@ def display_flight_table(flight_log_selection):
     html_content = css
     html_content += f"""
         <table class='flight_log_table' border=1>
-            <tr class="flight_log_header_1">
-                <th colspan="5" class="flight_log_header_cell_wide">
-                    <!-- Button to toggle extra info -->
-                    <div class="button-container">
-                        <button id="toggle_extra_info">Show</button>
-                    </div>
-                    <span class="extra_info">{len(flight_log_selection)} flights</span>
-                </th>
-                <th colspan="7" class="flight_log_header_cell sharp-left-border">&nbsp;Processed
-                    <span class="extra_info"> ()</span>
-                </th>
-            </tr>
-            <tr class="flight_log_header_2"><th></th>"""
-    for name in ["Field", "Date", "Image Type", "Drone Pilot", "DSM", "Blue", "Green", "NDVI", "NIR", "Red Edge", "Red"]:
+            <tr class="flight_log_header_2"><th>
+                <!-- Button to toggle extra info -->
+                <div class="button-container">
+                    <button id="toggle_extra_info">Show</button>
+                </div>
+            </th>"""
+    for name in ["Field", "Date", "Image Type", "Drone Pilot", "Processed"]:
         html_content += f"""
-                <th class="flight_log_header_cell"""
-        if name == "DSM":
-            html_content += " sharp-left-border"
-        html_content += f"""
-                ">{name}"""
+                <th class="flight_log_header_cell">{name}"""
         
         if name in flight_log_percentages_columns_names:
             index_of_column = flight_log_percentages_columns_names.index(name)
@@ -189,10 +178,6 @@ def display_flight_table(flight_log_selection):
 
 
     for index, row in flight_log_selection.iterrows():
-        if pd.isna(row['DSM_Path']) or pd.isnull(row['DSM_Path']):
-            dsm_exists = 0
-        else:
-            dsm_exists = 1
         html_content += f"""
             <tr class="flight_log_entry">
                 <td class="flight_log_link_cell"><a href="http://localhost:8502?Index={row['flight_ID']}" target="_blank"><img src="https://cdn-icons-png.flaticon.com/128/3388/3388930.png"></a></td>
@@ -200,13 +185,7 @@ def display_flight_table(flight_log_selection):
                 <td class="flight_log_cell">{row['date']}</td>
                 <td class="flight_log_cell">{row['image_type_keyword']}</td>
                 <td class="flight_log_cell">{row['drone_pilot']}</td>
-                <td class="flight_log_cell sharp-left-border">{int(dsm_exists) if not pd.isna(dsm_exists) else '?'}</td>
-                <td class="flight_log_cell">{int(row['Indice_blue']) if not pd.isna(row['Indice_blue']) else '?'}</td>
-                <td class="flight_log_cell">{int(row['Indice_green']) if not pd.isna(row['Indice_green']) else '?'}</td>
-                <td class="flight_log_cell">{int(row['Indice_ndvi']) if not pd.isna(row['Indice_ndvi']) else '?'}</td>
-                <td class="flight_log_cell">{int(row['Indice_nir']) if not pd.isna(row['Indice_nir']) else '?'}</td>
-                <td class="flight_log_cell">{int(row['Indice_red_edge']) if not pd.isna(row['Indice_red_edge']) else '?'}</td>
-                <td class="flight_log_cell">{int(row['Indice_red']) if not pd.isna(row['Indice_red']) else '?'}</td>
+                <td class="flight_log_cell">{int(row['processed']) if not pd.isna(row['processed']) else '?'}</td>
             </tr>
             """
 
@@ -232,3 +211,8 @@ def display_flight_table(flight_log_selection):
     #st.markdown(html_content, unsafe_allow_html=True)
 
 display_flight_table(flight_log_selection)
+
+processed_percentage = column_percentages['processed'][1]
+processed_count = round(len(flight_log_selection)*processed_percentage/100)
+bottom_text = f"Showing {len(flight_log_selection)} flights. &nbsp; Of which {processed_count} ({round(processed_percentage)}%) are fully processed."
+st.write(bottom_text)
