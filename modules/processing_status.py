@@ -3,6 +3,7 @@ import streamlit as st
 import time
 import pandas as pd
 import streamlit as st
+import numpy as np
 
 # A function to check which processing outputs exist for a flight.
 # It returns a dictionary with information like e.g. paths.
@@ -61,13 +62,23 @@ def create_new_row_for_processing_status(flight_details, processing_result):
     indice_nir_exists = 1 if any("nir" in name.lower() for name in processing_result["indices_names"]) else 0
     indice_red_edge_exists = 1 if any("red_edge" in name.lower() for name in processing_result["indices_names"]) else 0
     indice_red_exists = 1 if any("red_red" in name.lower() for name in processing_result["indices_names"]) else 0
+    DSM_exists = 0 if processing_result["DSM"] in [None, "", np.nan] else 1
     onging_status = 1 if flight_details["ongoing"] == 1 else 0
+
+    processing_columns_for_image_types = {"3D": [DSM_exists],
+                                      "MS": [indice_green_exists,indice_ndvi_exists,indice_nir_exists,indice_red_edge_exists,indice_red_exists],
+                                      "phantom-MS": [indice_blue_exists,indice_green_exists,indice_ndvi_exists,indice_nir_exists,indice_red_edge_exists,indice_red_exists]}
+
+    processed = 1
+    for column in processing_columns_for_image_types[flight_details["image_type_keyword"]]:
+        if column == 0:
+            processed = 0
 
     new_row = pd.DataFrame([{"flight_output_path": flight_details["output_path"], "ProjectFolderPath": processing_result["project"], "Report": processing_result["report"],
                 "Orthomosaics": processing_result["orthomosaics"], "Orthomosaics_names": processing_result["orthomosaics_names"], "DSM_Path": processing_result["DSM"],
-                "Indices": processing_result["indices"], "Indices_names": processing_result["indices_names"], "Stats": processing_result["stats"],
-                "Indice_blue": indice_blue_exists, "Indice_green": indice_green_exists, "Indice_ndvi": indice_ndvi_exists,
-                "Indice_nir": indice_nir_exists, "Indice_red_edge": indice_red_edge_exists, "Indice_red": indice_red_exists, "ongoing": onging_status}])
+                "DSM": DSM_exists, "Indices": processing_result["indices"], "Indices_names": processing_result["indices_names"], "Stats": processing_result["stats"],
+                "Indice_blue": indice_blue_exists, "Indice_green": indice_green_exists, "Indice_ndvi": indice_ndvi_exists, "Indice_nir": indice_nir_exists,
+                "Indice_red_edge": indice_red_edge_exists, "Indice_red": indice_red_exists, "processed": processed, "ongoing": onging_status}])
     
     return new_row
 
