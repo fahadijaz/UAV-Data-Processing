@@ -39,15 +39,16 @@ def get_qgis_results(qgis_folder_path, selected_field):
         # Only runs the next part if there exists results files
         if qgis_results_file_paths != [""]:
             qgis_results_dates = [path.split("\\")[1].split(" ")[0] for path in qgis_results_file_paths]
-            qgis_results_drone = qgis_results_file_paths[0].split("\\")[1].split(" ")[2]
             qgis_results_details = qgis_results_file_paths[0].split("\\")[1].split(" ")
+            qgis_results_drone = qgis_results_details[2]
+            qgis_results_year = qgis_results_details[0][:4]
 
             # Makes dataframes from the paths
             for path in qgis_results_file_paths:
                 qgis_file = pd.DataFrame(pd.read_csv(path))
                 qgis_results_files.append(qgis_file)
     
-    return qgis_results_files, qgis_results_dates, qgis_results_drone
+    return qgis_results_files, qgis_results_dates, qgis_results_drone, qgis_results_year
 
 # Returns (a) a list containing the selected indices for the user-selected indices, and (b) a list containing the corresponding indice column names.
 def indices_get_selected(input_indices, indices_column_names, input_data_type):
@@ -104,7 +105,7 @@ with input_col_5:
     input_indices = st.multiselect("Indices", indices_options, placeholder="*Indices", label_visibility="collapsed")
 
 
-qgis_results_files, qgis_results_dates, qgis_results_drone = get_qgis_results(qgis_folder_path, input_field)
+qgis_results_files, qgis_results_dates, qgis_results_drone, qgis_results_year = get_qgis_results(qgis_folder_path, input_field)
 
 
 
@@ -151,10 +152,10 @@ def display_statistics_boxplot():
 
             # Set the figure size
             plt.figure(figsize=(8, 5))  # width=8, height=5
+            plt.xticks(rotation=45) # Rotates the labels on the x axis
 
             sns.set(style='whitegrid')
-            #sns.boxplot(data=df_stats).set(title=f'Phenocrop M3MS {input_data_type} {final_indices[idx]}')
-            sns.boxplot(data=df_stats).set(title=f'{input_field} {qgis_results_drone} MS {input_data_type} {final_indices[idx]}')
+            sns.boxplot(data=df_stats).set(title=f'{input_field} {qgis_results_year}\n{final_indices[idx]} {input_data_type}\n{qgis_results_drone} MS')
             
             # Showing the plot in the correct cell of the grid
             row, col = get_grid_position(idx, 2)
