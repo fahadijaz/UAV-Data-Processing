@@ -139,6 +139,10 @@ def display_section_processing_status():
     if input_ongoing == "ongoing":
         flight_details["ongoing"] = 1
         update_this_processing_status(df_processing_status, flight_details, processing_paths)
+    
+    if input_ongoing == "":
+        flight_details["ongoing"] = 0
+        update_this_processing_status(df_processing_status, flight_details, processing_paths)
 
     update_this_processing_status(df_processing_status, flight_details, processing_paths)
     display_processing_status(processing_paths)
