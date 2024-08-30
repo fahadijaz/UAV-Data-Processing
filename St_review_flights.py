@@ -75,6 +75,10 @@ def display_flight_table(flight_log_selection):
     :root {
         --scrollbar-thumb: #888;
         --scrollbar-thumb-hover: #555;
+        --flight-entry-color-green: rgba(0, 255, 0, 0.3);
+        --flight-entry-color-blue: rgba(0, 0, 255, 0.1);
+        --flight-entry-color-grey: rgba(128, 128, 128, 0.3);
+        --flight-entry-color-yellow: rgba(255, 255, 0, 0.3);
     }
     ::-webkit-scrollbar {
         width: 8px;
@@ -148,6 +152,37 @@ def display_flight_table(flight_log_selection):
     .flight_log_header_cell_wide {
         position: relative; /* Create a positioning context for child elements */
     }
+
+    .flight_log_entry_processed_notongoing {
+        background-color: var(--flight-entry-color-green);
+    }
+    .flight_log_entry_processed_ongoing {
+        background: repeating-linear-gradient(
+            45deg,                                  /* Angle of the stripes */
+            var(--flight-entry-color-green),                   /* Green with 50% opacity */
+            var(--flight-entry-color-green) 5px,              /* Green stripe ends at 10px */
+            var(--flight-entry-color-blue) 5px,              /* Blue starts at 10px */
+            var(--flight-entry-color-blue) 10px               /* Blue stripe ends at 20px */
+        );
+    }
+    .flight_log_entry_notprocessed_ongoing {
+        background-color: var(--flight-entry-color-blue);
+    }
+    .flight_log_entry_notprocessed_notongoing {
+        background-color: var(--flight-entry-color-yellow)
+    }
+    .flight_log_entry_unknown_notongoing {
+        background-color: var(--flight-entry-color-grey);
+    }
+    .flight_log_entry_unknown_ongoing {
+        background: repeating-linear-gradient(
+            45deg,                                  /* Angle of the stripes */
+            var(--flight-entry-color-grey),   /* Grey with 50% opacity */
+            var(--flight-entry-color-grey) 5px, /* Grey stripe ends at 5px */
+            var(--flight-entry-color-blue) 5px,     /* Blue starts at 5px */
+            var(--flight-entry-color-blue) 10px     /* Blue stripe ends at 10px */
+        );
+    }
     </style>
     """
 
@@ -160,7 +195,7 @@ def display_flight_table(flight_log_selection):
                     <!-- <button id="toggle_extra_info">Show</button> -->
                 </div>
             </th>"""
-    for name in ["Field", "Date", "Image Type", "Drone Pilot", "Processed"]:
+    for name in ["Field", "Date", "Image Type", "Drone Pilot", "Processing status"]:
         html_content += f"""
                 <th class="flight_log_header_cell">{name}"""
         
@@ -178,14 +213,41 @@ def display_flight_table(flight_log_selection):
 
 
     for index, row in flight_log_selection.iterrows():
+        this_processed = int(row['processed']) if not pd.isna(row['processed']) else '?'
+        this_ongoing = row['ongoing']
+
+        # Setting processing status
+        this_processing_status = ""
+        this_processing_status_msg = ""
+        if this_processed == 1 and this_ongoing == 0:
+            this_processing_status = "processed_notongoing"
+            this_processing_status_msg = "Fully processed"
+        if this_processed == 1 and this_ongoing == 1:
+            this_processing_status = "processed_ongoing"
+            this_processing_status_msg = "Fully processed & processing"
+        if this_processed == 0 and this_ongoing == 1:
+            this_processing_status = "notprocessed_ongoing"
+            this_processing_status_msg = "Processing"
+        if this_processed == 0 and this_ongoing == 0:
+            this_processing_status = "notprocessed_notongoing"
+            this_processing_status_msg = "Neither processed nor processing"
+        if this_processed == "?" and pd.isna(this_ongoing):
+            this_processing_status = "unknown_notongoing"
+            this_processing_status_msg = "Unknown processing status"
+        if this_processed == "?" and this_ongoing == 1:
+            this_processing_status = "unknown_ongoing"
+            this_processing_status_msg = "Unknown processed status, but currently processing"
+        
         html_content += f"""
-            <tr class="flight_log_entry">
+            <tr class='flight_log_entry flight_log_entry_{this_processing_status}'>
                 <td class="flight_log_link_cell"><a href="http://localhost:8502?Index={row['flight_ID']}" target="_blank"><img src="https://cdn-icons-png.flaticon.com/128/3388/3388930.png"></a></td>
                 <td class="flight_log_cell">{row['LongName']}</td>
                 <td class="flight_log_cell">{row['date']}</td>
                 <td class="flight_log_cell">{row['image_type_keyword']}</td>
                 <td class="flight_log_cell">{row['drone_pilot']}</td>
-                <td class="flight_log_cell">{int(row['processed']) if not pd.isna(row['processed']) else '?'}</td>
+                <!-- <td class="flight_log_cell">{this_processed}</td> -->
+                <!-- <td class="flight_log_cell">{this_ongoing}</td> -->
+                <td class="flight_log_cell">{this_processing_status_msg}</td>
             </tr>
             """
 
@@ -214,5 +276,6 @@ display_flight_table(flight_log_selection)
 
 processed_percentage = column_percentages['processed'][1]
 processed_count = round(len(flight_log_selection)*processed_percentage/100)
-bottom_text = f"Showing {len(flight_log_selection)} flights.&nbsp; Of which {processed_count} ({round(processed_percentage)}%) are fully processed."
+ongoing_count = flight_log_selection['ongoing'].sum()
+bottom_text = f"Showing {len(flight_log_selection)} flights.&nbsp; Of which {processed_count} ({round(processed_percentage)}%) are fully processed and {round(ongoing_count)} are ongoing."
 st.write(bottom_text)
