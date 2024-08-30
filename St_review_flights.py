@@ -157,7 +157,7 @@ def display_flight_table(flight_log_selection):
             <tr class="flight_log_header_2"><th>
                 <!-- Button to toggle extra info -->
                 <div class="button-container">
-                    <button id="toggle_extra_info">Show</button>
+                    <!-- <button id="toggle_extra_info">Show</button> -->
                 </div>
             </th>"""
     for name in ["Field", "Date", "Image Type", "Drone Pilot", "Processed"]:
@@ -214,5 +214,5 @@ display_flight_table(flight_log_selection)
 
 processed_percentage = column_percentages['processed'][1]
 processed_count = round(len(flight_log_selection)*processed_percentage/100)
-bottom_text = f"Showing {len(flight_log_selection)} flights. &nbsp; Of which {processed_count} ({round(processed_percentage)}%) are fully processed."
+bottom_text = f"Showing {len(flight_log_selection)} flights.&nbsp; Of which {processed_count} ({round(processed_percentage)}%) are fully processed."
 st.write(bottom_text)

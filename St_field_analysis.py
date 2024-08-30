@@ -29,6 +29,8 @@ qgis_folder_path = "P:/PhenoCrop/3_qgis"
 def get_qgis_results(qgis_folder_path, selected_field):
     qgis_results_files = []
     qgis_results_dates = []
+    qgis_results_drone = ""
+    qgis_results_year = ""
     if selected_field != None:
         selected_field_ID = df_fields.loc[df_fields["LongName"] == selected_field, "Field ID"].values[0]
 
