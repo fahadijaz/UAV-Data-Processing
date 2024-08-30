@@ -56,6 +56,8 @@ def update_all_flights():
     df_processing_status.to_csv("P:/PhenoCrop/0_csv/processing_status.csv", index=False)
 
 def create_new_row_for_processing_status(flight_details, processing_result):
+    # the flight_details argument needs to be a pandas series
+    # the processing_result argument needs to be a dictionary
     indice_blue_exists = 1 if any("blue" in name.lower() for name in processing_result["indices_names"]) else 0
     indice_green_exists = 1 if any("green" in name.lower() for name in processing_result["indices_names"]) else 0
     indice_ndvi_exists = 1 if any("ndvi" in name.lower() for name in processing_result["indices_names"]) else 0
@@ -64,6 +66,11 @@ def create_new_row_for_processing_status(flight_details, processing_result):
     indice_red_exists = 1 if any("red_red" in name.lower() for name in processing_result["indices_names"]) else 0
     DSM_exists = 0 if processing_result["DSM"] in [None, "", np.nan] else 1
     onging_status = 1 if flight_details["ongoing"] == 1 else 0
+
+    if pd.isna(flight_details["coordinates_correct"]):
+        coordinates_correct = " "
+    else:
+        coordinates_correct = flight_details["coordinates_correct"]
 
     processing_columns_for_image_types = {"3D": [DSM_exists],
                                       "MS": [indice_green_exists,indice_ndvi_exists,indice_nir_exists,indice_red_edge_exists,indice_red_exists],
@@ -78,7 +85,8 @@ def create_new_row_for_processing_status(flight_details, processing_result):
                 "Orthomosaics": processing_result["orthomosaics"], "Orthomosaics_names": processing_result["orthomosaics_names"], "DSM_Path": processing_result["DSM"],
                 "DSM": DSM_exists, "Indices": processing_result["indices"], "Indices_names": processing_result["indices_names"], "Stats": processing_result["stats"],
                 "Indice_blue": indice_blue_exists, "Indice_green": indice_green_exists, "Indice_ndvi": indice_ndvi_exists, "Indice_nir": indice_nir_exists,
-                "Indice_red_edge": indice_red_edge_exists, "Indice_red": indice_red_exists, "processed": processed, "ongoing": onging_status}])
+                "Indice_red_edge": indice_red_edge_exists, "Indice_red": indice_red_exists, "processed": processed, "ongoing": onging_status,
+                "coordinates_correct": coordinates_correct}])
     
     return new_row
 

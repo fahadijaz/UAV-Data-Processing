@@ -195,7 +195,7 @@ def display_flight_table(flight_log_selection):
                     <!-- <button id="toggle_extra_info">Show</button> -->
                 </div>
             </th>"""
-    for name in ["Field", "Date", "Image Type", "Drone Pilot", "Processing status"]:
+    for name in ["Field", "Date", "Image Type", "Drone Pilot", "Processing status", "Coordinates correct?"]:
         html_content += f"""
                 <th class="flight_log_header_cell">{name}"""
         
@@ -216,7 +216,7 @@ def display_flight_table(flight_log_selection):
         this_processed = int(row['processed']) if not pd.isna(row['processed']) else '?'
         this_ongoing = row['ongoing']
 
-        # Setting processing status
+        # Setting processing status based on the combination of processing status and ongoing status
         this_processing_status = ""
         this_processing_status_msg = ""
         if this_processed == 1 and this_ongoing == 0:
@@ -238,6 +238,7 @@ def display_flight_table(flight_log_selection):
             this_processing_status = "unknown_ongoing"
             this_processing_status_msg = "Unknown processed status, but currently processing"
         
+        # Printing row for this flight
         html_content += f"""
             <tr class='flight_log_entry flight_log_entry_{this_processing_status}'>
                 <td class="flight_log_link_cell"><a href="http://localhost:8502?Index={row['flight_ID']}" target="_blank"><img src="https://cdn-icons-png.flaticon.com/128/3388/3388930.png"></a></td>
@@ -248,6 +249,7 @@ def display_flight_table(flight_log_selection):
                 <!-- <td class="flight_log_cell">{this_processed}</td> -->
                 <!-- <td class="flight_log_cell">{this_ongoing}</td> -->
                 <td class="flight_log_cell">{this_processing_status_msg}</td>
+                <td class="flight_log_cell">{row['coordinates_correct']}</td>
             </tr>
             """
 
