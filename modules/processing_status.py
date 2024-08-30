@@ -89,6 +89,7 @@ if __name__ == "__main__":
     from file_system_functions import find_tif_files_in_subfolders
     from flight_log_preprocessing import preprocessing
     from flight_log_preprocessing import import_log_file
+    st.write("Test")
 
     update_all_flights()
 else:
