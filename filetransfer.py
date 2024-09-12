@@ -14,10 +14,17 @@ import uuid
 
 # Configure logging
 logging.basicConfig(
+    filename='P:\\PhenoCrop\\0_csv\\logging.log',
+    filemode="a",
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    handlers=[logging.StreamHandler()]
+    #handlers=[logging.StreamHandler()]
 )
+console = logging.StreamHandler()
+formatter = logging.Formatter('%(name)-12s: %(levelname)-8s %(message)s')
+console.setFormatter(formatter)
+# add the handler to the root logger
+logging.getLogger('').addHandler(console)
 
 class FileTransfer:
     def __init__(self, input_path: str, output_path: str, data_overview_file: str, flight_log: str):
