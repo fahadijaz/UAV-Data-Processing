@@ -124,11 +124,50 @@ def display_section_main_1():
             st.table(flight_details_col_2)
 
 def display_section_processing_status():
-    st.write("#### Processing status")
+    # Sets the default value for the ongoing status field
+    default_ongoing_value = ""  # Default to empty string if condition is not met
+    if flight_details["ongoing"] == 1:
+        default_ongoing_value = "ongoing"
+    
+    # Sets the default value for the coordinates status field
+    default_coordinates_value = " "  # Default to empty string if condition is not met
+    if flight_details["coordinates_correct"] == "coordinates incorrect":
+        default_coordinates_value = "coordinates incorrect"
+    if flight_details["coordinates_correct"] == "coordinates correct":
+        default_coordinates_value = "coordinates correct"
 
-    display_processing_status(processing_paths)
-    #st.write(processing_paths)
+    processing_title_column_1, processing_title_column_2, processing_title_column_3 = st.columns([0.55, 0.18, 0.27])
+    with processing_title_column_1:
+        st.write("#### Processing status")
+    
+    with processing_title_column_2:
+        input_ongoing = st.selectbox("Processing ongoing?", ["","ongoing"], label_visibility="collapsed", index=["", "ongoing"].index(default_ongoing_value))
+    
+    with processing_title_column_3:
+        input_coordinates = st.selectbox("Coordinates correct?", [" ", "coordinates incorrect", "coordinates correct"], label_visibility="collapsed", index=[" ", "coordinates incorrect", "coordinates correct"].index(default_coordinates_value))
+    
+    if input_ongoing == "ongoing":
+        flight_details["ongoing"] = 1
+        update_this_processing_status(df_processing_status, flight_details, processing_paths)
+    
+    if input_ongoing == "":
+        flight_details["ongoing"] = 0
+        update_this_processing_status(df_processing_status, flight_details, processing_paths)
+        
+    if input_coordinates == " ":
+        flight_details["coordinates_correct"] = " "
+        update_this_processing_status(df_processing_status, flight_details, processing_paths)
+        
+    if input_coordinates == "coordinates incorrect":
+        flight_details["coordinates_correct"] = "coordinates incorrect"
+        update_this_processing_status(df_processing_status, flight_details, processing_paths)
+        
+    if input_coordinates == "coordinates correct":
+        flight_details["coordinates_correct"] = "coordinates correct"
+        update_this_processing_status(df_processing_status, flight_details, processing_paths)
+
     update_this_processing_status(df_processing_status, flight_details, processing_paths)
+    display_processing_status(processing_paths)
 
 display_section_title()
 display_section_main_1()

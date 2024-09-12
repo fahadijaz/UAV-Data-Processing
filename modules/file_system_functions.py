@@ -2,6 +2,7 @@ import subprocess
 import os
 import sys
 import glob
+import streamlit as st
 
 
 # Function to open the folder in the file explorer
@@ -15,9 +16,9 @@ def open_folder(path):
 
 
 # Function to find the tif files in a given folder
-def find_tif_files(folder_path):
+def find_files_in_folder(folder_path, file_ext):
     tif_files = []
-    tif_files.extend(glob.glob(os.path.join(folder_path, "*.tif"), recursive=False))
+    tif_files.extend(glob.glob(os.path.join(folder_path, rf"*.{file_ext}"), recursive=False))
 
     if tif_files == []:
         tif_files = [""]

@@ -1,4 +1,4 @@
-name: PhenotypingWithStreamlit
+name: PhenoTypingWithStreamlitSeaborn
 channels:
   - conda-forge
   - defaults
@@ -35,11 +35,11 @@ dependencies:
   - brotli-python=1.1.0=py38hd3f51b4_1
   - bzip2=1.0.8=hcfcfb64_5
   - c-ares=1.28.1=hcfcfb64_0
-  - ca-certificates=2024.6.2=h56e8100_0
+  - ca-certificates=2024.7.2=haa95532_0
   - cached-property=1.5.2=hd8ed1ab_1
   - cached_property=1.5.2=pyha770c72_1
   - cairo=1.18.0=h1fef639_0
-  - certifi=2024.6.2=py38haa95532_0
+  - certifi=2024.7.4=py38haa95532_0
   - cffi=1.16.0=py38h91455d4_0
   - cfitsio=4.4.0=h9b0cee5_1
   - charset-normalizer=3.3.2=pyhd8ed1ab_0
@@ -197,7 +197,7 @@ dependencies:
   - matplotlib=3.7.3=py38haa244fe_0
   - matplotlib-base=3.7.3=py38h2724991_0
   - matplotlib-inline=0.1.7=pyhd8ed1ab_0
-  - minizip=4.0.7=h52f1734_0
+  - minizip=4.0.6=hb638d1e_0
   - mistune=3.0.2=pyhd8ed1ab_0
   - mkl=2024.1.0=h66d3029_692
   - msys2-conda-epoch=20160418=1
@@ -280,6 +280,7 @@ dependencies:
   - rpds-py=0.18.1=py38h2e0ef18_0
   - scikit-image=0.20.0=py38hf08cf0d_1
   - scipy=1.9.1=py38h91810f7_0
+  - seaborn=0.13.2=py38haa95532_0
   - send2trash=1.8.3=pyh5737063_0
   - setuptools=70.0.0=pyhd8ed1ab_0
   - sip=6.7.12=py38hd3f51b4_0
@@ -371,10 +372,11 @@ dependencies:
       - rich==13.7.1
       - smmap==5.0.1
       - streamlit==1.36.0
+      - streamlit-date-picker==0.0.3
       - tenacity==8.4.2
       - tqdm==4.66.4
       - uuid==1.30
       - watchdog==4.0.1
       - y-py==0.6.2
       - ypy-websocket==0.8.4
-prefix: C:\Users\sstokke\.conda\envs\PhenotypingWithStreamlit
+prefix: C:\Users\sstokke\.conda\envs\PhenoTypingWithStreamlitSeaborn

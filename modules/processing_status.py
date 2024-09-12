@@ -2,6 +2,8 @@ import os
 import streamlit as st
 import time
 import pandas as pd
+import streamlit as st
+import numpy as np
 
 # A function to check which processing outputs exist for a flight.
 # It returns a dictionary with information like e.g. paths.
@@ -19,9 +21,9 @@ def check_processing_status(flight_details):
     if processing_paths["project"] != "":
         # Finding the other processing paths based on the project path
         processing_paths["report"] = rf'{processing_paths["project"]}\1_initial\report\html\index.html'
-        #processing_paths["orthomosaics"] = find_tif_files(rf'{processing_paths["project"]}\3_dsm_ortho\2_mosaic')[0]
-        processing_paths["orthomosaics"] = find_tif_files(rf'{processing_paths["project"]}\3_dsm_ortho\2_mosaic')
-        processing_paths["DSM"] = find_tif_files(rf'{processing_paths["project"]}\3_dsm_ortho\1_dsm')[0]
+        #processing_paths["orthomosaics"] = find_files_in_folder(rf'{processing_paths["project"]}\3_dsm_ortho\2_mosaic', 'tif')[0]
+        processing_paths["orthomosaics"] = find_files_in_folder(rf'{processing_paths["project"]}\3_dsm_ortho\2_mosaic', 'tif')
+        processing_paths["DSM"] = find_files_in_folder(rf'{processing_paths["project"]}\3_dsm_ortho\1_dsm', 'tif')[0]
         processing_paths["indices"], processing_paths["indices_names"] = find_tif_files_in_subfolders(rf'{processing_paths["project"]}\4_index\indices')
 
         #df_log_file = import_log_file(rf'{processing_paths["project"]}\1_initial\report\html\index.html')
@@ -54,32 +56,51 @@ def update_all_flights():
     df_processing_status.to_csv("P:/PhenoCrop/0_csv/processing_status.csv", index=False)
 
 def create_new_row_for_processing_status(flight_details, processing_result):
+    # the flight_details argument needs to be a pandas series
+    # the processing_result argument needs to be a dictionary
     indice_blue_exists = 1 if any("blue" in name.lower() for name in processing_result["indices_names"]) else 0
     indice_green_exists = 1 if any("green" in name.lower() for name in processing_result["indices_names"]) else 0
     indice_ndvi_exists = 1 if any("ndvi" in name.lower() for name in processing_result["indices_names"]) else 0
     indice_nir_exists = 1 if any("nir" in name.lower() for name in processing_result["indices_names"]) else 0
     indice_red_edge_exists = 1 if any("red_edge" in name.lower() for name in processing_result["indices_names"]) else 0
-    indice_red_exists = 1 if any(name.lower() == "Red_red" for name in processing_result["indices_names"]) else 0
+    indice_red_exists = 1 if any("red_red" in name.lower() for name in processing_result["indices_names"]) else 0
+    DSM_exists = 0 if processing_result["DSM"] in [None, "", np.nan] else 1
+    onging_status = 1 if flight_details["ongoing"] == 1 else 0
+
+    if pd.isna(flight_details["coordinates_correct"]):
+        coordinates_correct = " "
+    else:
+        coordinates_correct = flight_details["coordinates_correct"]
+
+    processing_columns_for_image_types = {"3D": [DSM_exists],
+                                      "MS": [indice_green_exists,indice_ndvi_exists,indice_nir_exists,indice_red_edge_exists,indice_red_exists],
+                                      "phantom-MS": [indice_blue_exists,indice_green_exists,indice_ndvi_exists,indice_nir_exists,indice_red_edge_exists,indice_red_exists]}
+
+    processed = 1
+    for column in processing_columns_for_image_types[flight_details["image_type_keyword"]]:
+        if column == 0:
+            processed = 0
 
     new_row = pd.DataFrame([{"flight_output_path": flight_details["output_path"], "ProjectFolderPath": processing_result["project"], "Report": processing_result["report"],
                 "Orthomosaics": processing_result["orthomosaics"], "Orthomosaics_names": processing_result["orthomosaics_names"], "DSM_Path": processing_result["DSM"],
-                "Indices": processing_result["indices"], "Indices_names": processing_result["indices_names"], "Stats": processing_result["stats"],
-                "Indice_blue": indice_blue_exists, "Indice_green": indice_green_exists, "Indice_ndvi": indice_ndvi_exists,
-                "Indice_nir": indice_nir_exists, "Indice_red_edge": indice_red_edge_exists, "Indice_red": indice_red_exists}])
+                "DSM": DSM_exists, "Indices": processing_result["indices"], "Indices_names": processing_result["indices_names"], "Stats": processing_result["stats"],
+                "Indice_blue": indice_blue_exists, "Indice_green": indice_green_exists, "Indice_ndvi": indice_ndvi_exists, "Indice_nir": indice_nir_exists,
+                "Indice_red_edge": indice_red_edge_exists, "Indice_red": indice_red_exists, "processed": processed, "ongoing": onging_status,
+                "coordinates_correct": coordinates_correct}])
     
     return new_row
 
 if __name__ == "__main__":
     import pandas as pd
     import streamlit as st
-    from file_system_functions import find_tif_files
+    from file_system_functions import find_files_in_folder
     from file_system_functions import find_tif_files_in_subfolders
     from flight_log_preprocessing import preprocessing
     from flight_log_preprocessing import import_log_file
 
     update_all_flights()
 else:
-    from .file_system_functions import find_tif_files
+    from .file_system_functions import find_files_in_folder
     from .file_system_functions import find_tif_files_in_subfolders
     from .flight_log_preprocessing import preprocessing
     from .flight_log_preprocessing import import_log_file

@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 from modules.flight_log_preprocessing import preprocessing
+from modules.file_system_functions import find_files_in_folder
 import datetime
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -12,16 +13,52 @@ df_flight_log, df_flight_routes, df_fields, df_flight_log_merged, df_processing_
 
 flight_log_selection = df_flight_log_merged.copy()
 
+qgis_folder_path = "P:/PhenoCrop/3_qgis"
 
 # Reading the excel files (these are test files)
-df0 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230614.xlsx"))
-df1 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230622.xlsx"))
-df2 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230628.xlsx"))
-df3 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230708.xlsx"))
-df4 = pd.DataFrame(pd.read_excel("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/phenocrop-2023-M3MS-20m-20230714.xlsx"))
+#df0 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240607 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df1 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240612 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df2 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240620 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df3 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240624 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df4 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240703 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df5 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240708 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df6 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240806 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+#df7 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240812 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
 
-dates = ['20230614', '20230622', '20230628', '20230708', '20230714']
+# Returns a list of paths to the qgis result files and a list of their dates
+def get_qgis_results(qgis_folder_path, selected_field):
+    qgis_results_files = []
+    qgis_results_dates = []
+    qgis_results_drone = ""
+    qgis_results_year = ""
+    if selected_field != None:
+        selected_field_ID = df_fields.loc[df_fields["LongName"] == selected_field, "Field ID"].values[0]
 
+        qgis_field_folder = rf"{qgis_folder_path}/{selected_field_ID}"
+
+        qgis_results_file_paths = find_files_in_folder(qgis_field_folder, 'csv')
+        
+        # Only runs the next part if there exists results files
+        if qgis_results_file_paths != [""]:
+            #qgis_results_dates = [path.split("\\")[1].split(" ")[0][4:] for path in qgis_results_file_paths]
+            qgis_results_details = qgis_results_file_paths[0].split("\\")[1].split(" ")
+            qgis_results_drone = qgis_results_details[2]
+            qgis_results_year = qgis_results_details[0][:4]
+
+            # Makes a list of the dates for the qgis result files in the format dd.mm
+            qgis_results_dates = []
+            for path in qgis_results_file_paths:
+                mm = path.split("\\")[1].split(" ")[0][4:6]
+                dd = path.split("\\")[1].split(" ")[0][6:]
+                date = rf"{dd}.{mm}"
+                qgis_results_dates.append(date)
+
+            # Makes dataframes from the paths
+            for path in qgis_results_file_paths:
+                qgis_file = pd.DataFrame(pd.read_csv(path))
+                qgis_results_files.append(qgis_file)
+    
+    return qgis_results_files, qgis_results_dates, qgis_results_drone, qgis_results_year
 
 # Returns (a) a list containing the selected indices for the user-selected indices, and (b) a list containing the corresponding indice column names.
 def indices_get_selected(input_indices, indices_column_names, input_data_type):
@@ -54,8 +91,6 @@ indices_column_names = {"Indices": ["Blue", "Green", "NDVI", "NIR", "Red Edge", 
                         "Median": ["blue_median", "green_median", "ndvi_median", "nir_median", "red_edge_median", "red_median"],
                         "Standard Deviation": ["blue_stdev", "green_stdev", "ndvi_stdev", "nir_stdev", "red_edge_stdev", "red_stdev"]}
 
-indices_check_if_exist(indices_column_names["Indices"], indices_column_names, df0)
-
 # Options for input fields
 excluded_field_IDs = ["Proteinbar NAPE", "GENE2BREAD", "High Grass", "Faba Bean"]
 field_IDs = [value for value in df_fields["LongName"] if value not in excluded_field_IDs]
@@ -80,18 +115,22 @@ with input_col_5:
     input_indices = st.multiselect("Indices", indices_options, placeholder="*Indices", label_visibility="collapsed")
 
 
+qgis_results_files, qgis_results_dates, qgis_results_drone, qgis_results_year = get_qgis_results(qgis_folder_path, input_field)
+
+
 
 def display_statistics_boxplot():
     # Check if the necessary input fields are non-empty
     ok_display_statistics_boxplot = 1
-    ok_display_statistics_boxplot = 0 if input_field is None else ok_display_statistics_boxplot
-    ok_display_statistics_boxplot = 0 if input_data_type is None else ok_display_statistics_boxplot
-    ok_display_statistics_boxplot = 0 if input_indices == [] else ok_display_statistics_boxplot
+    error_message = ""
+    ok_display_statistics_boxplot, error_message = (0, "Fill the necessary input fields") if input_data_type is None else (ok_display_statistics_boxplot, error_message)
+    ok_display_statistics_boxplot, error_message = (0, "Fill the necessary input fields") if input_indices is None else (ok_display_statistics_boxplot, error_message)
+    ok_display_statistics_boxplot, error_message = (0, "This field has no statistics yet") if qgis_results_files == [] else (ok_display_statistics_boxplot, error_message)
+    ok_display_statistics_boxplot, error_message = (0, "Fill the necessary input fields") if input_field is None else (ok_display_statistics_boxplot, error_message)
 
     if ok_display_statistics_boxplot == 1:
-
         selected_indices, selected_indice_column_names = indices_get_selected(input_indices, indices_column_names, input_data_type)
-        final_indices, final_indices_column_names = indices_check_if_exist(selected_indices, selected_indice_column_names, df0)
+        final_indices, final_indices_column_names = indices_check_if_exist(selected_indices, selected_indice_column_names, qgis_results_files[0])
 
         #st.write(final_indices)
         #st.write(final_indices_column_names)
@@ -117,23 +156,22 @@ def display_statistics_boxplot():
         for idx, selected_indice_column_name in enumerate(final_indices_column_names):
             # new dataframe for holding all red mean values
             df_stats = pd.DataFrame()
-            df_stats[dates[0]]=df0[selected_indice_column_name]
-            df_stats[dates[1]]=df1[selected_indice_column_name]
-            df_stats[dates[2]]=df2[selected_indice_column_name]
-            df_stats[dates[3]]=df3[selected_indice_column_name]
-            df_stats[dates[4]]=df4[selected_indice_column_name]
+            for idy, result_date in enumerate(qgis_results_dates):
+                result_file = qgis_results_files[idy]
+                df_stats[result_date] = result_file[selected_indice_column_name]
 
             # Set the figure size
             plt.figure(figsize=(8, 5))  # width=8, height=5
+            plt.xticks(rotation=45) # Rotates the labels on the x axis
 
             sns.set(style='whitegrid')
-            sns.boxplot(data=df_stats).set(title=f'Phenocrop M3MS {input_data_type} {final_indices[idx]}')
+            sns.boxplot(data=df_stats).set(title=f'{input_field} {qgis_results_year}\n{final_indices[idx]} {input_data_type}\n{qgis_results_drone} MS')
             
             # Showing the plot in the correct cell of the grid
             row, col = get_grid_position(idx, 2)
             with grid[row][col]:
                 st.pyplot(plt, clear_figure=True)
     else:
-        st.write("Fill the input fields")
+        st.write(error_message)
 
 display_statistics_boxplot()
