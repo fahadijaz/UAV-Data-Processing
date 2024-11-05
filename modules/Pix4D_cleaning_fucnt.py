@@ -1,4 +1,7 @@
+from file_system_functions import find_files_in_folder
+
 import os
+import csv
 import shutil
 from tqdm import tqdm # Progress Bar
 import hashlib # Checksum of files before copying
@@ -17,6 +20,37 @@ opt.showIndex = True
 # Turning off downsampling of data while printing it
 import itables.options as opt
 opt.maxBytes = 0
+
+
+def append_list_to_csv(list, comment):
+    with open('event.csv', 'a') as f_object:
+     
+        # Pass this file object to csv.writer()
+        # and get a writer object
+        writer_object = csv.writer(f_object)
+     
+        # Pass the list as an argument into
+        # the writerow()
+        writer_object.writerow(comment)
+        writer_object.writerow(list)     
+        # Close the file object
+        f_object.close()
+
+def append_dict_to_csv(dict, comment):
+    with open('event.csv', 'a') as f_object:
+     
+        # Pass this file object to csv.writer()
+        # and get a writer object
+        writer_object = csv.writer(f_object)
+     
+        # Pass the list as an argument into
+        # the writerow()
+        writer_object.writerow(comment)
+        for key, value in dict.items():
+            writer_object.writerow([key, value])
+     
+        # Close the file object
+        f_object.close()
 
 
 # Funcion to check if two files are identicals or not
@@ -179,6 +213,7 @@ def copy_p4d_log(dest_drive, pix4d_path_src):
                     log_not_found.append(file)
                     print("Log not found for ", file)
     print("Copying Complete")
+    append_list_to_csv(log_not_found, "LIST of Logs not found")
     return(log_not_found)
 
 # Copying Reports for all projects
@@ -254,7 +289,10 @@ def copy_reports(dest_drive, proj_dict):
             pdf_report_not_found.append(proj_name)
             print("PDF report not found for ", proj_name)
     print("Copying Complete")
-    
+
+    append_list_to_csv(pdf_report_not_found, "LIST of PDF Reports not found")
+    append_list_to_csv(report_does_not_exists, "LIST of Reports Folder does not exist")
+
     return(pdf_report_not_found, report_does_not_exists)
 
 # Copying Orthomosaics
@@ -311,7 +349,7 @@ def copy_ortho(dest_drive, proj_dict):
 
 
     # Outer progress bar for the total number of files across projects
-    with tqdm(total=total_files_to_copy, desc="Total Copy Progress", unit="file") as total_pbar:
+    with tqdm(total=total_files_to_copy, desc="Total Copy Progress", unit="file", leave=False) as total_pbar:
     
         for proj_name in proj_dict:
             print("Copying Ortho for", proj_name)
@@ -391,7 +429,7 @@ def copy_ortho(dest_drive, proj_dict):
             
                         # This check if the same file already exists at teh destination. If it does, it checks if the contents are similar. Copies only
                         # if contents differ. Also shows a progress bar of the copying operation
-                        copy_file_with_progress(ortho, dest_ortho_path)
+                        copy_file_with_progress(ortho, dest_ortho_path, chk_size=True)
                         # ortho_copied.append(ortho_file)
 
                         # Update outer progress bar after each file
@@ -403,7 +441,9 @@ def copy_ortho(dest_drive, proj_dict):
         ortho_not_found_dict[proj_name] = ortho_not_found
         ortho_found_dict[proj_name] = ortho_found
         # ortho_copied_dict[proj_name] = ortho_copied
-    
+        append_list_to_csv(ortho_not_found_dict, "LIST ortho not found"+proj_name)
+        append_list_to_csv(ortho_found_dict, "LIST ortho found"+proj_name)
+
     print("Complete")
 
 
