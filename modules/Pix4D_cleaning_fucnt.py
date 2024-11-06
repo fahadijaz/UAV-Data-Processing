@@ -7,48 +7,52 @@ from tqdm import tqdm # Progress Bar
 import hashlib # Checksum of files before copying
 import glob
 import pandas as pd
-from itables import init_notebook_mode
-
-init_notebook_mode(all_interactive=True)
-from itables import show
-# show(df, maxBytes=0)
-
-# Showing index
-import itables.options as opt
-opt.showIndex = True
-
-# Turning off downsampling of data while printing it
-import itables.options as opt
-opt.maxBytes = 0
 
 
-def append_list_to_csv(list, comment):
-    with open('event.csv', 'a') as f_object:
-     
-        # Pass this file object to csv.writer()
-        # and get a writer object
+
+
+def append_list_to_csv(data_list, comment, file_name='event.csv'):
+    """
+    Appends a list and a comment to a CSV file.
+    The list will be written as a single row, and the comment will be written as a header.
+
+    Parameters:
+    - data_list (list): The list of data to be written to the CSV file.
+    - comment (str): A comment or description to be added as a header to the CSV.
+    - file_name (str): The name of the CSV file to which the data will be appended. Defaults to 'event.csv'.
+    """
+    with open(file_name, 'a', newline='') as f_object:
         writer_object = csv.writer(f_object)
-     
-        # Pass the list as an argument into
-        # the writerow()
-        writer_object.writerow(comment)
-        writer_object.writerow(list)     
+
+        # Write the comment as the first row (e.g., a header or description)
+        writer_object.writerow([comment])
+
+        # Write the list as a single row in the CSV
+        writer_object.writerow(data_list)
         # Close the file object
         f_object.close()
 
-def append_dict_to_csv(dict, comment):
-    with open('event.csv', 'a') as f_object:
-     
-        # Pass this file object to csv.writer()
-        # and get a writer object
+
+def append_dict_to_csv(data_dict, comment, file_name='event.csv'):
+    """
+    Appends a dictionary and a comment to a CSV file.
+    Each key-value pair from the dictionary will be written in a new row.
+
+    Parameters:
+    - data_dict (dict): The dictionary whose keys and values will be written to the CSV file.
+    - comment (str): A comment or description to be added as a header to the CSV.
+    - file_name (str): The name of the CSV file to which the data will be appended. Defaults to 'event.csv'.
+    """
+    with open(file_name, 'a', newline='') as f_object:
         writer_object = csv.writer(f_object)
-     
-        # Pass the list as an argument into
-        # the writerow()
-        writer_object.writerow(comment)
-        for key, value in dict.items():
+
+        # Write the comment as the first row (e.g., a header or description)
+        writer_object.writerow([comment])
+
+        # Write each key-value pair from the dictionary in separate rows
+        for key, value in data_dict.items():
             writer_object.writerow([key, value])
-     
+
         # Close the file object
         f_object.close()
 
@@ -68,13 +72,16 @@ def calculate_md5(file_path, buffer_size=1024*1024):
             md5.update(chunk)
     return md5.hexdigest()
 
+
+
 # File copy function with progress bar
 def copy_file_with_progress(src_file, dst, chk_size=False, buffer_size=1024*1024):
     """
-    Copy  src_file to dst with a progress bar, content check, and metadata preservation.
+    Copy a file from src_file to dst with a progress bar, content check, and metadata preservation.
     
     :param src_file: Source file path
     :param dst: Destination directory path
+    :param chk_size: Flag to check file contents using checksum comparison (default is False)
     :param buffer_size: Number of bytes to read at a time (default is 1MB)
     """
 
@@ -132,39 +139,78 @@ def copy_file_with_progress(src_file, dst, chk_size=False, buffer_size=1024*1024
     shutil.copystat(src_file, dst_file)
     print("Metadata has been preserved.")
 
+    # Now, verify that the source and destination files are identical using MD5 checksum
+    print(f"Verifying if the source and destination files are identical...")
+    src_file_md5 = calculate_md5(src_file, buffer_size)
+    dst_file_md5 = calculate_md5(dst_file, buffer_size)
+    
+    if src_file_md5 == dst_file_md5:
+        print(f"Verification successful: The files are identical.")
+    else:
+        print(f"Verification failed: The files are different.")
+
 # Example usage:
 # copy_file_with_progress("path/to/source/file", "path/to/destination/file")
+
+
 
 
 # Listing paths of all projects in the folder into a dict and checking if all dir exist 
 # Returns a dict
 
 def create_proj_dict(src_drive, path_pix4d_gnrl, field_id, flight_type):
-    print("Preparing proj_dict for", field_id," flight type ", flight_type)
-    # Genertating pix4d projects source folder path
-    pix4d_path_src = src_drive+path_pix4d_gnrl+"\\"+field_id+"\\"+flight_type
+    """
+    Creates a dictionary of project paths for Pix4D projects, verifying whether each project folder exists.
     
-    # Creating list of folder in the main dir
+    This function constructs a dictionary with project names as keys and their corresponding paths as values,
+    based on the folder structure in the source directory. It also adds a path for the report folder if it exists.
+    
+    Parameters:
+    - src_drive (str): The root drive path where the projects are stored.
+    - path_pix4d_gnrl (str): The general folder path for the Pix4D projects.
+    - field_id (str): The field ID used to identify the specific folder containing the projects.
+    - flight_type (str): The type of flight (e.g., "drone", "aerial") used to further narrow down the project folder.
+    
+    Returns:
+    - proj_dict (dict): A dictionary where keys are project names (starting with "2024") and values are the full
+                         paths to the respective project folders. It also includes paths to report folders if available.
+    - pix4d_path_src (str): The full path to the source Pix4D folder for reference.
+    """
+    # Print the status to indicate which field and flight type the function is processing.
+    print(f"Preparing proj_dict for {field_id} flight type {flight_type}")
+    
+    # Generate the full source folder path for the Pix4D project files.
+    pix4d_path_src = os.path.join(src_drive, path_pix4d_gnrl, field_id, flight_type)
+    
+    # List all folders in the main project directory
     folders = [name for name in os.listdir(pix4d_path_src) if os.path.isdir(os.path.join(pix4d_path_src, name))]
-    # Filtering project folder names starting from 2024
-    projects = [proj for proj in folders if proj[:4] == "2024"]
 
-    proj_dict = {}
-    for proj in projects:
-        path_proj = pix4d_path_src+"\\"+proj
-        if os.path.exists(path_proj):
-            # print("Path Exists")
-            proj_dict[proj] = [path_proj]
-        else:
-            print(path_proj)
-            print("Path does not Exists")
-        # print(path_proj)
+    # Filter the list of project folders to only include those starting with '2024'
+    projects = [proj for proj in folders if proj[:4] == "2024"]
     
-    # Adding the path of the report for each project in the dict if it is not already there
+    # Initialize an empty dictionary to store project names and paths
+    proj_dict = {}
+    
+    # Loop through each project folder, verifying that it exists before adding to the dictionary
+    for proj in projects:
+        path_proj = os.path.join(pix4d_path_src, proj)
+        
+        # Check if the project folder exists
+        if os.path.exists(path_proj):
+            proj_dict[proj] = [path_proj]  # Add the project path to the dictionary
+        else:
+            print(f"Path does not exist: {path_proj}")  # Print a message if the project folder is missing
+    
+    # For each project, if the path of report folder path does not exist in the dictionary, add it
+    # Not using this path at the  moment. Just there in case.
     for proj_name in proj_dict:
-        if len(proj_dict[proj_name]) == 1:
-            proj_dict[proj_name].append(proj_dict[proj_name][0]+r"\1_initial\report")
-    return(proj_dict, pix4d_path_src)
+        if len(proj_dict[proj_name]) == 1:  # If only the project folder is in the list
+            report_path = os.path.join(proj_dict[proj_name][0], "1_initial", "report")
+            if os.path.exists(report_path):
+                proj_dict[proj_name].append(report_path)  # Add the report folder path to the dictionary
+    
+    # Return the project dictionary and the general source path for Pix4D projects
+    return proj_dict, pix4d_path_src
 
 
 
@@ -295,155 +341,208 @@ def copy_reports(dest_drive, proj_dict):
 
     return(pdf_report_not_found, report_does_not_exists)
 
+def ortho_paths(dest_drive, proj_name, proj_dict):
+    """
+    Generates source and destination directory paths for orthomosaic data within a project,
+    including only directories that exist in the source location.
+
+    Parameters:
+    - dest_drive (str): Base path for the destination drive where files should be copied.
+    - proj_name (str): Project name, used as a key to retrieve the base source path.
+    - proj_dict (dict): Dictionary containing project details, where proj_dict[proj_name][0]
+                        provides the base path for the source data.
+
+    Returns:
+    - dict: A dictionary mapping each existing source orthomosaic directory to its corresponding
+            destination directory.
+    """
+    # Base paths
+    src_base_path = proj_dict[proj_name][0]
+    dest_base_path = os.path.join(dest_drive, src_base_path[3:])  # Slice to ignore initial 3 chars
+    
+    # Define the relative paths for orthomosaic directories
+    ortho_subdirs = {
+        "dsm_ortho": r"3_dsm_ortho\2_mosaic",
+        "reflectance_ortho": r"4_index\reflectance",
+        "blue": r"4_index\indices\Blue_blue",
+        "green": r"4_index\indices\Green_green",
+        "grp_blue": r"4_index\indices\group1_blue",
+        "grp_grey": r"4_index\indices\group1_grayscale",
+        "grp_green": r"4_index\indices\group1_green",
+        "grp_red": r"4_index\indices\group1_red",
+        "ndvi": r"4_index\indices\ndvi",
+        "nir": r"4_index\indices\NIR_nir",
+        "red_edge": r"4_index\indices\Red_edge_red_edge",
+        "red": r"4_index\indices\Red_red"
+    }
+    
+    # Initialize dictionary to store mappings of existing source to destination paths
+    dict_ortho = {}
+    
+    # Only add to dict_ortho if the source directory exists
+    for subdir in ortho_subdirs.values():
+        src_path = os.path.join(src_base_path, subdir)
+        dest_path = os.path.join(dest_base_path, subdir)
+        
+        if os.path.exists(src_path):  # Only add if source path exists
+            dict_ortho[src_path] = dest_path
+
+    return dict_ortho
+
+def point_cloud_paths(dest_drive, proj_name, proj_dict):
+    """
+    Generates source and destination directory paths for point cloud data within a project,
+    including only directories that exist in the source location.
+
+    Parameters:
+    - dest_drive (str): Base path for the destination drive where files should be copied.
+    - proj_name (str): Project name, used as a key to retrieve the base source path.
+    - proj_dict (dict): Dictionary containing project details, where proj_dict[proj_name][0]
+                        provides the base path for the source data.
+
+    Returns:
+    - dict: A dictionary mapping each existing source point cloud directory to its corresponding
+            destination directory.
+    """
+    # Base paths
+    src_base_path = proj_dict[proj_name][0]
+    dest_base_path = os.path.join(dest_drive, src_base_path[3:])  # Adjust to ignore initial chars if needed
+    
+    # List of relative subdirectory paths for point cloud data
+    point_cloud_subdirs = [
+        r"2_densification\3d_mesh",
+        r"3_dsm_ortho\1_dsm",
+        r"3_dsm_ortho\extras\dtm",
+        r"3_dsm_ortho\2_mosaic\google_tiles"
+    ]
+    
+    # Generate dict with existing source paths only
+    dict_mesh = {
+        os.path.join(src_base_path, subdir): os.path.join(dest_base_path, subdir)
+        for subdir in point_cloud_subdirs
+        if os.path.exists(os.path.join(src_base_path, subdir))
+    }
+
+    return dict_mesh
+
 # Copying Orthomosaics
 def copy_ortho(dest_drive, proj_dict):
+    """
+    Copies orthomosaic (tiff) files from the source project directories to destination directories, 
+    including progress tracking. Creates missing destination directories and logs missing files.
+
+    Parameters:
+    - dest_drive (str): Base path for the destination drive where files should be copied.
+    - proj_dict (dict): Dictionary containing project names as keys, and project details as values. Each project
+                        entry has a source path at proj_dict[proj_name][0].
+
+    Returns:
+    - tuple: A tuple containing two dictionaries:
+      - `ortho_found_dict`: Project names mapped to lists of orthomosaics found and copied.
+      - `mesh_found_dict`: Project names mapped to lists of point cloud files found and copied.
+    """
     
-    ortho_not_found_dict = {}
-    ortho_found_dict = {}
-    # ortho_copied_dict = {}
+    ortho_found_dict = {}      # To store found and copied orthomosaic files per project
+    mesh_found_dict = {}      # To store found and copied mesh files per project
+    
+    # Print information about progress bar initialization
+    print("Calculating number of files to be copied for the progress bar")
 
-
-
-    dsm_ortho = r"\3_dsm_ortho\2_mosaic"
-    reflectance_ortho = r"\4_index\reflectance"
-    blue = r"\4_index\indices\Blue_blue"
-    green = r"\4_index\indices\Green_green"
-    grp_blue = r"\4_index\indices\group1_blue"
-    grp_grey = r"\4_index\indices\group1_grayscale"
-    grp_green = r"\4_index\indices\group1_green"
-    grp_red = r"\4_index\indices\group1_red"
-    ndvi = r"\4_index\indices\ndvi"
-    nir = r"\4_index\indices\NIR_nir"
-    red_edge = r"\4_index\indices\Red_edge_red_edge"
-    red = r"\4_index\indices\Red_red"
-
-    print("Calculating number of files to be copies for the progress bar")
     # Calculate the total number of files to copy across all directories
     total_files_to_copy = 0
     for proj_name in proj_dict:
-        path = proj_dict[proj_name][0]
+        path = proj_dict[proj_name][0]  # Get the project base path
+        dict_ortho = ortho_paths(dest_drive, proj_name, proj_dict)  # Get source to destination orthomosaic paths
+        dict_mesh = point_cloud_paths(dest_drive, proj_name, proj_dict)  # Get source to destination point cloud paths
         
-        src_dsm_ortho_dir = os.path.join(path+dsm_ortho)
-        src_reflectance_ortho_dir = os.path.join(path+reflectance_ortho)
-        src_blue_dir = os.path.join(path+blue)
-        src_green_dir = os.path.join(path+green)
-        src_grp_blue_dir = os.path.join(path+grp_blue)
-        src_grp_grey_dir = os.path.join(path+grp_grey)
-        src_grp_green_dir = os.path.join(path+grp_green)
-        src_grp_red_dir = os.path.join(path+grp_red)
-        src_ndvi_dir = os.path.join(path+ndvi)
-        src_nir_dir = os.path.join(path+nir)
-        src_red_edge_dir = os.path.join(path+red_edge)
-        src_red_dir = os.path.join(path+red)
-        # Add other directories as needed
-        list_src_ortho = [src_dsm_ortho_dir, src_reflectance_ortho_dir,
-                          src_blue_dir, src_green_dir,
-                          src_grp_blue_dir, src_grp_grey_dir, src_grp_green_dir, src_grp_red_dir,
-                          src_ndvi_dir, src_nir_dir, src_red_edge_dir, src_red_dir]
-        
-        print("Calculating for", proj_name)
-        for src_path in list_src_ortho:
-            if os.path.exists(src_path):
-                total_files_to_copy += len(find_files_in_folder(src_path, 'tif'))
+        list_src_ortho = list(dict_ortho.keys())  # List of source paths for orthomosaics
+        list_src_mesh = list(dict_mesh.keys())   # List of source paths for point clouds
 
+        # Calculate the total number of .tif files in the source orthomosaic and point cloud directories
+        if list_src_ortho:
+            print(f"Calculating the number of orthomosaic files for {proj_name}")
+            for src_path in list_src_ortho:
+                if os.path.exists(src_path):
+                    total_files_to_copy += len(find_files_in_folder(src_path, 'tif'))
 
-    # Outer progress bar for the total number of files across projects
+        if list_src_mesh:
+            print(f"Calculating the number of point cloud files for {proj_name}")
+            for src_path in list_src_mesh:
+                if os.path.exists(src_path):
+                    total_files_to_copy += len(find_files_in_folder(src_path, None, True))
+
+    # Initialize the outer progress bar for the total number of files to copy
     with tqdm(total=total_files_to_copy, desc="Total Copy Progress", unit="file", leave=False) as total_pbar:
     
+        # Iterate over each project to perform file copying
         for proj_name in proj_dict:
-            print("Copying Ortho for", proj_name)
-                    
-            ortho_not_found = []
+            print(f"Copying Orthomosaics for {proj_name}")
+            
+            # Initialize empty lists for missing and found orthomosaics
             ortho_found = []
-            # ortho_copied = []
-            
-            
+            mesh_found = []
+            # Retrieve source and destination paths for orthomosaics and point clouds
             path = proj_dict[proj_name][0]
-            dest_proj_path = dest_drive+ path[3:]
-            dest_ortho_path = dest_drive+ path[3:] + r"\2_orthomosaics"
-            
-            # Copying ortho from 3_dsm_ortho
-            src_dsm_ortho_dir = os.path.join(path+dsm_ortho)
-            src_reflectance_ortho_dir = os.path.join(path+reflectance_ortho)
-            src_blue_dir = os.path.join(path+blue)
-            src_green_dir = os.path.join(path+green)
-            src_grp_blue_dir = os.path.join(path+grp_blue)
-            src_grp_grey_dir = os.path.join(path+grp_grey)
-            src_grp_green_dir = os.path.join(path+grp_green)
-            src_grp_red_dir = os.path.join(path+grp_red)
-            src_ndvi_dir = os.path.join(path+ndvi)
-            src_nir_dir = os.path.join(path+nir)
-            src_red_edge_dir = os.path.join(path+red_edge)
-            src_red_dir = os.path.join(path+red)
-            
-            list_src_ortho = [src_dsm_ortho_dir, src_reflectance_ortho_dir,
-                              src_blue_dir, src_green_dir,
-                              src_grp_blue_dir, src_grp_grey_dir, src_grp_green_dir, src_grp_red_dir,
-                              src_ndvi_dir, src_nir_dir, src_red_edge_dir, src_red_dir]
-            
-            
-            dest_dsm_ortho_dir = os.path.join(dest_proj_path+dsm_ortho)
-            dest_reflectance_ortho_dir = os.path.join(dest_proj_path+reflectance_ortho)
-            dest_blue_dir = os.path.join(dest_proj_path+blue)
-            dest_green_dir = os.path.join(dest_proj_path+green)
-            dest_grp_blue_dir = os.path.join(dest_proj_path+grp_blue)
-            dest_grp_grey_dir = os.path.join(dest_proj_path+grp_grey)
-            dest_grp_green_dir = os.path.join(dest_proj_path+grp_green)
-            dest_grp_red_dir = os.path.join(dest_proj_path+grp_red)
-            dest_ndvi_dir = os.path.join(dest_proj_path+ndvi)
-            dest_nir_dir = os.path.join(dest_proj_path+nir)
-            dest_red_edge_dir = os.path.join(dest_proj_path+red_edge)
-            dest_red_dir = os.path.join(dest_proj_path+red)
-            
-            # Creating a list of destanation ortho folders if case we need to copy them to the respective folder in the destination
-            list_dest_ortho = [dest_dsm_ortho_dir, dest_reflectance_ortho_dir,
-                              dest_blue_dir, dest_green_dir,
-                              dest_grp_blue_dir, dest_grp_grey_dir, dest_grp_green_dir, dest_grp_red_dir,
-                              dest_ndvi_dir, dest_nir_dir, dest_red_edge_dir, dest_red_dir]
-            
-            # Create a dictionary mapping source to destination directories
-            dict_ortho = dict(zip(list_src_ortho, list_dest_ortho))
-            
-            
-            #Create Destination Folder for Orthomosaics
+            dest_proj_path = dest_drive + path[3:]
+            dest_ortho_path = os.path.join(dest_proj_path, "2_orthomosaics")
+            dest_mesh_path = os.path.join(dest_proj_path, "3_mesh")
+
+            dict_ortho = ortho_paths(dest_drive, proj_name, proj_dict)
+            dict_mesh = point_cloud_paths(dest_drive, proj_name, proj_dict)
+
+            # Create destination directory for orthomosaics if it doesn't exist
             try:
-                os.mkdir(dest_ortho_path)
-                print(dest_ortho_path, "created")
-            # This will raise an error if the dir already exists. Adding exception to that error
-            except FileExistsError:
-                print(dest_ortho_path, "already exists")
+                os.makedirs(dest_ortho_path, exist_ok=True)  # This handles both creation and skipping if exists
+                print(f"{dest_ortho_path} created or already exists.")
+            except Exception as e:
+                print(f"Error creating {dest_ortho_path}: {e}")
                 pass
-                                
+
+            # Copy orthomosaic files from source to destination
             for src_path, dest_path in dict_ortho.items():
-                # Checking if the orthomosaic folder exists in the source project files
-                if os.path.exists(src_path):
-                    print(src_path)
-                    # Returns a list of al tifs in the dir
-                    ortho_tif_src = find_files_in_folder(src_path, 'tif')
-                    ortho_found.extend(ortho_tif_src)
+                # Get a list of .tif files in the source directory
+                ortho_tif_src = find_files_in_folder(src_path, 'tif')
 
-                    # Copying all orthomosaics one by one
-                    for ortho in ortho_tif_src:
-                        ortho_file = ortho.split('\\')[-1]
+                # Copy each orthomosaic file to the destination folder
+                for ortho in ortho_tif_src:
+                    ortho_file = os.path.basename(ortho)  # Extract the file name from the path
+                    ortho_found.extend(ortho_file)
+
+                    # Copy the file using a utility function that checks for differences before copying
+                    copy_file_with_progress(ortho, dest_ortho_path, chk_size=True)
+                    
+                    # Update progress bar after each file is copied
+                    total_pbar.update(1)
+                    
+            # Copy point cloud files from source to destination
+            for src_path, dest_path in dict_mesh.items():
+                # Get a list of all files in the source directory and sub directories
+                mesh_files_src = find_files_in_folder(src_path, None, True)
+
+
+                # Copy each orthomosaic file to the destination folder
+                for mesh in mesh_files_src:
+                    mesh_file = os.path.basename(mesh)  # Extract the file name from the path
+                    mesh_found.extend(mesh_file)
+                    
+                    # Copy the file using a utility function that checks for differences before copying
+                    copy_file_with_progress(mesh, dest_mesh_path, chk_size=True)
+                    
+                    # Update progress bar after each file is copied
+                    total_pbar.update(1)
+
             
-                        # This check if the same file already exists at teh destination. If it does, it checks if the contents are similar. Copies only
-                        # if contents differ. Also shows a progress bar of the copying operation
-                        copy_file_with_progress(ortho, dest_ortho_path, chk_size=True)
-                        # ortho_copied.append(ortho_file)
+            # Log missing and found orthomosaics to CSV files
+            ortho_found_dict[proj_name] = ortho_found
+            mesh_found_dict[proj_name] = mesh_found
 
-                        # Update outer progress bar after each file
-                        total_pbar.update(1)
-                            
-                else:
-                    ortho_not_found.append(src_path)
-        
-        ortho_not_found_dict[proj_name] = ortho_not_found
-        ortho_found_dict[proj_name] = ortho_found
-        # ortho_copied_dict[proj_name] = ortho_copied
-        append_list_to_csv(ortho_not_found_dict, "LIST ortho not found"+proj_name)
-        append_list_to_csv(ortho_found_dict, "LIST ortho found"+proj_name)
+            append_list_to_csv(ortho_found, proj_name, 'ortho_list.csv')
+            append_list_to_csv(mesh_found, proj_name, 'mesh_list.csv')
 
-    print("Complete")
+            
+        append_dict_to_csv(ortho_found_dict, f"LIST_ortho_found")
+        append_dict_to_csv(mesh_found_dict, f"LIST_mesh_found")
 
-
-    return(ortho_not_found_dict, ortho_found_dict)
+    # Print completion message and return dictionaries
+    print("Copying complete")
+    return ortho_not_found_dict, ortho_found_dict
