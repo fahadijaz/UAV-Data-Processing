@@ -67,6 +67,7 @@ def calculate_md5(file_path, buffer_size=1024*1024):
         while chunk := f.read(buffer_size):
             md5.update(chunk)
     return md5.hexdigest()
+
 # File copy function with progress bar
 def copy_file_with_progress(src_file, dst, chk_size=False, buffer_size=1024*1024):
     """
@@ -217,7 +218,6 @@ def copy_p4d_log(dest_drive, pix4d_path_src):
     return(log_not_found)
 
 # Copying Reports for all projects
-
 # This step overwrites all the files already in the destination dir with the same name
 
 def copy_reports(dest_drive, proj_dict):
@@ -296,7 +296,6 @@ def copy_reports(dest_drive, proj_dict):
     return(pdf_report_not_found, report_does_not_exists)
 
 # Copying Orthomosaics
-
 def copy_ortho(dest_drive, proj_dict):
     
     ortho_not_found_dict = {}

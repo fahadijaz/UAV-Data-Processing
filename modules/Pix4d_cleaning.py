@@ -5,7 +5,6 @@ from Pix4D_cleaning_fucnt import *
 # Import all CSV Logs
 
 # Loading and preprocessing datasets
-#df_flight_log = pd.read_csv("P:\\PhenoCrop\\Test_Folder\\Test_SINDRE\\Git_repo\\UAV-Data-Processing - Copy (24.07.2024)\\Flight Log.csv")
 df_flight_log = pd.read_csv("P:\\PhenoCrop\\0_csv\\flight_log.csv")
 df_flight_routes = pd.read_csv("P:\\PhenoCrop\\0_csv\\flight_routes.csv")
 df_fields = pd.read_csv("P:\\PhenoCrop\\0_csv\\fields.csv")
