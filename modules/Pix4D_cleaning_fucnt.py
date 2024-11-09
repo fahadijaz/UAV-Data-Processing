@@ -39,7 +39,7 @@ def append_dict_to_csv(data_dict, comment, file_name='event.csv'):
     Each key-value pair from the dictionary will be written in a new row.
 
     Parameters:
-    - data_dict (dict): The dictionary whose keys and values will be written to the CSV file.
+    - data_dict (dict): The dictionary whose keys and values will be written to the CSV file.   
     - comment (str): A comment or description to be added as a header to the CSV.
     - file_name (str): The name of the CSV file to which the data will be appended. Defaults to 'event.csv'.
     """
@@ -74,6 +74,8 @@ def calculate_md5(file_path, buffer_size=1024*1024):
 
 
 
+
+
 # File copy function with progress bar
 def copy_file_with_progress(src_file, dst, chk_size=False, buffer_size=1024*1024):
     """
@@ -88,6 +90,7 @@ def copy_file_with_progress(src_file, dst, chk_size=False, buffer_size=1024*1024
     file_name = src_file.split('\\')[-1]
     
     # Check if the destination file already exists
+    # Create dir if not exists
     if not os.path.exists(dst):
         os.mkdir(dst)
 
@@ -95,8 +98,8 @@ def copy_file_with_progress(src_file, dst, chk_size=False, buffer_size=1024*1024
 
 
     if os.path.exists(dst_file):
-        print(f"File '{dst_file}' already exists.")
-
+        print("File", '\033[1m', file_name, '\033[0m', "already exists in", '\033[1m', dst,'\033[0m',)
+        
         # Only check contents if specified. Else skip copying if the file exists
         if chk_size:
             print(f"Checking contents...")
@@ -150,13 +153,37 @@ def copy_file_with_progress(src_file, dst, chk_size=False, buffer_size=1024*1024
         print(f"Verification failed: The files are different.")
 
 # Example usage:
-# copy_file_with_progress("path/to/source/file", "path/to/destination/file")
+# copy_file_with_progress("path/to/source/file", "path/to/destination")
 
 
+# Copy files, subfolders and files in sub folders
+def copy_everything(src_dir, dest_dir):
+    """
+    Recursively copies files and subdirectories from src_dir to dest_dir, preserving the directory structure.
 
+    :param src_dir: Source directory to copy files from.
+    :param dest_dir: Destination directory to copy files to.
+    """
+    # Ensure destination directory exists
+    os.makedirs(dest_dir, exist_ok=True)
+    
+    # Loop through each item in the source directory
+    for item in os.listdir(src_dir):
+        item_path_src = os.path.join(src_dir, item)
+        item_path_dest = os.path.join(dest_dir, item)
 
-# Listing paths of all projects in the folder into a dict and checking if all dir exist 
-# Returns a dict
+        # If it's a file, copy with progress and content verification
+        if os.path.isfile(item_path_src):
+            copy_file_with_progress(item_path_src, dest_dir, chk_size=True)
+
+        # If it's a directory, recursively copy files within the subdirectory
+        elif os.path.isdir(item_path_src):
+            print(f"Copying subdir {item}.")
+            # Recursively call the function for each subdirectory
+            # Using copy tree function since this preserves the metadata for the sub folders as well
+            # And copytree is faster than copy_file_with_progress since it does not perform filesize check
+            shutil.copytree(item_path_src, item_path_dest, dirs_exist_ok=True)
+
 
 def create_proj_dict(src_drive, path_pix4d_gnrl, field_id, flight_type):
     """
@@ -213,9 +240,7 @@ def create_proj_dict(src_drive, path_pix4d_gnrl, field_id, flight_type):
     return proj_dict, pix4d_path_src
 
 
-
 # Copy all P4D Project Files and logs
-
 def copy_p4d_log(dest_drive, pix4d_path_src):
     dest_proj_path = dest_drive+ pix4d_path_src[3:]
     for file in os.listdir(pix4d_path_src):
@@ -266,71 +291,33 @@ def copy_p4d_log(dest_drive, pix4d_path_src):
 # Copying Reports for all projects
 # This step overwrites all the files already in the destination dir with the same name
 
-def copy_reports(dest_drive, proj_dict):
+def copy_reports(dest_path, proj_dict):
     pdf_report_not_found = []
     report_does_not_exists = []
     for proj_name in proj_dict:
         path = proj_dict[proj_name][0]
-        dest_proj_path = dest_drive+ path[3:]
+        dest_proj_path = os.path.join(dest_path, proj_name)
     
         # Copying all reports from all projects
         src_report_dir = path+r"\1_initial\report"
-        # print(src_report_dir)
         dest_report_dir = dest_proj_path+r"\1_initial\report"
     
         # Checking if the report folder exists in the source project files
         if not os.path.exists(src_report_dir):
             report_does_not_exists.append(proj_name)
             print("Report does not does not exists for project ", proj_name)
-    
-        # Creating the whole path of parent and sub directories in the desired location
-        try:
-            os.makedirs(dest_report_dir)
-            # print(dest_report_dir, "created")
-        # This will raise an error if the dir already exists. Adding exception to that error
-        except FileExistsError:
-            # print(dest_report_dir, "already exists")
-            pass
-        
-        # Copy all files from source to newly created destination directory 
-        # Iterating through all files in the source dir
-        # Check for pdf version of report present in there
-        pdf_report_found = False
-        for file in os.listdir(src_report_dir):
-            file_path_src = os.path.join(src_report_dir, file)
-            # Checking if a certain item is a file or dir
-            if os.path.isfile(file_path_src):
+        else:
+            # Recursively copies files and subdirectories from src_dir to dest_dir, preserving the directory structure.
+            copy_everything(src_report_dir, dest_report_dir)
+            
+            # Iterating through all files in the source dir
+            # Check for pdf version of report present in there
+            pdf_report_found = False
+            for file in os.listdir(src_report_dir):
                 if file == proj_name+"_report.pdf":
                     pdf_report_found = True
-                    # print("PDF report found for ", proj_name)
-                # Copying only if the file does not already exists in the destination location
-                if not os.path.exists(os.path.join(dest_report_dir, file)):
-                    shutil.copy2(file_path_src, dest_report_dir)
-                # If the files exists, then do not overwrite and display the following message
-                else:
-                    print("File", '\033[1m', file, '\033[0m', "already exists in", '\033[1m', dest_report_dir,'\033[0m',)
-                
-            # If dir then iterate through the files in subdir and copy them
-            elif os.path.isdir(file_path_src):
-                # Create the same dir in the destination
-                dir_path_dest = dest_drive+file_path_src[3:]
-                try:
-                    os.mkdir(dir_path_dest)
-                    # print(dir_path_dest, "created")
-                # This will raise an error if the dir already exists. Adding exception to that error
-                except FileExistsError:
-                    # print(dir_path_dest, "already exists")
-                    pass
-                for subfile in os.listdir(file_path_src):
-                    subfile_path = os.path.join(file_path_src, subfile)
-                    if os.path.isfile(subfile_path):
-                        # Copying only if the file does not already exists in the destination location
-                        if not os.path.exists(os.path.join(dest_drive, subfile_path[3:])):
-                            shutil.copy2(subfile_path, dir_path_dest)
-                        # If the files exists, then do not overwrite and display the following message
-                        else:
-                            print("File", '\033[1m', subfile, '\033[0m', "already exists in", '\033[1m', dir_path_dest,'\033[0m',)
-                            
+
+        
         if not pdf_report_found:
             pdf_report_not_found.append(proj_name)
             print("PDF report not found for ", proj_name)
@@ -341,13 +328,13 @@ def copy_reports(dest_drive, proj_dict):
 
     return(pdf_report_not_found, report_does_not_exists)
 
-def ortho_paths(dest_drive, proj_name, proj_dict):
+def ortho_paths(dest_path, proj_name, proj_dict):
     """
     Generates source and destination directory paths for orthomosaic data within a project,
     including only directories that exist in the source location.
 
     Parameters:
-    - dest_drive (str): Base path for the destination drive where files should be copied.
+    - dest_path (str): Base path for the destination location where files should be copied.
     - proj_name (str): Project name, used as a key to retrieve the base source path.
     - proj_dict (dict): Dictionary containing project details, where proj_dict[proj_name][0]
                         provides the base path for the source data.
@@ -358,8 +345,8 @@ def ortho_paths(dest_drive, proj_name, proj_dict):
     """
     # Base paths
     src_base_path = proj_dict[proj_name][0]
-    dest_base_path = os.path.join(dest_drive, src_base_path[3:])  # Slice to ignore initial 3 chars
-    
+    dest_proj_path = os.path.join(dest_path, proj_name)
+       
     # Define the relative paths for orthomosaic directories
     ortho_subdirs = {
         "dsm_ortho": r"3_dsm_ortho\2_mosaic",
@@ -382,20 +369,20 @@ def ortho_paths(dest_drive, proj_name, proj_dict):
     # Only add to dict_ortho if the source directory exists
     for subdir in ortho_subdirs.values():
         src_path = os.path.join(src_base_path, subdir)
-        dest_path = os.path.join(dest_base_path, subdir)
+        dest_path = os.path.join(dest_proj_path, subdir)
         
         if os.path.exists(src_path):  # Only add if source path exists
             dict_ortho[src_path] = dest_path
 
     return dict_ortho
 
-def point_cloud_paths(dest_drive, proj_name, proj_dict):
+def point_cloud_tif(dest_path, proj_name, proj_dict):
     """
     Generates source and destination directory paths for point cloud data within a project,
     including only directories that exist in the source location.
 
     Parameters:
-    - dest_drive (str): Base path for the destination drive where files should be copied.
+    - dest_path (str): Base path for the destination location where files should be copied.
     - proj_name (str): Project name, used as a key to retrieve the base source path.
     - proj_dict (dict): Dictionary containing project details, where proj_dict[proj_name][0]
                         provides the base path for the source data.
@@ -406,33 +393,70 @@ def point_cloud_paths(dest_drive, proj_name, proj_dict):
     """
     # Base paths
     src_base_path = proj_dict[proj_name][0]
-    dest_base_path = os.path.join(dest_drive, src_base_path[3:])  # Adjust to ignore initial chars if needed
+    dest_proj_path = os.path.join(dest_path, proj_name)
     
     # List of relative subdirectory paths for point cloud data
     point_cloud_subdirs = [
-        r"2_densification\3d_mesh",
-        r"3_dsm_ortho\1_dsm",
-        r"3_dsm_ortho\extras\dtm",
-        r"3_dsm_ortho\2_mosaic\google_tiles"
+        r"3_dsm_ortho\1_dsm", # Only tif
+        r"3_dsm_ortho\extras\dtm", # Only tif
     ]
+    # Initialize dictionary to store mappings of existing source to destination paths
+    dict_mesh_tif = {}
     
     # Generate dict with existing source paths only
-    dict_mesh = {
-        os.path.join(src_base_path, subdir): os.path.join(dest_base_path, subdir)
+    dict_mesh_tif = {
+        os.path.join(src_base_path, subdir): os.path.join(dest_proj_path, subdir)
         for subdir in point_cloud_subdirs
         if os.path.exists(os.path.join(src_base_path, subdir))
     }
 
-    return dict_mesh
+    return dict_mesh_tif
+
+def point_cloud_all(dest_path, proj_name, proj_dict):
+    """
+    Generates source and destination directory paths for point cloud data within a project,
+    including only directories that exist in the source location.
+
+    Parameters:
+    - dest_path (str): Base path for the destination location where files should be copied.
+    - proj_name (str): Project name, used as a key to retrieve the base source path.
+    - proj_dict (dict): Dictionary containing project details, where proj_dict[proj_name][0]
+                        provides the base path for the source data.
+
+    Returns:
+    - dict: A dictionary mapping each existing source point cloud directory to its corresponding
+            destination directory.
+    """
+    # Base paths
+    src_base_path = proj_dict[proj_name][0]
+    dest_proj_path = os.path.join(dest_path, proj_name)
+    
+    # List of relative subdirectory paths for point cloud data
+    point_cloud_subdirs = [
+        r"2_densification\3d_mesh", # Copy all
+        r"3_dsm_ortho\2_mosaic\google_tiles" # Copy all
+    ]
+
+    # Initialize dictionary to store mappings of existing source to destination paths
+    dict_mesh_all = {}
+    
+    # Generate dict with existing source paths only
+    dict_mesh_all = {
+        os.path.join(src_base_path, subdir): os.path.join(dest_proj_path, subdir)
+        for subdir in point_cloud_subdirs
+        if os.path.exists(os.path.join(src_base_path, subdir))
+    }
+
+    return dict_mesh_all
 
 # Copying Orthomosaics
-def copy_ortho(dest_drive, proj_dict):
+def copy_ortho(dest_path, proj_dict):
     """
     Copies orthomosaic (tiff) files from the source project directories to destination directories, 
     including progress tracking. Creates missing destination directories and logs missing files.
 
     Parameters:
-    - dest_drive (str): Base path for the destination drive where files should be copied.
+    - dest_path (str): Base path for the destination location where files should be copied.
     - proj_dict (dict): Dictionary containing project names as keys, and project details as values. Each project
                         entry has a source path at proj_dict[proj_name][0].
 
@@ -444,6 +468,7 @@ def copy_ortho(dest_drive, proj_dict):
     
     ortho_found_dict = {}      # To store found and copied orthomosaic files per project
     mesh_found_dict = {}      # To store found and copied mesh files per project
+    mesh_extra_found = {}      # To store found and copied mesh extras per project
     
     # Print information about progress bar initialization
     print("Calculating number of files to be copied for the progress bar")
@@ -452,22 +477,24 @@ def copy_ortho(dest_drive, proj_dict):
     total_files_to_copy = 0
     for proj_name in proj_dict:
         path = proj_dict[proj_name][0]  # Get the project base path
-        dict_ortho = ortho_paths(dest_drive, proj_name, proj_dict)  # Get source to destination orthomosaic paths
-        dict_mesh = point_cloud_paths(dest_drive, proj_name, proj_dict)  # Get source to destination point cloud paths
-        
+        dict_ortho = ortho_paths(dest_path, proj_name, proj_dict)  # Get source to destination orthomosaic paths
+        dict_mesh_tif = point_cloud_tif(dest_path, proj_name, proj_dict)  # Get source to destination point cloud paths
+        dict_mesh_all = point_cloud_all(dest_path, proj_name, proj_dict)  # Get source to destination point cloud paths
+
         list_src_ortho = list(dict_ortho.keys())  # List of source paths for orthomosaics
-        list_src_mesh = list(dict_mesh.keys())   # List of source paths for point clouds
+        list_src_mesh_tif = list(dict_mesh_tif.keys())   # List of source paths for point clouds ortho
+        list_src_mesh_all = list(dict_mesh_all.keys())   # List of source paths for point clouds
 
         # Calculate the total number of .tif files in the source orthomosaic and point cloud directories
-        if list_src_ortho:
+        if list_src_ortho+list_src_mesh_tif: # Porceeding if the list is not empty
             print(f"Calculating the number of orthomosaic files for {proj_name}")
-            for src_path in list_src_ortho:
+            for src_path in list_src_ortho+list_src_mesh_tif:
                 if os.path.exists(src_path):
                     total_files_to_copy += len(find_files_in_folder(src_path, 'tif'))
 
-        if list_src_mesh:
-            print(f"Calculating the number of point cloud files for {proj_name}")
-            for src_path in list_src_mesh:
+        if list_src_mesh_all: # Porceeding if the list is not empty
+            print(f"Calculating the number of extras files for {proj_name}")
+            for src_path in list_src_mesh_all:
                 if os.path.exists(src_path):
                     total_files_to_copy += len(find_files_in_folder(src_path, None, True))
 
@@ -481,25 +508,30 @@ def copy_ortho(dest_drive, proj_dict):
             # Initialize empty lists for missing and found orthomosaics
             ortho_found = []
             mesh_found = []
+            mesh_extra_found = []
             # Retrieve source and destination paths for orthomosaics and point clouds
             path = proj_dict[proj_name][0]
-            dest_proj_path = dest_drive + path[3:]
+            dest_proj_path = os.path.join(dest_path, proj_name)
             dest_ortho_path = os.path.join(dest_proj_path, "2_orthomosaics")
             dest_mesh_path = os.path.join(dest_proj_path, "3_mesh")
+            dest_mesh_path_extras = os.path.join(dest_proj_path, "4_extras")
 
-            dict_ortho = ortho_paths(dest_drive, proj_name, proj_dict)
-            dict_mesh = point_cloud_paths(dest_drive, proj_name, proj_dict)
+            dict_ortho = ortho_paths(dest_path, proj_name, proj_dict)
+            dict_mesh_tif = point_cloud_tif(dest_path, proj_name, proj_dict)
+            dict_mesh_all = point_cloud_all(dest_path, proj_name, proj_dict)
 
             # Create destination directory for orthomosaics if it doesn't exist
             try:
                 os.makedirs(dest_ortho_path, exist_ok=True)  # This handles both creation and skipping if exists
-                print(f"{dest_ortho_path} created or already exists.")
+                os.makedirs(dest_mesh_path, exist_ok=True)  # This handles both creation and skipping if exists
+                os.makedirs(dest_mesh_path_extras, exist_ok=True)  # This handles both creation and skipping if exists
+                print(f"{dest_ortho_path}, {dest_mesh_path}, {dest_mesh_path_extras} created or already exists.")
             except Exception as e:
-                print(f"Error creating {dest_ortho_path}: {e}")
+                print(f"Error creating one of the paths {dest_ortho_path}, {dest_mesh_path}, {dest_mesh_path_extras}: {e}")
                 pass
 
             # Copy orthomosaic files from source to destination
-            for src_path, dest_path in dict_ortho.items():
+            for src_path, dest_path_temp in dict_ortho.items():
                 # Get a list of .tif files in the source directory
                 ortho_tif_src = find_files_in_folder(src_path, 'tif')
 
@@ -514,11 +546,10 @@ def copy_ortho(dest_drive, proj_dict):
                     # Update progress bar after each file is copied
                     total_pbar.update(1)
                     
-            # Copy point cloud files from source to destination
-            for src_path, dest_path in dict_mesh.items():
+            # Copy point cloud tif files from source to destination
+            for src_path, dest_path_temp in dict_mesh_tif.items():
                 # Get a list of all files in the source directory and sub directories
-                mesh_files_src = find_files_in_folder(src_path, None, True)
-
+                mesh_files_src = find_files_in_folder(src_path, 'tif')
 
                 # Copy each orthomosaic file to the destination folder
                 for mesh in mesh_files_src:
@@ -531,17 +562,35 @@ def copy_ortho(dest_drive, proj_dict):
                     # Update progress bar after each file is copied
                     total_pbar.update(1)
 
-            
+          
+            # Copy point cloud extras files and subfolders from source to destination
+            for src_path, dest_path_temp in dict_mesh_all.items():
+                # Copy the everything using a utility function that checks for differences before copying
+                copy_everything(src_path, dest_path_temp):
+                
+                # Loop to update list and progress bar
+                # Get a list of all files in the source directory and sub directories
+                mesh_all_src = find_files_in_folder(src_path, None, True)
+                for mesh in mesh_all_src:
+                    mesh_file = os.path.basename(mesh)  # Extract the file name from the path
+                    mesh_extra_found.extend(mesh_file)
+                    # Update progress bar after each file is copied
+                    total_pbar.update(1)
+                    
+
             # Log missing and found orthomosaics to CSV files
             ortho_found_dict[proj_name] = ortho_found
             mesh_found_dict[proj_name] = mesh_found
+            mesh_extra_found[proj_name] = mesh_extra_found
 
             append_list_to_csv(ortho_found, proj_name, 'ortho_list.csv')
             append_list_to_csv(mesh_found, proj_name, 'mesh_list.csv')
+            append_list_to_csv(mesh_extra_found, proj_name, 'mesh_list.csv')
 
             
         append_dict_to_csv(ortho_found_dict, f"LIST_ortho_found")
         append_dict_to_csv(mesh_found_dict, f"LIST_mesh_found")
+        append_dict_to_csv(mesh_extra_found, f"LIST_mesh_extra_found")
 
     # Print completion message and return dictionaries
     print("Copying complete")
