@@ -683,4 +683,4 @@ def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ort
 
     # Print completion message and return dictionaries
     print("Copying complete")
-    return ortho_not_found_dict, ortho_found_dict, mesh_extra_found_dict
+    return ortho_found_dict, mesh_found_dict, mesh_extra_found_dict
