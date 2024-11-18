@@ -15,6 +15,7 @@ def open_folder(path):
         subprocess.Popen(['xdg-open', path])
 
 
+# Function to find the tif files in a given folder¶
 def find_files_in_folder(folder_path, extension=None, recursive=False):
     """
     Retrieves a list of file paths in a specified folder, optionally filtered by file extension,
@@ -40,12 +41,19 @@ def find_files_in_folder(folder_path, extension=None, recursive=False):
     """
     
     matched_files = []
-    
-    # Determine the search pattern based on whether an extension is provided
+
+    # Determine the search pattern based on whether an extension is provided and recursion is enabled
     if extension:
-        search_pattern = os.path.join(folder_path, f"**/*.{extension}")
+        if recursive:
+            search_pattern = os.path.join(folder_path, f"**/*.{extension}")
+        else:
+            search_pattern = os.path.join(folder_path, f"*.{extension}")
     else:
-        search_pattern = os.path.join(folder_path, "**/*" if recursive else "*")
+        # No extension specified, handle both recursive and non-recursive cases
+        if recursive:
+            search_pattern = os.path.join(folder_path, "**/*")
+        else:
+            search_pattern = os.path.join(folder_path, "*")
     
     # Use glob to find matching files in the specified directory and subdirectories if recursive
     matched_files.extend(glob.glob(search_pattern, recursive=recursive))
