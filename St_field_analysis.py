@@ -13,7 +13,7 @@ df_flight_log, df_flight_routes, df_fields, df_flight_log_merged, df_processing_
 
 flight_log_selection = df_flight_log_merged.copy()
 
-qgis_folder_path = "P:/PhenoCrop/3_qgis"
+qgis_folder_path = "D:/PhenoCrop/3_qgis"
 
 # Reading the excel files (these are test files)
 #df0 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240607 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
@@ -166,7 +166,60 @@ def display_statistics_boxplot():
 
             sns.set(style='whitegrid')
             sns.boxplot(data=df_stats).set(title=f'{input_field} {qgis_results_year}\n{final_indices[idx]} {input_data_type}\n{qgis_results_drone} MS')
-            
+
+
+            # # ============================================================================================================================ #
+            # # AN ALTERNATE PLOT WITH SEABORN
+            # # Create a function to customize the axes of all the subsequent graphs in a uniform way.
+            # def add_cosmetics(title=f'{input_field} {qgis_results_year}\n{final_indices[idx]} {input_data_type}\n{qgis_results_drone} MS', 
+            #                 xlabel='Flights', ylabel='Index value'):
+            #     plt.title(title, fontsize=22)
+            #     plt.xlabel(xlabel, fontsize=20)
+            #     plt.ylabel(ylabel, fontsize=20)
+            #     plt.xticks(fontsize=18)
+            #     plt.yticks(fontsize=18)
+            #     sns.despine()
+
+            # plt.figure(figsize=(15, 10))
+            # # Create violin plots without mini-boxplots inside.
+            # ax = sns.violinplot(data=df_stats,
+            #                     color='mediumslateblue', 
+            #                     cut=0, inner=None)
+            # # Clip the right half of each violin.
+            # for item in ax.collections:
+            #     x0, y0, width, height = item.get_paths()[0].get_extents().bounds
+            #     item.set_clip_path(plt.Rectangle((x0, y0), width/2, height,
+            #                     transform=ax.transData))
+            # # Create strip plots with partially transparent points of different colors depending on the group.
+            # num_items = len(ax.collections)
+            # sns.stripplot( data=df_stats,
+            #             palette=['blue', 'deepskyblue'], alpha=0.4, size=7)
+            # # Shift each strip plot strictly below the correponding volin.
+            # for item in ax.collections[num_items:]:
+            #     item.set_offsets(item.get_offsets() + 0.15)
+            # # Create narrow boxplots on top of the corresponding violin and strip plots, with thick lines, the mean values, without the outliers.
+            # sns.boxplot(data=df_stats, width=0.35,
+            #             showfliers=False, showmeans=True, 
+            #             meanprops=dict(marker='o', markerfacecolor='darkorange',
+            #                         markersize=10, zorder=3),
+            #             boxprops=dict(facecolor=(0,0,0,0), 
+            #                         linewidth=3, zorder=3),
+            #             whiskerprops=dict(linewidth=3),
+            #             capprops=dict(linewidth=3),
+            #             medianprops=dict(linewidth=3)).set(title=f'{input_field} {qgis_results_year}\n{final_indices[idx]} {input_data_type}\n{qgis_results_drone} MS')
+            # plt.legend(frameon=False, fontsize=15, loc='lower left')
+            # add_cosmetics(xlabel='Flights', ylabel='Index value')
+            # # ============================================================================================================================ #
+
+
+
+
+
+
+
+
+
+
             # Showing the plot in the correct cell of the grid
             row, col = get_grid_position(idx, 2)
             with grid[row][col]:

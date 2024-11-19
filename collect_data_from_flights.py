@@ -3,11 +3,11 @@ import os
 import csv
 import pandas as pd
 
-input_path = "P:\\PhenoCrop\\1_flights"
-data_file = "P:\\PhenoCrop\\0_csv\\data_overview.csv"
-flight_log = "P:\\PhenoCrop\\0_csv\\flight_log.csv"
-output_path = "P:\\PhenoCrop\\1_flights"
-not_logged_csv_path = "P:\\PhenoCrop\\Test_Folder\\Test_ISAK\\not_logged.csv"
+input_path = "D:\\PhenoCrop\\1_flights"
+data_file = "D:\\PhenoCrop\\0_csv\\data_overview.csv"
+flight_log = "D:\\PhenoCrop\\0_csv\\flight_log.csv"
+output_path = "D:\\PhenoCrop\\1_flights"
+not_logged_csv_path = "D:\\PhenoCrop\\Test_Folder\\Test_ISAK\\not_logged.csv"
 original_df = pd.read_csv(not_logged_csv_path)
 
 

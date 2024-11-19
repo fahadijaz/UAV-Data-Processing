@@ -16,9 +16,9 @@ def load_file_transfers():
     st.session_state.ready_to_move = False
     st.session_state.data_loaded = False
 
-    output_path = "P:\\PhenoCrop\\1_flights"
-    data_file = "P:\\PhenoCrop\\0_csv\\flight_routes.csv"
-    flight_log = "P:\\PhenoCrop\\0_csv\\flight_log.csv"
+    output_path = "D:\\PhenoCrop\\1_flights"
+    data_file = "D:\\PhenoCrop\\0_csv\\flight_routes.csv"
+    flight_log = "D:\\PhenoCrop\\0_csv\\flight_log.csv"
     sd_card_paths = look_for_sd_cards()
     obj_list = [FileTransfer(input_path=path, output_path=output_path, data_overview_file=data_file, flight_log=flight_log) for path in sd_card_paths]
     for ft in obj_list:

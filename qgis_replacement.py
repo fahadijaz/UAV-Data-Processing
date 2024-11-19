@@ -5,18 +5,18 @@ import numpy as np
 from rasterio.features import geometry_mask
 
 # Load the shapefile
-shp = gpd.read_file("P:/PhenoCrop/3_qgis/shape files new/Phenocrop.geojson")
+shp = gpd.read_file("D:/PhenoCrop/3_qgis/shape files new/Phenocrop.geojson")
 
 # Paths to individual band rasters
-red_raster_path = "P:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/20240624 PHENO P4M 20m MS_index_red_red.tif"
-blue_raster_path = "P:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/20240624 PHENO P4M 20m MS_index_blue_blue.tif"
-green_raster_path = "P:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/20240624 PHENO P4M 20m MS_index_green_green.tif"
-nir_raster_path = "P:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/20240624 PHENO P4M 20m MS_index_nir_nir.tif"
-redE_raster_path = "P:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/20240624 PHENO P4M 20m MS_index_red_edge_red_edge.tif"
+red_raster_path = "D:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/20240624 PHENO P4M 20m MS_index_red_red.tif"
+blue_raster_path = "D:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/20240624 PHENO P4M 20m MS_index_blue_blue.tif"
+green_raster_path = "D:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/20240624 PHENO P4M 20m MS_index_green_green.tif"
+nir_raster_path = "D:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/20240624 PHENO P4M 20m MS_index_nir_nir.tif"
+redE_raster_path = "D:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/20240624 PHENO P4M 20m MS_index_red_edge_red_edge.tif"
 
 # Try to load an existing DataFrame, or start a new one
 try:
-    stats_df = pd.read_csv('P:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/combined_band_statistics.csv')
+    stats_df = pd.read_csv('D:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/combined_band_statistics.csv')
     # Find the last complete row
     last_complete_row = stats_df.dropna().index[-1] + 1
     print(f"Resuming from row {last_complete_row}")
@@ -55,7 +55,7 @@ def process_rasters(start_index):
 
             # Save intermediate results
             if (i % 100 == 0 or i == len(shp) - 1):
-                stats_df.to_csv('P:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/combined_band_statistics.csv', index=False)
+                stats_df.to_csv('D:/PhenoCrop/Phenotyping 2024/PHENO/MS/20240624 PHENO P4M 20m MS/band_data/combined_band_statistics.csv', index=False)
                 print(f"Saved progress at row {i}")
 
 if __name__ == "__main__":

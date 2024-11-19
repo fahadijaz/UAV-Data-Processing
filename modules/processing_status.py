@@ -53,7 +53,7 @@ def update_all_flights():
     time_spent = round(time.time()-start_time, 2)
     st.write(f"Spent {time_spent}s going through {df_flight_log_merged.shape[0]} flights")
     st.write(df_processing_status)
-    df_processing_status.to_csv("P:/PhenoCrop/0_csv/processing_status.csv", index=False)
+    df_processing_status.to_csv("D:/PhenoCrop/0_csv/processing_status.csv", index=False)
 
 def create_new_row_for_processing_status(flight_details, processing_result):
     # the flight_details argument needs to be a pandas series

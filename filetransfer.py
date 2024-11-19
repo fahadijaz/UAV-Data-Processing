@@ -14,7 +14,7 @@ import uuid
 
 # Configure logging
 logging.basicConfig(
-    filename='P:\\PhenoCrop\\0_csv\\logging.log',
+    filename='D:\\PhenoCrop\\0_csv\\logging.log',
     filemode="a",
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -41,7 +41,7 @@ class FileTransfer:
         self.output_path = output_path
         self.data_overview_file = data_overview_file
         self.flight_log_file = flight_log
-        self.temp_log_file = "P:\\PhenoCrop\\0_csv\\temp_flight_log.csv" #add as variable insted of hardcoded
+        self.temp_log_file = "D:\\PhenoCrop\\0_csv\\temp_flight_log.csv" #add as variable insted of hardcoded
         self.type_counts = {'MS': 0, '3D': 0, 'Reflectance': 0, 'phantom-MS': 0}
         self.flights_folders = []
 
@@ -768,9 +768,9 @@ if __name__ == "__main__":
         available_paths = [path for path in potential_paths if os.path.exists(path)]
         return available_paths
 
-    output_path = "P:\\PhenoCrop\\1_flights"
-    data_file = "P:\\PhenoCrop\\0_csv\\flight_routes.csv"
-    flight_log = "P:\\PhenoCrop\\0_csv\\flight_log.csv"
+    output_path = "D:\\PhenoCrop\\1_flights"
+    data_file = "D:\\PhenoCrop\\0_csv\\flight_routes.csv"
+    flight_log = "D:\\PhenoCrop\\0_csv\\flight_log.csv"
 
     sd_card_paths = detect_sd_cards()
     logging.info(f'SD cards detected: {sd_card_paths}')

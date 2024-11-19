@@ -62,7 +62,7 @@ def update_this_processing_status(df_processing_status, flight_details, processi
         df_processing_status = pd.concat([df_processing_status, new_processing_status], ignore_index=True)
     
     # Save the updated DataFrame back to the CSV file
-    df_processing_status.to_csv("P:/PhenoCrop/0_csv/processing_status.csv", index=False)
+    df_processing_status.to_csv("D:/PhenoCrop/0_csv/processing_status.csv", index=False)
 
 
 def display_section_title():
@@ -102,7 +102,7 @@ def display_section_main_1():
             st.table(flight_details_col_1)
             # Button to open the folder
             link_path = rf'{flight_details["output_path"]}'
-            #link_path = rf'P:\PhenoCrop\1_flights\{flight_details["Field ID"]}\{flight_details["BaseType"]}'
+            #link_path = rf'D:\PhenoCrop\1_flights\{flight_details["Field ID"]}\{flight_details["BaseType"]}'
             if st.button('Go to image folder'):
                 #st.write(f"Opened folder: {link_path}")
                 open_folder(link_path)

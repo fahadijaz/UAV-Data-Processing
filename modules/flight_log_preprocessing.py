@@ -4,11 +4,11 @@ import re
 
 def preprocessing():
     # Loading and preprocessing datasets
-    #df_flight_log = pd.read_csv("P:\\PhenoCrop\\Test_Folder\\Test_SINDRE\\Git_repo\\UAV-Data-Processing - Copy (24.07.2024)\\Flight Log.csv")
-    df_flight_log = pd.read_csv("P:\\PhenoCrop\\0_csv\\flight_log.csv")
-    df_flight_routes = pd.read_csv("P:\\PhenoCrop\\0_csv\\flight_routes.csv")
-    df_fields = pd.read_csv("P:\\PhenoCrop\\0_csv\\fields.csv")
-    df_processing_status = pd.read_csv("P:\\PhenoCrop\\0_csv\\processing_status.csv")
+    #df_flight_log = pd.read_csv("D:\\PhenoCrop\\Test_Folder\\Test_SINDRE\\Git_repo\\UAV-Data-Processing - Copy (24.07.2024)\\Flight Log.csv")
+    df_flight_log = pd.read_csv("D:\\PhenoCrop\\0_csv\\flight_log.csv")
+    df_flight_routes = pd.read_csv("D:\\PhenoCrop\\0_csv\\flight_routes.csv")
+    df_fields = pd.read_csv("D:\\PhenoCrop\\0_csv\\fields.csv")
+    df_processing_status = pd.read_csv("D:\\PhenoCrop\\0_csv\\processing_status.csv")
 
     # Fixing the date formatting
     df_flight_log['date'] = pd.to_datetime(df_flight_log['date'], format='%Y%m%d').dt.date

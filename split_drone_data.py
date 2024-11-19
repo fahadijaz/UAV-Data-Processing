@@ -83,5 +83,5 @@ def split_images_by_band(folder_path):
 # Example usage
 if __name__ == "__main__":
     # just an exsample folder, can be automated, take input from user. loop thru folder system.
-    folder_path = "P:/PhenoCrop/Test_Folder/Test_ISAK/20240619 E166 M3M 30m MS"
+    folder_path = "D:/PhenoCrop/Test_Folder/Test_ISAK/20240619 E166 M3M 30m MS"
     split_images_by_band(folder_path)
