@@ -324,6 +324,8 @@ def copy_p4d_log(dest_path, pix4d_path_src):
 
 # Copying Reports for all projects
 # This step overwrites all the files already in the destination dir with the same name
+# Copying Reports for all projects
+# This step overwrites all the files already in the destination dir with the same name
 def copy_reports(dest_path, proj_dict):
     """
     Copies report directories and PDF reports from source projects to the destination directory.
@@ -357,7 +359,7 @@ def copy_reports(dest_path, proj_dict):
 
         # Define source and destination report directories
         src_report_dir = os.path.join(src_path, r"1_initial\report")
-        dest_report_dir = os.path.join(dest_proj_path, r"1_report")
+        dest_report_dir = os.path.join(dest_proj_path, r"1_Report")
 
         # Check if the source report directory exists
         if not os.path.exists(src_report_dir):
@@ -391,9 +393,9 @@ def copy_reports(dest_path, proj_dict):
 
     # List of tuples containing the list and corresponding comments
     report_data = [
-        (pdf_report_not_found, "PDF Reports not found"),
-        (report_does_not_exists, "Reports Folder does not exist"),
-        (report_name_different, "Reports with mismatching name")
+        (pdf_report_not_found, "PDF Report not found"),
+        (report_does_not_exists, "Report folder does not exist"),
+        (report_name_different, "Report with mismatching name")
     ]
     
     # Loop through each tuple and save to CSV if the list is not empty
@@ -620,20 +622,13 @@ def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ort
                             # Checking if the proj_name is a part of source and destination paths
                             if proj_name in tif_file and proj_name in dest_folder:
                                 # Apply the condition for '_group1.tif' files
-                                print(tif_file)
-                                print(type_of_data_to_copy)
-                                print(file_name)
                                 if "2_mosaic" in tif_file and not file_name.endswith('_mosaic_group1.tif'):
-                                    print("first loop")
                                     if "ortho_extra" in type_of_data_to_copy:
-                                        print("first-2 loop")
-
                                         copy_file_with_progress(tif_file, dest_ortho_extra, chk_size=chk_size)
                                         total_pbar.update(1)  # Update progress bar
                                     else:
                                         continue
                                 else:
-                                    print("second loop")
                                     # Copy the file with progress tracking
                                     copy_file_with_progress(tif_file, dest_folder, chk_size=chk_size)
                                     total_pbar.update(1)
@@ -646,7 +641,8 @@ def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ort
                         # Checking if the proj_name is a part of source and destination paths
                         if proj_name in src_path and proj_name in dest_folder:
                             # Copying all files and directories for mesh extras
-                            copy_everything(src_path, dest_folder, chk_size=chk_size)
+                            dest_subfolder = os.path.join(dest_folder, src_path.split("\\")[-1])
+                            copy_everything(src_path, dest_subfolder, chk_size=chk_size)
     
                             # Track all files found in mesh extras
                             mesh_extra_files = find_files_in_folder(src_path, None, True)
