@@ -13,7 +13,8 @@ df_processing_status = pd.read_csv("P:\\PhenoCrop\\0_csv\\processing_status.csv"
 
 # field_ids = df_fields["Field ID"].tolist()
 flight_types =  sorted(list(set(df_flight_routes["BaseType"].dropna())))
-field_ids = ['PRO_BAR_VOLL', 'DIVERSITY_OATS', 'OAT_FRONTIERS', 'PILOT', 'E166', 'PRO_BAR_SØRÅS', 'PHENO_CROP']
+# field_ids = ['PRO_BAR_VOLL', 'DIVERSITY_OATS', 'OAT_FRONTIERS', 'PILOT', 'E166', 'PRO_BAR_SØRÅS', 'PHENO_CROP']
+field_ids = ['PRO_BAR_SØRÅS']
 field_ids, flight_types
 
 src_drive = r"P:\\"

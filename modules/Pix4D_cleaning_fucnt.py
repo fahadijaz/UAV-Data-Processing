@@ -81,7 +81,7 @@ def calculate_md5(file_path, buffer_size=1024*1024):
 
 
 # File copy function with progress bar
-def copy_file_with_progress(src_file, dst, chk_size=False, buffer_size=1024*1024):
+def copy_file_with_progress(src_file, dst, chk_size=True, buffer_size=1024*1024):
     """
     Copy a file from src_file to dst with a progress bar, content check, and metadata preservation.
     
@@ -179,7 +179,7 @@ def copy_everything(src_dir, dest_dir, chk_size=True):
 
         # If it's a file, copy with progress and content verification
         if os.path.isfile(item_path_src):
-            copy_file_with_progress(item_path_src, dest_dir, chk_size=True)
+            copy_file_with_progress(item_path_src, dest_dir, chk_size=chk_size)
 
         # If it's a directory, recursively copy files within the subdirectory
         elif os.path.isdir(item_path_src):
