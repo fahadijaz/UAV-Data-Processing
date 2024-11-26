@@ -69,9 +69,9 @@ A comprehensive list of packages and version numbers can be found in the file Ph
   </li>
   <li>In the other “Anaconda Prompt” window, you write:
     <pre><code>streamlit run St_flight_details.py</code></pre>
-    <ol type="a">
+    <ul>
       <li><strong>Note:</strong> The browser window that appears will contain an error. This is fine, and you can close this window after it has opened. It is just so that it runs in the background and is used when the user clicks to see details of a flight.</li>
-    </ol>
+    </ul>
   </li>
 </ol>
 
@@ -92,16 +92,16 @@ A comprehensive list of packages and version numbers can be found in the file Ph
     <ul>
       <li><strong>Note:</strong> This might take some seconds to run (5-120s) as it is going through all the flights and checking the processing status of each.</li>
     </ul>
-
+  </li>
+</ol>
 
 
 
 
 
 ## Database Structure
-The data is stored in csv files on the shared drive in the location:
+The data is stored locally in csv files on the shared drive in the location:
 -	P:\PhenoCrop\0_csv
 
 
-  </li>
-</ol>
+
