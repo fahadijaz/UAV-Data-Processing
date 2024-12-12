@@ -607,34 +607,44 @@ def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ort
                         
                     # Handle different types of data copying
                     if data_type in ["ortho_primary", "ortho_extra", "dsm_dtm"]:
-                        # Copying .tif files (Orthomosaics or DSM/DTM)
+                        # Copying required files (Orthomosaics or DSM/DTM) and relavant georeference files
                         tif_files = find_files_in_folder(src_path, 'tif')
+                        prj_files = find_files_in_folder(src_path, 'prj')
+                        tfw_files = find_files_in_folder(src_path, 'tfw')
 
-                        for tif_file in tif_files:
-                            print(tif_file)
-                            file_name = os.path.basename(tif_file)
+                        files_to_copy = tif_files + prj_files + tfw_files
+                        
+                        for file_path in files_to_copy:
+                            print(file_path)
+                            file_name = os.path.basename(file_path)
+
+                            # Updating log of files to be copied
                             if data_type in ["ortho_primary", "ortho_extra"]:
                                 ortho_found.append(file_name)
                             else:
                                 mesh_found.append(file_name)
-                            print("Copying", tif_file, dest_folder)
+                            print("Copying", file_path, dest_folder)
                             
                             # Checking if the proj_name is a part of source and destination paths
-                            if proj_name in tif_file and proj_name in dest_folder:
-                                # Apply the condition for '_group1.tif' files
-                                if "2_mosaic" in tif_file and not file_name.endswith('_mosaic_group1.tif'):
+                            if proj_name in file_path and proj_name in dest_folder:
+
+                                # Apply the condition for ortho_extra files so they are coped in the Extras folder
+                                if "2_mosaic" in file_path and not '_mosaic_group1' in file_name:
                                     if "ortho_extra" in type_of_data_to_copy:
-                                        copy_file_with_progress(tif_file, dest_ortho_extra, chk_size=chk_size)
+                                        copy_file_with_progress(file_path, dest_ortho_extra, chk_size=chk_size)
                                         total_pbar.update(1)  # Update progress bar
                                     else:
                                         continue
                                 else:
                                     # Copy the file with progress tracking
-                                    copy_file_with_progress(tif_file, dest_folder, chk_size=chk_size)
+                                    copy_file_with_progress(file_path, dest_folder, chk_size=chk_size)
+                                    copy_file_with_progress(prj_files, dest_folder, chk_size=chk_size)
+                                    copy_file_with_progress(tfw_files, dest_folder, chk_size=chk_size)
+
                                     total_pbar.update(1)
                             else:
                                 print(f"""Warning-2: Project name mismatch! 
-                                Source path {tif_file} or destination path {dest_folder} 
+                                Source path {file_path} or destination path {dest_folder} 
                                 does not contain the project name {proj_name}.""")
 
                     elif data_type == "mesh_extras":
@@ -644,12 +654,12 @@ def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ort
                             dest_subfolder = os.path.join(dest_folder, src_path.split("\\")[-1])
                             copy_everything(src_path, dest_subfolder, chk_size=chk_size)
     
-                            # Track all files found in mesh extras
-                            mesh_extra_files = find_files_in_folder(src_path, None, True)
-                            for mesh_file in mesh_extra_files:
-                                file_name = os.path.basename(mesh_file)
-                                mesh_extra_found.append(file_name)
-                                total_pbar.update(1)
+                            # # Track all files found in mesh extras
+                            # mesh_extra_files = find_files_in_folder(src_path, None, True)
+                            # for mesh_file in mesh_extra_files:
+                            #     file_name = os.path.basename(mesh_file)
+                            #     mesh_extra_found.append(file_name)
+                            #     total_pbar.update(1)
                         else:
                             print(f"""Warning-3: Project name mismatch! 
                             Source path {src_path} or destination path {dest_folder} 
@@ -673,9 +683,9 @@ def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ort
                     append_list_to_csv(data_list, project_name, filename)
 
             
-        append_dict_to_csv(ortho_found_dict, f"LIST_ortho_found")
-        append_dict_to_csv(mesh_found_dict, f"LIST_mesh_found")
-        append_dict_to_csv(mesh_extra_found_dict, f"LIST_mesh_extra_found")
+        # append_dict_to_csv(ortho_found_dict, f"LIST_ortho_found")
+        # append_dict_to_csv(mesh_found_dict, f"LIST_mesh_found")
+        # append_dict_to_csv(mesh_extra_found_dict, f"LIST_mesh_extra_found")
 
     # Print completion message and return dictionaries
     print("Copying complete")

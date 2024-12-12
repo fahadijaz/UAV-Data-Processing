@@ -14,7 +14,7 @@ df_processing_status = pd.read_csv("P:\\PhenoCrop\\0_csv\\processing_status.csv"
 # field_ids = df_fields["Field ID"].tolist()
 flight_types =  sorted(list(set(df_flight_routes["BaseType"].dropna())))
 # field_ids = ['PRO_BAR_VOLL', 'DIVERSITY_OATS', 'OAT_FRONTIERS', 'PILOT', 'E166', 'PRO_BAR_SØRÅS', 'PHENO_CROP']
-field_ids = ['PRO_BAR_SØRÅS']
+field_ids = ['PILOT', 'PRO_BAR_VOLL', 'DIVERSITY_OATS', 'OAT_FRONTIERS', 'E166', 'PRO_BAR_SØRÅS', 'PHENO_CROP']
 field_ids, flight_types
 
 src_drive = r"P:\\"
@@ -38,10 +38,12 @@ for key, combination  in field_data_combinations.items():
         Destination Path: {dest_path}
         """)
     
+    # type_of_data_to_copy=["ortho_primary","ortho_extra", "dsm_dtm", "mesh_extras"]
+
     proj_dict, pix4d_path_src = create_proj_dict(src_drive, path_pix4d_gnrl, field_id, flight_type)
     log_not_found = copy_p4d_log(dest_path, pix4d_path_src)
     pdf_report_not_found, report_does_not_exists, report_name_different = copy_reports(dest_path, proj_dict)
-    ortho_found_dict, mesh_found_dict, mesh_extra_found_dict = copy_ortho(dest_path, proj_dict, chk_size=True, type_of_data_to_copy=["ortho_primary", "dsm_dtm", "mesh_extras"])
+    ortho_found_dict, mesh_found_dict, mesh_extra_found_dict = copy_ortho(dest_path, proj_dict, chk_size=True, type_of_data_to_copy=["ortho_primary","ortho_extra", "dsm_dtm", "mesh_extras"])
 
 
     print(f"""
