@@ -90,7 +90,7 @@ def copy_file_with_progress(src_file, dst, chk_size=True, buffer_size=1024*1024)
     :param chk_size: Flag to check file contents using checksum comparison (default is False)
     :param buffer_size: Number of bytes to read at a time (default is 1MB)
     """
-
+    print(src_file)
     file_name = src_file.split('\\')[-1]
     
     # Check if the destination file already exists
@@ -638,8 +638,6 @@ def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ort
                                 else:
                                     # Copy the file with progress tracking
                                     copy_file_with_progress(file_path, dest_folder, chk_size=chk_size)
-                                    copy_file_with_progress(prj_files, dest_folder, chk_size=chk_size)
-                                    copy_file_with_progress(tfw_files, dest_folder, chk_size=chk_size)
 
                                     total_pbar.update(1)
                             else:

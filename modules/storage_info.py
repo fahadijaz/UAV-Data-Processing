@@ -1,4 +1,5 @@
-# from storage_functions.py import *
+from storage_functions import *
+from Pix4D_cleaning_fucnt import *
 import os
 import pandas as pd
 import itertools
@@ -33,11 +34,10 @@ for key, combination  in field_data_combinations.items():
         Flight Type: {flight_type}
         """)
     
-    # type_of_data_to_copy=["ortho_primary","ortho_extra", "dsm_dtm", "mesh_extras"]
-
     proj_dict, pix4d_path_src = create_proj_dict(src_drive, path_pix4d_gnrl, field_id, flight_type)
-    data = "pix4d"
+    
     if proj_dict:
+        data = "pix4d"
         folder_sizes = measure_folders_size(proj_dict)
         append_dict_to_csv(folder_sizes, field_id+flight_type, file_name='Pix4d_Size.csv')
 
@@ -48,10 +48,10 @@ for key, combination  in field_data_combinations.items():
         append_dict_to_csv(folder_sizes_flights, field_id+"_"+flight_type+"_"+data, file_name='Flights_Size.csv')
 
         # Getting number of images in each flight
-        data = "number of images"
-        extension = ".jpg"
+        data = "number-of-images"
+        extension = [".jpg", ".tif"]
         file_counts = count_files_in_folders(updated_proj_dict, extension)
-        append_dict_to_csv(folder_sizes_flights, field_id+"_"+flight_type+"_"+data, file_name='Images.csv')
+        append_dict_to_csv(file_counts, field_id+"_"+flight_type+"_"+data, file_name='Count_Images.csv')
         
     print(f"""
         Copying complete!

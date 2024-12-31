@@ -32,21 +32,27 @@ def measure_folders_size(folders_dict):
 # pprint.pprint(folder_sizes)
 
 import os
+# Counting with a list of extensinos
 
-def count_files_with_extension(folder_path, extension):
-    count = 0
+def count_files_with_extensions(folder_path, extensions):
+    counts = {ext: 0 for ext in extensions}
+    total_count = 0
     for dirpath, dirnames, filenames in os.walk(folder_path):
         for f in filenames:
-            if f.endswith(extension):
-                count += 1
-    return count
+            for ext in extensions:
+                if f.lower().endswith(ext.lower()):
+                    counts[ext] += 1
+                    total_count += 1
+    counts["total"] = total_count
+    return counts
 
-def count_files_in_folders(folders_dict, extension):
+def count_files_in_folders(folders_dict, extensions):
     file_counts = {}
     for folder_name, folder_info in folders_dict.items():
         folder_path = folder_info[0]
-        file_counts[folder_name] = count_files_with_extension(folder_path, extension)
-        print(Folder_name, ": ", file_counts[folder_name], "JPG Images")
+        counts = count_files_with_extensions(folder_path, extensions)
+        file_counts[folder_name] = counts
+        print(folder_name, ": ", file_counts[folder_name], "Images")
     return file_counts
 
 # # Example usage
@@ -56,6 +62,6 @@ def count_files_in_folders(folders_dict, extension):
 #     "Music": ["/path/to/music"]
 # }
 
-# extension = ".txt"
-# file_counts = count_files_in_folders(folders_dict, extension)
+# extensions = [".txt", ".pdf", ".docx"]
+# file_counts = count_files_in_folders(folders_dict, extensions)
 # print(file_counts)
