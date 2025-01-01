@@ -33,6 +33,7 @@ def append_list_to_csv(data_list, comment, file_name='event.csv'):
         f_object.close()
 
 
+
 def append_dict_to_csv(data_dict, comment, file_name='event.csv'):
     """
     Appends a dictionary and a comment to a CSV file, with a timestamp added to each row.
@@ -75,10 +76,6 @@ def calculate_md5(file_path, buffer_size=1024*1024):
         while chunk := f.read(buffer_size):
             md5.update(chunk)
     return md5.hexdigest()
-
-
-
-
 
 # File copy function with progress bar
 def copy_file_with_progress(src_file, dst, chk_size=True, buffer_size=1024*1024):
@@ -324,8 +321,6 @@ def copy_p4d_log(dest_path, pix4d_path_src):
 
 # Copying Reports for all projects
 # This step overwrites all the files already in the destination dir with the same name
-# Copying Reports for all projects
-# This step overwrites all the files already in the destination dir with the same name
 def copy_reports(dest_path, proj_dict):
     """
     Copies report directories and PDF reports from source projects to the destination directory.
@@ -505,7 +500,7 @@ def process_directories(src_proj_path, dest_proj_path, subdirs):
 
 
 # Copying Orthomosaics
-def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ortho_extra", "dsm_dtm", "mesh_extras"], chk_size=True):
+def copy_ortho(dest_path, proj_dict, combination, state_file, type_of_data_to_copy=["ortho_primary", "ortho_extra", "dsm_dtm", "mesh_extras"], chk_size=True):
     """
     Copies orthomosaic (tiff) files from the source project directories to destination directories, 
     including progress tracking. Creates missing destination directories and logs missing files.
@@ -557,10 +552,16 @@ def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ort
     with tqdm(total=total_files_to_copy, desc="Total Copy Progress", unit="file", leave=False) as total_pbar:
     
         # Iterate over each project to perform file copying
-        for proj_name in proj_dict:
+        projects_to_process = list(proj_dict.keys())  # Make a copy to avoid issues during modification
 
+        # Iterate over each project to perform file copying
+        for proj_name in projects_to_process:
+        
             print(f"Processing data for project: {proj_name}")
-            
+
+            # Initialize flags and lists
+            project_complete = True
+
             # Initialize empty lists for missing and found orthomosaics
             ortho_found = []
             mesh_found = []
@@ -594,15 +595,30 @@ def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ort
                 else:
                     continue  # Skip any unknown data types
 
+##
+                # Choose the appropriate destination folder based on data type
+                dest_folder = {
+                    "ortho_primary": os.path.join(dest_proj_path, "2_Orthomosaics"),
+                    "ortho_extra": os.path.join(dest_proj_path, "2_Orthomosaics", "Extras"),
+                    "dsm_dtm": os.path.join(dest_proj_path, "3_DSM_DTM_Elevation_Models"),
+                    "mesh_extras": os.path.join(dest_proj_path, "3_DSM_DTM_Elevation_Models", "Point_Clouds_Extras"),
+                }.get(data_type, None)
+
+                if not dest_folder:
+                    continue  # Skip unknown data types
+##
+
                 for src_path in dict_paths.keys():
                     if not os.path.exists(src_path):
                         print(f"Source path '{src_path}' for data type '{data_type}' not found.")
+                        project_complete = False
                         continue
 
                     # Check if project name in source path is the same as in destination path
                     if proj_name not in src_path:
                         print(f"""Warning-1: Project name mismatch! Source path {src_path}
                         does not contain the project name {proj_name}.""")
+                        project_complete = False
                         break
                         
                     # Handle different types of data copying
@@ -644,6 +660,7 @@ def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ort
                                 print(f"""Warning-2: Project name mismatch! 
                                 Source path {file_path} or destination path {dest_folder} 
                                 does not contain the project name {proj_name}.""")
+                                project_complete = False
 
                     elif data_type == "mesh_extras":
                         # Checking if the proj_name is a part of source and destination paths
@@ -662,12 +679,29 @@ def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ort
                             print(f"""Warning-3: Project name mismatch! 
                             Source path {src_path} or destination path {dest_folder} 
                             does not contain the project name {proj_name}.""")
+                            project_complete = False
 
             # Log missing and found orthomosaics and meshes to respective CSV files
             ortho_found_dict[proj_name] = ortho_found
             mesh_found_dict[proj_name] = mesh_found
             mesh_extra_found_dict[proj_name] = mesh_extra_found
 
+            if project_complete:
+                print(f"Project {proj_name} successfully copied. Removing from proj_dict.")
+                del proj_dict[proj_name]
+            else:
+                print(f"Project {proj_name} not fully copied. Keeping it in proj_dict.")
+
+
+            # Cleanup: Delete the state file after all projects are processed
+            if len(proj_dict) == 0:
+                if os.path.exists(state_file):
+                    os.remove(state_file)
+                print("All projects processed. State file removed.")
+            else:
+                # Save the updated state to disk
+                save_proj_data(proj_dict, combination)
+                
             # List of tuples containing the list, project name, and filename for CSV logging
             data_to_log = [
                 (ortho_found, proj_name, 'ortho_list.csv'),
@@ -688,3 +722,46 @@ def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ort
     # Print completion message and return dictionaries
     print("Copying complete")
     return ortho_found_dict, mesh_found_dict, mesh_extra_found_dict
+
+import os
+import json
+
+def save_proj_data(proj_dict, proj_list, state_file="proj_dict_state_temp.json"):
+    """
+    Save a dictionary and a list to a specified file in JSON format.
+    
+    Parameters:
+    - proj_dict (dict): The dictionary to save.
+    - proj_list (list): The list to save.
+    - state_file (str): The path to the file where data will be saved.
+    """
+    data = {
+        "proj_dict": proj_dict,
+        "proj_list": proj_list
+    }
+    with open(state_file, 'w') as f:
+        json.dump(data, f, indent=4)
+    print(f"Data saved to {state_file}")
+    
+def load_proj_data(state_file="proj_dict_state_temp.json"):
+    """
+    Load a dictionary and a list from a specified file.
+    
+    Parameters:
+    - state_file (str): The path to the file where data is stored.
+    
+    Returns:
+    - tuple: A tuple containing the loaded dictionary and list.
+    """
+    if not os.path.exists(state_file):
+        print("No existing state file found. Starting fresh.")
+        return None, None
+    if os.path.exists(state_file):
+        with open(state_file, 'r') as f:
+            data = json.load(f)
+        
+        proj_dict = data.get("proj_dict", {})
+        proj_list = data.get("proj_list", [])
+        
+        print(f"Data loaded from {state_file}")
+        return proj_dict, proj_list

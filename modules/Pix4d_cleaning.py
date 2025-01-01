@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import itertools
 
+
 # Import all CSV Logs
 # Loading and preprocessing datasets
 df_flight_log = pd.read_csv("D:\\PhenoCrop\\0_csv\\flight_log.csv")
@@ -13,10 +14,9 @@ df_processing_status = pd.read_csv("D:\\PhenoCrop\\0_csv\\processing_status.csv"
 
 # field_ids = df_fields["Field ID"].tolist()
 flight_types =  sorted(list(set(df_flight_routes["BaseType"].dropna())))
-flight_types = ['MS']
+flight_types = ['MS', '3D']
 # field_ids = ['PRO_BAR_VOLL', 'DIVERSITY_OATS', 'OAT_FRONTIERS', 'PILOT', 'E166', 'PRO_BAR_SØRÅS', 'PHENO_CROP']
-# field_ids = ['PILOT', 'PRO_BAR_VOLL', 'DIVERSITY_OATS', 'OAT_FRONTIERS', 'E166', 'PRO_BAR_SØRÅS', 'PHENO_CROP']
-field_ids = ['PHENO_CROP']
+field_ids = ['PRO_BAR_VOLL', 'OAT_FRONTIERS', 'DIVERSITY_OATS', 'PILOT', 'PRO_BAR_SØRÅS', 'PHENO_CROP']
 field_ids, flight_types
 
 src_drive = r"P:\\"
@@ -24,12 +24,41 @@ dest_drive = r"D:\\"
 path_pix4d_gnrl = r"PhenoCrop\2_pix4d"
 type_of_data_to_copy=["ortho_primary","ortho_extra", "dsm_dtm", "mesh_extras"]
 
+# Naming the file for backing up the status of copy progress
+state_file = "proj_dict_state_temp.json"
+
 # Generate a dictionary with all combinations
 field_data_combinations = {f"{key}_{value}": (key, value) for key, value in itertools.product(field_ids, flight_types)}
 
-for key, combination  in field_data_combinations.items():
+
+# Adding a fail safe in case the copying fails mid copy. If proj_dict already exists, then do not go through this step. 
+# Rather go to else and resume copying from the last project being copied.
+
+if os.path.exists(state_file):
+    # Load proj_dict temp status file if it exists, in case the run was stopped in the middle
+    
+    proj_dict, combination = load_proj_data(state_file)
+
+    print("Resuming copying from the project", proj_dict.keys())
     field_id = combination[0]
     flight_type = combination[1]
+    dest_path = os.path.join(dest_drive, path_pix4d_gnrl, field_id, flight_type)
+    log_not_found = copy_p4d_log(dest_path, pix4d_path_src)
+    pdf_report_not_found, report_does_not_exists, report_name_different = copy_reports(dest_path, proj_dict)
+    ortho_found_dict, mesh_found_dict, mesh_extra_found_dict = copy_ortho(dest_path, proj_dict, combination, state_file, chk_size=True, type_of_data_to_copy=type_of_data_to_copy)
+
+else:
+    print("Starting copying from start. proj_dict does not exist.")
+
+
+for key, combination in field_data_combinations.items():
+
+    field_id = combination[0]
+    flight_type = combination[1]
+
+    # Deleting the field_datatype from the field_data_combinations
+    del field_data_combinations[key]
+
     dest_path = os.path.join(dest_drive, path_pix4d_gnrl, field_id, flight_type)
     print(f"""
         Begining of processing new field
@@ -43,14 +72,13 @@ for key, combination  in field_data_combinations.items():
     
 
     proj_dict, pix4d_path_src = create_proj_dict(src_drive, path_pix4d_gnrl, field_id, flight_type)
-    del proj_dict['20240603 PHENO_CROP P4M 20m MS 80 85'], proj_dict['20240606 PHENO_CROP M3M 20m MS 80 85'], proj_dict['20240607 PHENO_CROP M3M 30m MS 80 85']
-    del proj_dict['20240611 PHENO_CROP M3M 30m MS 80 85'], proj_dict['20240611 PHENO_CROP P4M 20m MS 80 85'], proj_dict['20240613 PHENO_CROP P4M 20m MS 70 70']
-    del proj_dict['20240619 PHENO_CROP P4M 20m MS 70 75'], proj_dict['20240621 PHENO_CROP M3M 30m MS 80 85'], proj_dict['20240624 PHENO_CROP P4M 20m MS 70 75']
-    del proj_dict['20240625 PHENO_CROP M3M 30m MS 80 85']
+    save_proj_data(proj_dict, combination, state_file)
+    proj_dict, combination = load_proj_data(state_file)
 
-    # log_not_found = copy_p4d_log(dest_path, pix4d_path_src)
-    # pdf_report_not_found, report_does_not_exists, report_name_different = copy_reports(dest_path, proj_dict)
-    ortho_found_dict, mesh_found_dict, mesh_extra_found_dict = copy_ortho(dest_path, proj_dict, chk_size=True, type_of_data_to_copy=type_of_data_to_copy)
+    log_not_found = copy_p4d_log(dest_path, pix4d_path_src)
+    pdf_report_not_found, report_does_not_exists, report_name_different = copy_reports(dest_path, proj_dict)
+    
+    ortho_found_dict, mesh_found_dict, mesh_extra_found_dict = copy_ortho(dest_path, proj_dict, combination, state_file, chk_size=True, type_of_data_to_copy=type_of_data_to_copy)
 
     print(proj_dict)
 

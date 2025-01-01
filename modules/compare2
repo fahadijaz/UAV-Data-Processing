@@ -1,0 +1,53 @@
+def copy_ortho_with_resume(dest_path, proj_dict, state_file, type_of_data_to_copy=["ortho_primary", "ortho_extra", "dsm_dtm", "mesh_extras"], chk_size=True):
+    """
+   
+    
+     
+     
+     
+     
+     
+     
+      
+       
+        
+         
+          
+           
+            
+             
+              
+               
+                 Enhanced copy_ortho function with resume capability by saving progress to disk.
+    """
+    # Load state from disk if available
+    saved_proj_dict = load_proj_dict(state_file)
+    if saved_proj_dict:
+        proj_dict = saved_proj_dict
+
+    ortho_found_dict = {}
+    mesh_found_dict = {}
+    mesh_extra_found_dict = {}
+
+    # Iterate over each project
+    for proj_name in list(proj_dict.keys()):  # Use list() to safely modify dict
+        print(f"Processing project: {proj_name}")
+        src_proj_path = proj_dict[proj_name][0]  # Get the source path for the project
+        
+        # Copy files (similar to previous logic)
+        # ...
+        # (Add your file copying logic here)
+
+        # After successfully processing the project, remove it from proj_dict
+        del proj_dict[proj_name]
+        
+        # Save the updated state to disk
+        save_proj_dict(proj_dict, state_file)
+
+    # Cleanup: Delete the state file after all projects are processed
+    if not proj_dict:
+        if os.path.exists(state_file):
+            os.remove(state_file)
+        print("All projects processed. State file removed.")
+
+    return ortho_found_dict, mesh_found_dict, mesh_extra_found_dict

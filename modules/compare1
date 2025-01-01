@@ -1,0 +1,213 @@
+# Copying Orthomosaics
+def copy_ortho(dest_path, proj_dict, type_of_data_to_copy=["ortho_primary", "ortho_extra", "dsm_dtm", "mesh_extras"], chk_size=True):
+    """
+    Copies orthomosaic (tiff) files from the source project directories to destination directories, 
+    including progress tracking. Creates missing destination directories and logs missing files.
+
+    Parameters:
+    - dest_path (str): Base path for the destination location where files should be copied.
+    - proj_dict (dict): Dictionary containing project names as keys, and project details as values. Each project
+                        entry has a source path at proj_dict[proj_name][0].
+    - type_of_data_to_copy (list): List of data types to copy. Options include:
+        - "ortho_primary": Primary orthomosaic files.
+        - "ortho_extra": Extra orthomosaic files.
+        - "dsm_dtm": DSM and DTM files.
+        - "mesh_extras": Additional point cloud files.
+        
+    Returns:
+    - tuple: A tuple containing three dictionaries:
+      - `ortho_found_dict`: Project names mapped to lists of orthomosaics found and copied.
+      - `mesh_found_dict`: Project names mapped to lists of point cloud files found and copied.
+      - `mesh_extra_found_dict`: Project names mapped to lists of extra point cloud files found and copied.
+    """
+    
+    ortho_found_dict = {}      # To store found and copied orthomosaic files per project
+    mesh_found_dict = {}      # To store found and copied mesh files per project
+    mesh_extra_found_dict = {}      # To store found and copied mesh extras per project
+    
+    # Print information about progress bar initialization
+    print("Calculating number of files to be copied for the progress bar")
+
+    # Calculate the total number of files to copy across all directories
+    total_files_to_copy = 0
+    for proj_name in proj_dict:
+        src_proj_path = proj_dict[proj_name][0]  # Get the project base path
+        dict_project_paths = generate_project_paths(src_proj_path, dest_path, proj_name)
+
+        # Loop through each type of data to be copied and calculate the number of files
+        for data_type in type_of_data_to_copy:
+            dict_paths = dict_project_paths.get(data_type, {})
+
+            for src_path in dict_paths.keys():
+                if os.path.exists(src_path):
+                    # If copying orthomosaics or DSM/DTM, count only .tif files
+                    if data_type in ["ortho_primary", "ortho_extra", "dsm_dtm"]:
+                        total_files_to_copy += len(find_files_in_folder(src_path, 'tif'))
+                    # If copying mesh extras, count all files
+                    elif data_type == "mesh_extras":
+                        total_files_to_copy += len(find_files_in_folder(src_path, None, True))
+        
+    # Initialize the outer progress bar for the total number of files to copy
+    with tqdm(total=total_files_to_copy, desc="Total Copy Progress", unit="file", leave=False) as total_pbar:
+    
+        # Iterate over each project to perform file copying
+        projects_to_process = list(proj_dict.keys())  # Make a copy to avoid issues during modification
+
+        # Iterate over each project to perform file copying
+        for proj_name in projects_to_process:
+        
+            print(f"Processing data for project: {proj_name}")
+
+            # Initialize flags and lists
+            project_complete = True
+
+            # Initialize empty lists for missing and found orthomosaics
+            ortho_found = []
+            mesh_found = []
+            mesh_extra_found = []
+            
+            # Retrieve source and destination paths for orthomosaics and point clouds
+            src_proj_path = proj_dict[proj_name][0]
+            dest_proj_path = os.path.join(dest_path, proj_name)
+            dict_project_paths = generate_project_paths(src_proj_path, dest_path, proj_name)
+            
+            # Customized folders for each data type
+            dest_ortho_primary = os.path.join(dest_proj_path, "2_Orthomosaics")
+            dest_ortho_extra = os.path.join(dest_proj_path, "2_Orthomosaics", "Extras")
+            dest_dsm_dtm = os.path.join(dest_proj_path, "3_DSM_DTM_Elevation_Models")
+            dest_mesh_extras = os.path.join(dest_proj_path, "3_DSM_DTM_Elevation_Models", "Point_Clouds_Extras")
+
+               
+            # Loop over the data types specified in type_of_data_to_copy
+            for data_type in type_of_data_to_copy:
+                dict_paths = dict_project_paths.get(data_type, {})
+
+                # Choose the appropriate destination folder based on data type
+                if data_type == "ortho_primary":
+                    dest_folder = dest_ortho_primary
+                elif data_type == "ortho_extra":
+                    dest_folder = dest_ortho_extra
+                elif data_type == "dsm_dtm":
+                    dest_folder = dest_dsm_dtm
+                elif data_type == "mesh_extras":
+                    dest_folder = dest_mesh_extras
+                else:
+                    continue  # Skip any unknown data types
+
+##
+                # Choose the appropriate destination folder based on data type
+                dest_folder = {
+                    "ortho_primary": os.path.join(dest_proj_path, "2_Orthomosaics"),
+                    "ortho_extra": os.path.join(dest_proj_path, "2_Orthomosaics", "Extras"),
+                    "dsm_dtm": os.path.join(dest_proj_path, "3_DSM_DTM_Elevation_Models"),
+                    "mesh_extras": os.path.join(dest_proj_path, "3_DSM_DTM_Elevation_Models", "Point_Clouds_Extras"),
+                }.get(data_type, None)
+
+                if not dest_folder:
+                    continue  # Skip unknown data types
+##
+
+                for src_path in dict_paths.keys():
+                    if not os.path.exists(src_path):
+                        print(f"Source path '{src_path}' for data type '{data_type}' not found.")
+                        project_complete = False
+                        continue
+
+                    # Check if project name in source path is the same as in destination path
+                    if proj_name not in src_path:
+                        print(f"""Warning-1: Project name mismatch! Source path {src_path}
+                        does not contain the project name {proj_name}.""")
+                        project_complete = False
+                        break
+                        
+                    # Handle different types of data copying
+                    if data_type in ["ortho_primary", "ortho_extra", "dsm_dtm"]:
+                        # Copying required files (Orthomosaics or DSM/DTM) and relavant georeference files
+                        tif_files = find_files_in_folder(src_path, 'tif')
+                        prj_files = find_files_in_folder(src_path, 'prj')
+                        tfw_files = find_files_in_folder(src_path, 'tfw')
+
+                        files_to_copy = tif_files + prj_files + tfw_files
+                        
+                        for file_path in files_to_copy:
+                            print(file_path)
+                            file_name = os.path.basename(file_path)
+
+                            # Updating log of files to be copied
+                            if data_type in ["ortho_primary", "ortho_extra"]:
+                                ortho_found.append(file_name)
+                            else:
+                                mesh_found.append(file_name)
+                            print("Copying", file_path, dest_folder)
+                            
+                            # Checking if the proj_name is a part of source and destination paths
+                            if proj_name in file_path and proj_name in dest_folder:
+
+                                # Apply the condition for ortho_extra files so they are coped in the Extras folder
+                                if "2_mosaic" in file_path and not '_mosaic_group1' in file_name:
+                                    if "ortho_extra" in type_of_data_to_copy:
+                                        copy_file_with_progress(file_path, dest_ortho_extra, chk_size=chk_size)
+                                        total_pbar.update(1)  # Update progress bar
+                                    else:
+                                        continue
+                                else:
+                                    # Copy the file with progress tracking
+                                    copy_file_with_progress(file_path, dest_folder, chk_size=chk_size)
+
+                                    total_pbar.update(1)
+                            else:
+                                print(f"""Warning-2: Project name mismatch! 
+                                Source path {file_path} or destination path {dest_folder} 
+                                does not contain the project name {proj_name}.""")
+                                project_complete = False
+
+                    elif data_type == "mesh_extras":
+                        # Checking if the proj_name is a part of source and destination paths
+                        if proj_name in src_path and proj_name in dest_folder:
+                            # Copying all files and directories for mesh extras
+                            dest_subfolder = os.path.join(dest_folder, src_path.split("\\")[-1])
+                            copy_everything(src_path, dest_subfolder, chk_size=chk_size)
+    
+                            # # Track all files found in mesh extras
+                            # mesh_extra_files = find_files_in_folder(src_path, None, True)
+                            # for mesh_file in mesh_extra_files:
+                            #     file_name = os.path.basename(mesh_file)
+                            #     mesh_extra_found.append(file_name)
+                            #     total_pbar.update(1)
+                        else:
+                            print(f"""Warning-3: Project name mismatch! 
+                            Source path {src_path} or destination path {dest_folder} 
+                            does not contain the project name {proj_name}.""")
+                            project_complete = False
+
+            # Log missing and found orthomosaics and meshes to respective CSV files
+            ortho_found_dict[proj_name] = ortho_found
+            mesh_found_dict[proj_name] = mesh_found
+            mesh_extra_found_dict[proj_name] = mesh_extra_found
+
+            if project_complete:
+                print(f"Project {proj_name} successfully copied. Removing from proj_dict.")
+                del proj_dict[proj_name]
+            else:
+                print(f"Project {proj_name} not fully copied. Remaining in proj_dict.")
+                
+            # List of tuples containing the list, project name, and filename for CSV logging
+            data_to_log = [
+                (ortho_found, proj_name, 'ortho_list.csv'),
+                (mesh_found, proj_name, 'mesh_list.csv'),
+                (mesh_extra_found, proj_name, 'mesh_list.csv')
+            ]
+
+            # Loop through each tuple and log to CSV only if the list is not empty
+            for data_list, project_name, filename in data_to_log:
+                if data_list:  # Check if the list is not empty
+                    append_list_to_csv(data_list, project_name, filename)
+
+            
+        # append_dict_to_csv(ortho_found_dict, f"LIST_ortho_found")
+        # append_dict_to_csv(mesh_found_dict, f"LIST_mesh_found")
+        # append_dict_to_csv(mesh_extra_found_dict, f"LIST_mesh_extra_found")
+
+    # Print completion message and return dictionaries
+    print("Copying complete")
+    return ortho_found_dict, mesh_found_dict, mesh_extra_found_dict
