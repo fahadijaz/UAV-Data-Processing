@@ -311,7 +311,7 @@ def copy_p4d_log(dest_path, pix4d_path_src):
                     log_not_found.append(file)
                     print(f"No log files found for '{file}'")
 
-    print("Copying Complete")
+    print("Copying P4D log complete")
     if log_not_found:
         # Append the list of directories without logs to a CSV file for reference
         append_list_to_csv(log_not_found, "Logs not found")
@@ -383,7 +383,7 @@ def copy_reports(dest_path, proj_dict):
                 print(f"PDF report for '{proj_name}' not found for project '{proj_name}'.")
 
     # Notify that copying is complete
-    print("Copying Complete")
+    print("Copying reports complete")
 
 
     # List of tuples containing the list and corresponding comments
@@ -611,7 +611,6 @@ def copy_ortho(dest_path, proj_dict, combination, state_file, type_of_data_to_co
                 for src_path in dict_paths.keys():
                     if not os.path.exists(src_path):
                         print(f"Source path '{src_path}' for data type '{data_type}' not found.")
-                        project_complete = False
                         continue
 
                     # Check if project name in source path is the same as in destination path
@@ -695,11 +694,13 @@ def copy_ortho(dest_path, proj_dict, combination, state_file, type_of_data_to_co
 
             # Cleanup: Delete the state file after all projects are processed
             if len(proj_dict) == 0:
+                print("All projects from the field processed. Remaining state_file is ", proj_dict, combination)
                 if os.path.exists(state_file):
                     os.remove(state_file)
-                print("All projects processed. State file removed.")
+                print("All projects from the field processed. State file removed.")
             else:
                 # Save the updated state to disk
+                print("Saving data to json", proj_dict, combination)
                 save_proj_data(proj_dict, combination)
                 
             # List of tuples containing the list, project name, and filename for CSV logging
@@ -720,7 +721,7 @@ def copy_ortho(dest_path, proj_dict, combination, state_file, type_of_data_to_co
         # append_dict_to_csv(mesh_extra_found_dict, f"LIST_mesh_extra_found")
 
     # Print completion message and return dictionaries
-    print("Copying complete")
+    print("Copying ortho complete")
     return ortho_found_dict, mesh_found_dict, mesh_extra_found_dict
 
 import os
