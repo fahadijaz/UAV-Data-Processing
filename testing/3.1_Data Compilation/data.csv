@@ -1,0 +1,3 @@
+name,green_median,green_mean,green_stdev,ndvi_median,ndvi_mean,ndvi_stdev,nir_median,nir_mean,nir_stdev,red_median,red_mean,red_stdev,rededge_median,rededge_mean,rededge_stdev,Date
+A,1,3,5,7,9,11,13,15,17,19,21,23,25,27,29,2025-01-01
+B,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,2025-01-02
