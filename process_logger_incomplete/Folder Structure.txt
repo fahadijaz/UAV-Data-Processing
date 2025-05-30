@@ -1,0 +1,15 @@
+/process_logger/
+│
+├── app/
+│   ├── __init__.py
+│   ├── models.py           # SQLAlchemy models
+│   ├── views.py            # Routes and logic
+│   ├── scheduler.py        # Weekly scheduling logic
+│   ├── forms.py            # Flask-WTF forms
+│   ├── templates/          # HTML files (Jinja2)
+│   └── static/             # CSS/JS
+│
+├── config.py
+├── run.py                 # App runner
+├── requirements.txt
+└── README.md

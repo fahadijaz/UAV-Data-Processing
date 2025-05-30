@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Log a Process</title>
+</head>
+<body>
+    <h2>Log a Process</h2>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        {{ form.user.label }} {{ form.user() }}<br><br>
+        {{ form.subject.label }} {{ form.subject() }}<br><br>
+        {{ form.process.label }} {{ form.process() }}<br><br>
+        {{ form.instrument.label }} {{ form.instrument() }}<br><br>
+        {{ form.submit() }}
+    </form>
+    <a href="/">Back to Home</a>
+</body>
+</html>

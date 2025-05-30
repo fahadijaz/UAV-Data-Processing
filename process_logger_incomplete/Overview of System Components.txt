@@ -1,0 +1,6 @@
+Component	Technology	Notes
+Backend API	Flask or FastAPI	Flask is simpler; FastAPI is faster and modern
+Database	SQLite (for local) / PostgreSQL (for network)	Use SQLAlchemy ORM
+Frontend UI	Flask templates with Bootstrap	Easy, clean UI
+Scheduler	Python (apscheduler) or cron	Weekly batch process
+Authentication	Flask-Login (basic user management)	Optional in Phase 1

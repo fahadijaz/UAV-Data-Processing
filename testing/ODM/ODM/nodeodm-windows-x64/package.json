@@ -1,0 +1,51 @@
+{
+  "name": "NodeODM",
+  "version": "2.2.3",
+  "description": "REST API to access ODM",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "winbundle": "node scripts/winbundle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/OpenDroneMap/NodeODM.git"
+  },
+  "keywords": [
+    "opendronemap"
+  ],
+  "author": "Piero Toffanin",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/OpenDroneMap/NodeODM/issues"
+  },
+  "homepage": "https://github.com/OpenDroneMap/NodeODM#readme",
+  "dependencies": {
+    "archiver": "^3.0.0",
+    "async": "^2.6.1",
+    "aws-sdk": "^2.368.0",
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
+    "express": "^4.16.4",
+    "glob": "^7.1.3",
+    "mime": "^2.4.0",
+    "minimist": "^1.2.0",
+    "multer": "^1.4.1",
+    "mv": "^2.1.1",
+    "node-schedule": "^1.3.1",
+    "node-unzip-2": "^0.2.7",
+    "request": "^2.88.0",
+    "rimraf": "^2.6.2",
+    "swagger-jsdoc": "^3.2.6",
+    "systeminformation": "3.42.0",
+    "tree-kill": "^1.2.1",
+    "uuid": "^3.3.2",
+    "winston": "^3.3.3"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.3",
+    "grunt-contrib-jshint": "^1.0.0",
+    "nodemon": "^1.18.4",
+    "time-grunt": "^1.4.0"
+  }
+}
