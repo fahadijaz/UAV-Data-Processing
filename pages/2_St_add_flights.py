@@ -5,7 +5,7 @@ import os
 
 st.set_page_config(layout="wide")
 
-
+DB_PATH = "database/drone_data.db"
 
 #############################################
 # This section is responsible for detecting SD cards on different platforms
@@ -132,7 +132,7 @@ def get_flight_route_info() -> dict:
         - Uses `BasePath` as the primary key to group related routes and logs.
         - If no matching logs exist for a project, the `flight_log` list will be empty.
     """
-    conn = sqlite3.connect(DB_PATH)
+    conn = sqlite3.connect(DB_PATH)  # Use the correct path to your database
     conn.row_factory = sqlite3.Row  # Enables dictionary-like row access
     cur = conn.cursor()
 
@@ -489,9 +489,6 @@ def handle_confirm_and_move():
         if st.button("Update main log and Wipe SD Cards"):
             for ft in st.session_state.file_transfers:
                 st.session_state.ready_to_move = False
-                
-                
-
 
 
 def initialize_session_state(defaults: dict):
@@ -512,7 +509,6 @@ def main():
     of UI rendering, file handling, and user interaction.
     """
     
-    DB_PATH = r"database/drone_data.db"
     st.title("SD Card File Transfer Management")
     initialize_session()
 
@@ -546,4 +542,3 @@ def main():
 
 # Run the application
 main()
-
