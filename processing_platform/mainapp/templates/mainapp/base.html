@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}My App{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex">
+
+  <!-- Sidebar -->
+  <nav class="w-64 bg-white shadow-lg h-screen p-6 space-y-4">
+    <h1 class="text-2xl font-bold text-gray-800 mb-8">UAV Data Processing</h1>
+
+    <ul class="space-y-3 text-gray-700 font-medium">
+      <li><a href="{% url 'home' %}" class="block hover:text-blue-600">Overview</a></li>
+      <li><a href="{% url 'sd_card' %}" class="block hover:text-blue-600">Add flights</a></li>
+      <!-- Add more links here -->
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex-1 p-8">
+    {% block content %}
+    <!-- Child templates fill this in -->
+    {% endblock %}
+  </main>
+
+</body>
+</html>
