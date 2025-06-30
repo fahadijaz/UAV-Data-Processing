@@ -1,0 +1,734 @@
+﻿#;Foldername;Flight Field ID;Project;Route type (MS, 3D, Thermal, RGB);Drone Model;Drone Pilot;Reflectance Panel (New/Old);Flight Date;Flight Start;Flight End;Wind Speed;Flight Comments;Step 1 P4D Proj.;Done by;Workable Data;P4D Processing;Done by;PC Used;Processing Comments;Flight Height;Side Overlap;Front Overlap;Wind (m/s);Drone type;New folder name;Root Folder;Flight path;Pix4D path
+1;DJI_202407181034_001_RaygrassVertical;RyeGrass;DLT-Farming;3D;M3M;;;18-Jul-2024;;;;;;;;;;;;20m;80;85;;M3M;20240718 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20240718 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20240718 RyeGrass M3M 20m 3D 80 85
+2;DJI_202407181052_002_RaygrassMS;RyeGrass;DLT-Farming;MS;M3M;;;18-Jul-2024;;;;;;;;;;;;20m;80;85;;M3M;20240718 RyeGrass M3M 20m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20240718 RyeGrass M3M 20m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20240718 RyeGrass M3M 20m MS 80 85
+3;DJI_202407231031_001_RaygrassHorizontal;RyeGrass;DLT-Farming;3D;M3M;;;23-Jul-2024;;;;;;;;;;;;20m;80;85;;M3M;20240723 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20240723 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20240723 RyeGrass M3M 20m 3D 80 85
+4;DJI_202407251148_002_RaygrassMS-30m;RyeGrass;DLT-Farming;MS;M3M;;;25-Jul-2024;;;;;;;;;;;;30m;80;85;;M3M;20240725 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20240725 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20240725 RyeGrass M3M 30m MS 80 85
+5;DJI_202408021326_003_RaygrassHorizontal;RyeGrass;DLT-Farming;3D;M3M;;;2-Aug-2024;;;;;;;;;;;;20m;80;85;;M3M;20240802 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20240802 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20240802 RyeGrass M3M 20m 3D 80 85
+6;DJI_202408051208_002_RaygrassMS-30m;RyeGrass;DLT-Farming;MS;M3M;;;5-Aug-2024;;;;;;;;;;;;30m;80;85;;M3M;20240805 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20240805 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20240805 RyeGrass M3M 30m MS 80 85
+7;DJI_202408061723_022_RaygrassHorizontal;RyeGrass;DLT-Farming;3D;M3M;;;6-Aug-2024;;;;;;;;;;;;20m;80;85;;M3M;20240806 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20240806 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20240806 RyeGrass M3M 20m 3D 80 85
+8;DJI_202408111306_002_RaygrassMS-30m;RyeGrass;DLT-Farming;MS;M3M;;;11-Aug-2024;;;;;;;;;;;;30m;80;85;;M3M;20240811 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20240811 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20240811 RyeGrass M3M 30m MS 80 85
+9;DJI_202408121401_001_RaygrassHorizontal;RyeGrass;DLT-Farming;3D;M3M;;;12-Aug-2024;;;;;;;;;;;;20m;80;85;;M3M;20240812 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20240812 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20240812 RyeGrass M3M 20m 3D 80 85
+10;DJI_202408121148_009_RaygrassMS-30m;RyeGrass;DLT-Farming;MS;M3M;;;12-Aug-2024;;;;;;;;;;;;30m;80;85;;M3M;20240812 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20240812 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20240812 RyeGrass M3M 30m MS 80 85
+11;DJI_202408201241_009_RyegrassHorizontal;RyeGrass;DLT-Farming;3D;M3M;;;20-Aug-2024;;;;;;;;;;;;20m;80;85;;M3M;20240820 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20240820 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20240820 RyeGrass M3M 20m 3D 80 85
+12;DJI_202408201241_008_RyegrassMS-30m;RyeGrass;DLT-Farming;MS;M3M;;;20-Aug-2024;;;;;;;;;;;;30m;80;85;;M3M;20240820 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20240820 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20240820 RyeGrass M3M 30m MS 80 85
+13;DJI_202408261551_001_RyegrassHorizontal;RyeGrass;DLT-Farming;3D;M3M;;;26-Aug-2024;;;;;;;;;;;;20m;80;85;;M3M;20240826 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20240826 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20240826 RyeGrass M3M 20m 3D 80 85
+14;DJI_202408271035_002_RyegrassMS-30m;RyeGrass;DLT-Farming;MS;M3M;;;27-Aug-2024;;;;;;;;;;;;30m;80;85;;M3M;20240827 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20240827 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20240827 RyeGrass M3M 30m MS 80 85
+15;DJI_202409061312_003_RyegrassHorizontal;RyeGrass;DLT-Farming;3D;M3M;;;6-Sep-2024;;;;;;;;;;;;20m;80;85;;M3M;20240906 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20240906 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20240906 RyeGrass M3M 20m 3D 80 85
+16;DJI_202409061312_002_RyegrassMS-30m;RyeGrass;DLT-Farming;MS;M3M;;;6-Sep-2024;;;;;;;;;;;;30m;80;85;;M3M;20240906 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20240906 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20240906 RyeGrass M3M 30m MS 80 85
+17;DJI_202409121240_008_RyegrassHorizontal;RyeGrass;DLT-Farming;3D;M3M;;;12-Sep-2024;;;;;;;;;;;;20m;80;85;;M3M;20240912 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20240912 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20240912 RyeGrass M3M 20m 3D 80 85
+18;DJI_202409121218_005_RyegrassMS-30m;RyeGrass;DLT-Farming;MS;M3M;;;12-Sep-2024;;;;;;;;;;;;30m;80;85;;M3M;20240912 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20240912 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20240912 RyeGrass M3M 30m MS 80 85
+19;DJI_202503191242_004_RyegrassHorizontal;RyeGrass;DLT-Farming;3D;M3M;;;19-Mar-2025;;;;;;;;;;;;20m;80;85;;M3M;20250319 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250319 RyeGrass M3M 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250319 RyeGrass M3M 20m 3D 80 85
+20;DJI_202503191216_002_RyegrassMS-30m;RyeGrass;DLT-Farming;MS;M3M;;;19-Mar-2025;;;;;;;;;;;;30m;80;85;;M3M;20250319 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250319 RyeGrass M3M 30m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250319 RyeGrass M3M 30m MS 80 85
+21;DJI_202503191242_003_RyegrassMS-20m;RyeGrass;DLT-Farming;MS;M3M;;;19-Mar-2025;;;;;;;;;;;;20m;80;85;;M3M;20250319 RyeGrass M3M 20m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250319 RyeGrass M3M 20m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250319 RyeGrass M3M 20m MS 80 85
+22;DJI_202504081217_007_RyegrassHorizontal;RyeGrass;DLT-Farming;3D;M3M-1;;;8-Apr-2025;;;;;;;;;;;;20m;80;85;;M3M-1;20250408 RyeGrass M3M-1 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250408 RyeGrass M3M-1 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250408 RyeGrass M3M-1 20m 3D 80 85
+23;DJI_202504081142_002_RyegrassMS-30m;RyeGrass;DLT-Farming;MS;M3M-1;;;8-Apr-2025;;;;;;;;;;;;30m;80;85;;M3M-1;20250408 RyeGrass M3M-1 30m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250408 RyeGrass M3M-1 30m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250408 RyeGrass M3M-1 30m MS 80 85
+24;DJI_202504081142_003_RyegrassMS-20m;RyeGrass;DLT-Farming;MS;M3M-1;;;8-Apr-2025;;;;;;;;;;;;20m;80;85;;M3M-1;20250408 RyeGrass M3M-1 20m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250408 RyeGrass M3M-1 20m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250408 RyeGrass M3M-1 20m MS 80 85
+25;DJI_202504090924_001_RyegrassVertical;RyeGrass;DLT-Farming;3D;M3M-1;;;9-Apr-2025;;;;;;;;;;;;20m;80;85;;M3M-1;20250409 RyeGrass M3M-1 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250409 RyeGrass M3M-1 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250409 RyeGrass M3M-1 20m 3D 80 85
+26;DJI_202504151021_003_RyegrassVertical;RyeGrass;DLT-Farming;3D;M3M-1;;;15-Apr-2025;;;;;;;;;;;;20m;80;85;;M3M-1;20250415 RyeGrass M3M-1 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250415 RyeGrass M3M-1 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250415 RyeGrass M3M-1 20m 3D 80 85
+27;DJI_202504151051_009_RyegrassMS-30m;RyeGrass;DLT-Farming;MS;M3M-1;;;15-Apr-2025;;;;;;;;;;;;30m;80;85;;M3M-1;20250415 RyeGrass M3M-1 30m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250415 RyeGrass M3M-1 30m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250415 RyeGrass M3M-1 30m MS 80 85
+28;DJI_202504151021_002_RyegrassMS-20m;RyeGrass;DLT-Farming;MS;M3M-1;;;15-Apr-2025;;;;;;;;;;;;20m;80;85;;M3M-1;20250415 RyeGrass M3M-1 20m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250415 RyeGrass M3M-1 20m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250415 RyeGrass M3M-1 20m MS 80 85
+29;DJI_202504251157_004_RyegrassHorizontal;RyeGrass;DLT-Farming;3D;M3M-1;;;25-Apr-2025;;;;;;;;;;;;20m;80;85;;M3M-1;20250425 RyeGrass M3M-1 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250425 RyeGrass M3M-1 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250425 RyeGrass M3M-1 20m 3D 80 85
+30;DJI_202504251157_002_RyegrassMS-20m;RyeGrass;DLT-Farming;MS;M3M-1;;;25-Apr-2025;;;;;;;;;;;;20m;80;85;;M3M-1;20250425 RyeGrass M3M-1 20m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250425 RyeGrass M3M-1 20m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250425 RyeGrass M3M-1 20m MS 80 85
+31;DJI_202504251309_013_25-DiversityOats-MS-30m-8085;DiversityOats;DiversityOats;MS;M3M-2;;;25-Apr-2025;;;;;;;;;;;;30m;85;80;;M3M-2;20250425 DiversityOats M3M-2 30m MS 85 80;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\20250425 DiversityOats M3M-2 30m MS 85 80;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\MS\20250425 DiversityOats M3M-2 30m MS 85 80
+32;DJI_202504251247_009_25-DiversityOats-01-RGB-Horizontal-20m-8085;DiversityOats;DiversityOats;3D;M3M-2;;;25-Apr-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250425 DiversityOats M3M-2 20m 3D 85 80;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\20250425 DiversityOats M3M-2 20m 3D 85 80;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\3D\20250425 DiversityOats M3M-2 20m 3D 85 80
+33;DJI_202504251246_007_25-G2BOatsBarley-01-RGB-Horizontal-20m-8085;G2BOatsBarley;Gene2Bread;3D;M3M-1;;;25-Apr-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250425 G2BOatsBarley M3M-1 20m 3D 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\20250425 G2BOatsBarley M3M-1 20m 3D 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\3D\20250425 G2BOatsBarley M3M-1 20m 3D 85 80
+34;DJI_202504251345_013_25-G2BOatsBarley-MS-30m-8085;G2BOatsBarley;Gene2Bread;MS;M3M-1;;;25-Apr-2025;;;;;;;;;;;;30m;85;80;;M3M-1;20250425 G2BOatsBarley M3M-1 30m MS 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\20250425 G2BOatsBarley M3M-1 30m MS 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\MS\20250425 G2BOatsBarley M3M-1 30m MS 85 80
+35;DJI_202504251159_002_25-PROBARVOLL-01-RGB-Horizontal-20m-8085;ProBarVoll;ProteinBar - Vollebekk;3D;M3M-2;;;25-Apr-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250425 ProBarVoll M3M-2 20m 3D 85 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\20250425 ProBarVoll M3M-2 20m 3D 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\3D\20250425 ProBarVoll M3M-2 20m 3D 85 80
+36;DJI_202504251344_017_25-PROBARVOLL-Oblique-20m-8085;ProBarVoll;ProteinBar - Vollebekk;3D;M3M-2;;;25-Apr-2025;;;;2nd flight - Oblique;;;;;;;;20m;85;80;;M3M-2;20250425 ProBarVoll M3M-2 20m 3D 85 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\20250425 ProBarVoll M3M-2 20m 3D 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\3D\20250425 ProBarVoll M3M-2 20m 3D 85 80
+37;DJI_202504251221_006_25-PROBARVOLL-MS-20m-8085;ProBarVoll;ProteinBar - Vollebekk;MS;M3M-2;;;25-Apr-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250425 ProBarVoll M3M-2 20m MS 85 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\20250425 ProBarVoll M3M-2 20m MS 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\MS\20250425 ProBarVoll M3M-2 20m MS 85 80
+38;DJI_202504301144_001_Vollebekk;Vollebekk;Vollebekk;RGB;M4T;;;30-Apr-2025;;;;;;;;;;;;120m;75;70;;M4T;20250430 Vollebekk M4T 120m RGB 75 70;P:\PheNo\Vollebekk\1_flights\Vollebekk\RGB\;P:\PheNo\Vollebekk\1_flights\Vollebekk\RGB\20250430 Vollebekk M4T 120m RGB 75 70;P:\PheNo\Vollebekk\2_1_pix4d\Vollebekk\RGB\20250430 Vollebekk M4T 120m RGB 75 70
+39;DJI_202504301144_001_Vollebekk;Vollebekk;Vollebekk;Thermal;M4T;;;30-Apr-2025;;;;;;;;;;;;120m;75;70;;M4T;20250430 Vollebekk M4T 120m Thermal 75 70;#I/T;#I/T;#I/T
+40;DJI_202505051253_001_25-DLTFarming-Vertical-20m-80-85;RyeGrass;DLT-Farming;3D;M3M-1;;;5-May-2025;;;;;;;;;;;;20m;80;85;;M3M-1;20250505 RyeGrass M3M-1 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250505 RyeGrass M3M-1 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250505 RyeGrass M3M-1 20m 3D 80 85
+41;DJI_202505061153_006_25-DLTFarming-oblique-20m-80-85;RyeGrass;DLT-Farming;3D;M3M-1;;;6-May-2025;;;;;;;;;;;;20m;80;85;;M3M-1;20250506 RyeGrass M3M-1 20m 3D 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250506 RyeGrass M3M-1 20m 3D 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250506 RyeGrass M3M-1 20m 3D 80 85
+42;DJI_202505061122_003_25-DLTFarming-MS-20m-80-85;RyeGrass;DLT-Farming;MS;M3M-1;;;6-May-2025;;;;;;;;;;;;20m;80;85;;M3M-1;20250506 RyeGrass M3M-1 20m MS 80 85;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250506 RyeGrass M3M-1 20m MS 80 85;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250506 RyeGrass M3M-1 20m MS 80 85
+43;DJI_202505061125_004_25-SmartWheatBox-Horizontal-20m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;3D;M3M-2;;;6-May-2025;;;;;;;;;;;;20m;80;85;;M3M-2;20250506 SmartWheatBox M3M-2 20m 3D 80 85;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\20250506 SmartWheatBox M3M-2 20m 3D 80 85;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\3D\20250506 SmartWheatBox M3M-2 20m 3D 80 85
+44;DJI_202505061153_007_25-SmartWheatGram-Horizontal-20m-80-85;SmartWheatGram;SmartWheat - Graminor;3D;M3M-1;;;6-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250506 SmartWheatGram M3M-1 20m 3D 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\20250506 SmartWheatGram M3M-1 20m 3D 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\3D\20250506 SmartWheatGram M3M-1 20m 3D 85 80
+45;DJI_202505061230_010_25-DiversityOats-02-RGB-Vertical-20m-8085;DiversityOats;DiversityOats;3D;M3M-2;;;6-May-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250506 DiversityOats M3M-2 20m 3D 85 80;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\20250506 DiversityOats M3M-2 20m 3D 85 80;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\3D\20250506 DiversityOats M3M-2 20m 3D 85 80
+46;DJI_202505061151_008_25-PROBARVOLL-01-RGB-Horizontal-20m-8085;ProBarVoll;ProteinBar - Vollebekk;3D;M3M-2;;;6-May-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250506 ProBarVoll M3M-2 20m 3D 85 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\20250506 ProBarVoll M3M-2 20m 3D 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\3D\20250506 ProBarVoll M3M-2 20m 3D 85 80
+47;DJI_202505061125_001_25-PROBARVOLL-MS-20m-8085;ProBarVoll;ProteinBar - Vollebekk;MS;M3M-2;;;6-May-2025;;;;;;;;;;;;20m;80;80;;M3M-2;20250506 ProBarVoll M3M-2 20m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\20250506 ProBarVoll M3M-2 20m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\MS\20250506 ProBarVoll M3M-2 20m MS 80 80
+48;DJI_202505071246_001_25-G2BOatFrontiers-Vertical-20m-80-85;G2BOatFrontiers;Gene2Bread;3D;M3M-1;;;7-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250507 G2BOatFrontiers M3M-1 20m 3D 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\20250507 G2BOatFrontiers M3M-1 20m 3D 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\3D\20250507 G2BOatFrontiers M3M-1 20m 3D 85 80
+49;DJI_202505081135_001_25-SmartWheatGram-Vertical-20m-80-85;SmartWheatGram;SmartWheat - Graminor;3D;M3M-1;;;8-May-2025;;;;Incomplete;;;;;;;;20m;85;80;;M3M-1;20250508 SmartWheatGram M3M-1 20m 3D 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\20250508 SmartWheatGram M3M-1 20m 3D 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\3D\20250508 SmartWheatGram M3M-1 20m 3D 85 80
+50;DJI_202505091239_003_25-Soraas-Horizontal-20m-80-8;ProBarSørås;ProteinBar - Søråsjordet;3D;M4T;;;9-May-2025;;;;;;;;;;;;20m;80;85;;M4T;20250509 ProBarSørås M4T 20m 3D 80 85;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\20250509 ProBarSørås M4T 20m 3D 80 85;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\3D\20250509 ProBarSørås M4T 20m 3D 80 85
+51;DJI_202505091216_001_25-SmartwheatBox-Thermal-20m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;Thermal;M4T;;;9-May-2025;;;;;;;;;;;;20m;85;80;;M4T;20250509 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\20250509 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\Thermal\20250509 SmartWheatBox M4T 20m Thermal 85 80
+52;DJI_202505091301_004_25-Søråsjordet-Vertical-20m-80-85 M3M_1;ProBarSørås;ProteinBar - Søråsjordet;3D;M3M-1;;;9-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250509 ProBarSørås M3M-1 20m 3D 85 80;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\20250509 ProBarSørås M3M-1 20m 3D 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\3D\20250509 ProBarSørås M3M-1 20m 3D 85 80
+53;DJI_202505091233_001_25-Soraas-Vertical-20m-80-85 M3M_1;ProBarSørås;ProteinBar - Søråsjordet;3D;M3M-1;;;9-May-2025;;;;Incomelete;;;;;;;;20m;85;80;;M3M-1;20250509 ProBarSørås M3M-1 20m 3D 85 80;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\20250509 ProBarSørås M3M-1 20m 3D 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\3D\20250509 ProBarSørås M3M-1 20m 3D 85 80
+54;DJI_202505091211_002_25-G2BOatFrontiers-MS-30m-80-85;G2BOatFrontiers;Gene2Bread;MS;M3M-2;;;9-May-2025;;;;;;;;;;;;30m;85;80;;M3M-2;20250509 G2BOatFrontiers M3M-2 30m MS 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\20250509 G2BOatFrontiers M3M-2 30m MS 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\MS\20250509 G2BOatFrontiers M3M-2 30m MS 85 80
+55;DJI_202505161137_002_25-G2BOatFrontiers-MS-30m-80-85;G2BOatFrontiers;Gene2Bread;MS;M3M-1;;;16-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250516 G2BOatFrontiers M3M-1 20m MS 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\20250516 G2BOatFrontiers M3M-1 20m MS 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\MS\20250516 G2BOatFrontiers M3M-1 20m MS 85 80
+56;DJI_202505161221_003_25-SmartWheatGram-Oblique-30m-75-70-M3M;SmartWheatGram;SmartWheat - Graminor;3D;M4T;;;16-May-2025;;;;;;;;;;;;30m;75;70;;M4T;20250516 SmartWheatGram M4T 30m 3D 75 70;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\20250516 SmartWheatGram M4T 30m 3D 75 70;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\3D\20250516 SmartWheatGram M4T 30m 3D 75 70
+57;DJI_202505161221_004_25-PROBARVOLL-Oblique-30m-75-70-M3M;ProBarVoll;ProteinBar - Vollebekk;3D;M4T;;;16-May-2025;;;;;;;;;;;;30m;75;70;;M4T;20250516 ProBarVoll M4T 30m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\20250516 ProBarVoll M4T 30m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\3D\20250516 ProBarVoll M4T 30m 3D 75 70
+58;DJI_202505161221_005_25-DLTFarming-Oblique-30m-75-70-M3M;RyeGrass;DLT-Farming;3D;M4T;;;16-May-2025;;;;;;;;;;;;30m;75;70;;M4T;20250516 RyeGrass M4T 30m 3D 75 70;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250516 RyeGrass M4T 30m 3D 75 70;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250516 RyeGrass M4T 30m 3D 75 70
+59;DJI_202505161221_006_25-DiversityOats-Oblique-30m-75-70;DiversityOats;DiversityOats;3D;M4T;;;16-May-2025;;;;;;;;;;;;30m;75;70;;M4T;20250516 DiversityOats M4T 30m 3D 75 70;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\20250516 DiversityOats M4T 30m 3D 75 70;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\3D\20250516 DiversityOats M4T 30m 3D 75 70
+60;DJI_202505161301_008_25-PhenoCrop-Oblique-30m-75-70;SmartWheatGram;SmartWheat - Graminor;3D;M4T;;;16-May-2025;;;;2nd flight;;;;;;;;30m;75;70;;M4T;20250516 SmartWheatGram M4T 30m 3D 75 70-2;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\20250516 SmartWheatGram M4T 30m 3D 75 70-2;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\3D\20250516 SmartWheatGram M4T 30m 3D 75 70-2
+61;DJI_202505161301_009_25-ProBarVoll-Oblique-30m-75-70;ProBarVoll;ProteinBar - Vollebekk;3D;M4T;;;16-May-2025;;;;2nd flight;;;;;;;;30m;75;70;;M4T;20250516 ProBarVoll M4T 30m 3D 75 70-2;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\20250516 ProBarVoll M4T 30m 3D 75 70-2;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\3D\20250516 ProBarVoll M4T 30m 3D 75 70-2
+62;DJI_202505161318_011_25-G2BOatFrontiers-Oblique-30m-75-70;G2BOatFrontiers;Gene2Bread;3D;M4T;;;16-May-2025;;;;;;;;;;;;30m;75;70;;M4T;20250516 G2BOatFrontiers M4T 30m 3D 75 70;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\20250516 G2BOatFrontiers M4T 30m 3D 75 70;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\3D\20250516 G2BOatFrontiers M4T 30m 3D 75 70
+63;DJI_202505161318_012_25-RyeGrass-Oblique-30m-75-70;RyeGrass;DLT-Farming;3D;M4T;;;16-May-2025;;;;2nd flight;;;;;;;;30m;75;70;;M4T;20250516 RyeGrass M4T 30m 3D 75 70;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250516 RyeGrass M4T 30m 3D 75 70;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250516 RyeGrass M4T 30m 3D 75 70
+64;DJI_202505161338_013_25-Soraas-Oblique-30m-70-75;ProBarSørås;ProteinBar - Søråsjordet;3D;M4T;;;16-May-2025;;;;;;;;;;;;30m;75;70;;M4T;20250516 ProBarSørås M4T 30m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\20250516 ProBarSørås M4T 30m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\3D\20250516 ProBarSørås M4T 30m 3D 75 70
+65;DJI_202505161132_002_25-SmartWheatBox-Oblique-30m-75-70;SmartWheatBox;SmartWheat - DroughtBOX;3D;M4T;;;16-May-2025;;;;;;;;;;;;30m;70;75;;M4T;20250516 SmartWheatBox M4T 30m 3D 70 75;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\20250516 SmartWheatBox M4T 30m 3D 70 75;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\3D\20250516 SmartWheatBox M4T 30m 3D 70 75
+66;DJI_202505161132_001_25-SmartWheatBox-Thermal-20m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;Thermal;M4T;;;16-May-2025;;;;;;;;;;;;20m;85;80;;M4T;20250516 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\20250516 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\Thermal\20250516 SmartWheatBox M4T 20m Thermal 85 80
+67;DJI_202505161208_011_25-DLTFarming-Vertical-20m-80-85;RyeGrass;DLT-Farming;3D;M3M-1;;;16-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250516 RyeGrass M3M-1 20m 3D 85 80;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250516 RyeGrass M3M-1 20m 3D 85 80;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250516 RyeGrass M3M-1 20m 3D 85 80
+68;DJI_202505161208_007_25-DLTFarming-MS-20m-80-85;RyeGrass;DLT-Farming;MS;M3M-1;;;16-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250516 RyeGrass M3M-1 20m MS 85 80;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250516 RyeGrass M3M-1 20m MS 85 80;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250516 RyeGrass M3M-1 20m MS 85 80
+69;DJI_202505161137_003_25-G2BOatFrontiers-Vertical-20m-80-85;G2BOatFrontiers;Gene2Bread;3D;M3M-1;;;16-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250516 G2BOatFrontiers M3M-1 20m 3D 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\20250516 G2BOatFrontiers M3M-1 20m 3D 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\3D\20250516 G2BOatFrontiers M3M-1 20m 3D 85 80
+70;DJI_202505161137_002_25-G2BOatFrontiers-MS-30m-80-85;G2BOatFrontiers;Gene2Bread;MS;M3M-1;;;16-May-2025;;;;;;;;;;;;30m;85;80;;M3M-1;20250516 G2BOatFrontiers M3M-1 30m MS 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\20250516 G2BOatFrontiers M3M-1 30m MS 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\MS\20250516 G2BOatFrontiers M3M-1 30m MS 85 80
+71;DJI_202505161208_009_25-SmartWheatBox-MS-20m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;MS;M3M-1;;;16-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250516 SmartWheatBox M3M-1 20m MS 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\20250516 SmartWheatBox M3M-1 20m MS 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\MS\20250516 SmartWheatBox M3M-1 20m MS 85 80
+72;DJI_202505161210_004_25-DiversityOats-01-RGB-Horizontal-20m-8085;DiversityOats;DiversityOats;3D;M3M-2;;;16-May-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250516 DiversityOats M3M-2 20m 3D 85 80;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\20250516 DiversityOats M3M-2 20m 3D 85 80;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\3D\20250516 DiversityOats M3M-2 20m 3D 85 80
+73;DJI_202505161144_002_25-DiversityOats-MS-30m-8085 INCOMPLETE;DiversityOats;DiversityOats;MS;M3M-2;;;16-May-2025;;;;;;;;;;;;30m;85;80;;M3M-2;20250516 DiversityOats M3M-2 30m MS 85 80;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\20250516 DiversityOats M3M-2 30m MS 85 80;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\MS\20250516 DiversityOats M3M-2 30m MS 85 80
+74;DJI_202505161257_010_25-ProBarVoll-MS-20m-8085;ProBarVoll;ProteinBar - Vollebekk;MS;M3M-2;;;16-May-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250516 ProBarVoll M3M-2 20m MS 85 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\20250516 ProBarVoll M3M-2 20m MS 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\MS\20250516 ProBarVoll M3M-2 20m MS 85 80
+75;DJI_202505161257_013_25-SmartWheatBox-MS-20m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;MS;M3M-2;;;16-May-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250516 SmartWheatBox M3M-2 20m MS 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\20250516 SmartWheatBox M3M-2 20m MS 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\MS\20250516 SmartWheatBox M3M-2 20m MS 85 80
+76;DJI_202505161236_007_25-SmartWheatGram-MS-30m-80-85;SmartWheatGram;SmartWheat - Graminor;MS;M3M-2;;;16-May-2025;;;;;;;;;;;;30m;85;80;;M3M-2;20250516 SmartWheatGram M3M-2 30m MS 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\20250516 SmartWheatGram M3M-2 30m MS 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\MS\20250516 SmartWheatGram M3M-2 30m MS 85 80
+77;DJI_202505161337_014_25-Søråsjordet-MS-30m-80-85;ProBarSørås;ProteinBar - Søråsjordet;MS;M3M-2;;;16-May-2025;;;;;;;;;;;;30m;85;80;;M3M-2;20250516 ProBarSørås M3M-2 30m MS 85 80;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\20250516 ProBarSørås M3M-2 30m MS 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\MS\20250516 ProBarSørås M3M-2 30m MS 85 80
+78;DJI_202505201421_001_25-SmartWheatBox-Thermal-20m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;Thermal;M4T;;;20-May-2025;;;;;;;;;;;;20m;85;80;;M4T;20250520 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\20250520 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\Thermal\20250520 SmartWheatBox M4T 20m Thermal 85 80
+79;DJI_202505201421_003_25-SmartWheatBox-RGB-12m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;RGB;M4T;;;20-May-2025;;;;4K;;;;;;;;12m;85;80;;M4T;20250520 SmartWheatBox M4T 12m RGB 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\20250520 SmartWheatBox M4T 12m RGB 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\RGB\20250520 SmartWheatBox M4T 12m RGB 85 80
+80;DJI_202505201421_004_25-SmartWheatBox-RGB-12m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;RGB;M4T;;;20-May-2025;;;;8K;;;;;;;;12m;85;80;;M4T;20250520 SmartWheatBox M4T 12m RGB 85 80-8K;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\20250520 SmartWheatBox M4T 12m RGB 85 80-8K;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\RGB\20250520 SmartWheatBox M4T 12m RGB 85 80-8K
+81;DJI_202505201421_006_25-Vollebekk-Ortho-120m-85-80;Vollebekk;Vollebekk;RGB;M4T;;;20-May-2025;;;;;;;;;;;;120m;85;80;;M4T;20250520 Vollebekk M4T 120m RGB 85 80;P:\PheNo\Vollebekk\1_flights\Vollebekk\RGB\;P:\PheNo\Vollebekk\1_flights\Vollebekk\RGB\20250520 Vollebekk M4T 120m RGB 85 80;P:\PheNo\Vollebekk\2_1_pix4d\Vollebekk\RGB\20250520 Vollebekk M4T 120m RGB 85 80
+82;DJI_202505201205_001_25-SmartWheatBox-Thermal-20m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;Thermal;M4T;;;20-May-2025;;;;Trash;;;;;;;;20m;85;80;;M4T;20250520 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\20250520 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\Thermal\20250520 SmartWheatBox M4T 20m Thermal 85 80
+83;DJI_202505211132_011_25-Søråsjordet-MS-30m-80-80;ProBarSørås;ProteinBar - Søråsjordet;MS;M3M-2;;;21-May-2025;;;;;;;;;;;;30m;80;80;;M3M-2;20250521 ProBarSørås M3M-2 30m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\20250521 ProBarSørås M3M-2 30m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\MS\20250521 ProBarSørås M3M-2 30m MS 80 80
+84;DJI_202505211003_006_25-ProBarVoll-MS-20m-80-80;ProBarVoll;ProteinBar - Vollebekk;MS;M3M-1;;;21-May-2025;;;;;;;;;;;;20m;80;85;;M3M-1;20250521 ProBarVoll M3M-1 20m MS 80 85;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\20250521 ProBarVoll M3M-1 20m MS 80 85;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\MS\20250521 ProBarVoll M3M-1 20m MS 80 85
+85;DJI_202505211006_002_25-SmartWheatGram-Oblique-20m-75-70;SmartWheatGram;SmartWheat - Graminor;3D;M4T;;;21-May-2025;;;;;;;;;;;;22m;75;70;;M4T;20250521 SmartWheatGram M4T 22m 3D 75 70;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\20250521 SmartWheatGram M4T 22m 3D 75 70;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\3D\20250521 SmartWheatGram M4T 22m 3D 75 70
+86;DJI_202505211006_004_25-DiversityOats-Oblique-20m-75-70;DiversityOats;DiversityOats;3D;M4T;;;21-May-2025;;;;;;;;;;;;20m;75;70;;M4T;20250521 DiversityOats M4T 20m 3D 75 70;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\20250521 DiversityOats M4T 20m 3D 75 70;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\3D\20250521 DiversityOats M4T 20m 3D 75 70
+87;DJI_202505211040_006_25-SmartWheatBox-Oblique-20m-75-70;SmartWheatBox;SmartWheat - DroughtBOX;3D;M4T;;;21-May-2025;;;;;;;;;;;;20m;70;75;;M4T;20250521 SmartWheatBox M4T 20m 3D 70 75;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\20250521 SmartWheatBox M4T 20m 3D 70 75;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\3D\20250521 SmartWheatBox M4T 20m 3D 70 75
+88;DJI_202505211040_008_25-SmartWheatBox-RGB-12m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;RGB;M4T;;;21-May-2025;;;;;;;;;;;;12m;85;80;;M4T;20250521 SmartWheatBox M4T 12m RGB 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\20250521 SmartWheatBox M4T 12m RGB 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\RGB\20250521 SmartWheatBox M4T 12m RGB 85 80
+89;DJI_202505211040_010_25-ProBarVoll-Oblique-20m-75-70;ProBarVoll;ProteinBar - Vollebekk;3D;M4T;;;21-May-2025;;;;;;;;;;;;20m;75;70;;M4T;20250521 ProBarVoll M4T 20m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\20250521 ProBarVoll M4T 20m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\3D\20250521 ProBarVoll M4T 20m 3D 75 70
+90;DJI_202505211040_012_25-G2BOatFrontiers-Oblique-20m-75-70;G2BOatFrontiers;Gene2Bread;3D;M4T;;;21-May-2025;;;;;;;;;;;;20m;75;70;;M4T;20250521 G2BOatFrontiers M4T 20m 3D 75 70;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\20250521 G2BOatFrontiers M4T 20m 3D 75 70;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\3D\20250521 G2BOatFrontiers M4T 20m 3D 75 70
+91;DJI_202505211118_014_25-DLTFarming-Oblique-20m-75-70;RyeGrass;DLT-Farming;3D;M4T;;;21-May-2025;;;;;;;;;;;;20m;75;70;;M4T;20250521 RyeGrass M4T 20m 3D 75 70;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250521 RyeGrass M4T 20m 3D 75 70;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250521 RyeGrass M4T 20m 3D 75 70
+92;DJI_202505211130_016_25-Søråsjordet-Oblique-20m-75-70;ProBarSørås;ProteinBar - Søråsjordet;3D;M4T;;;21-May-2025;;;;;;;;;;;;20m;75;70;;M4T;20250521 ProBarSørås M4T 20m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\20250521 ProBarSørås M4T 20m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\3D\20250521 ProBarSørås M4T 20m 3D 75 70
+93;DJI_202505211203_018_25-Pilot-Oblique-30m-70-75;ProBarPilot;Proteinbar - Pilot;3D;M4T;;;21-May-2025;;;;;;;;;;;;30m;70;75;;M4T;20250521 ProBarPilot M4T 30m 3D 70 75;P:\PheNo\ProteinBar\1_flights\ProBarPilot\3D\;P:\PheNo\ProteinBar\1_flights\ProBarPilot\3D\20250521 ProBarPilot M4T 30m 3D 70 75;P:\PheNo\ProteinBar\2_1_pix4d\ProBarPilot\3D\20250521 ProBarPilot M4T 30m 3D 70 75
+94;DJI_202505211003_004_25-DiversityOats-MS-30m-85-80;DiversityOats;DiversityOats;MS;M3M-1;;;21-May-2025;;;;;;;;;;;;30m;85;80;;M3M-1;20250521 DiversityOats M3M-1 30m MS 85 80;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\20250521 DiversityOats M3M-1 30m MS 85 80;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\MS\20250521 DiversityOats M3M-1 30m MS 85 80
+95;DJI_202505211032_009_25-DLTFarming-Oblique-20m-85-80;RyeGrass;DLT-Farming;3D;M3M-1;;;21-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250521 RyeGrass M3M-1 20m 3D 85 80;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250521 RyeGrass M3M-1 20m 3D 85 80;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250521 RyeGrass M3M-1 20m 3D 85 80
+96;DJI_202505211003_002_25-SmartWheatBox-MS-20m-85-80;SmartWheatBox;SmartWheat - DroughtBOX;MS;M3M-1;;;21-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250521 SmartWheatBox M3M-1 20m MS 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\20250521 SmartWheatBox M3M-1 20m MS 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\MS\20250521 SmartWheatBox M3M-1 20m MS 85 80
+97;DJI_202505211003_002_25-DLTFarming-MS-20m-85-80;RyeGrass;DLT-Farming;MS;M3M-2;;;21-May-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250521 RyeGrass M3M-2 20m MS 85 80;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250521 RyeGrass M3M-2 20m MS 85 80;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250521 RyeGrass M3M-2 20m MS 85 80
+98;DJI_202505211203_014_25-E166-Oblique-20m-85-80;ProBarE166;Proteinbar - E166;3D;M3M-2;;;21-May-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250521 ProBarE166 M3M-2 20m 3D 85 80;P:\PheNo\ProteinBar\1_flights\ProBarE166\3D\;P:\PheNo\ProteinBar\1_flights\ProBarE166\3D\20250521 ProBarE166 M3M-2 20m 3D 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarE166\3D\20250521 ProBarE166 M3M-2 20m 3D 85 80
+99;DJI_202505211003_005_25-G2BOatFrontiers-MS-20m-85-80;G2BOatFrontiers;Gene2Bread;MS;M3M-2;;;21-May-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250521 G2BOatFrontiers M3M-2 20m MS 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\20250521 G2BOatFrontiers M3M-2 20m MS 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\MS\20250521 G2BOatFrontiers M3M-2 20m MS 85 80
+100;DJI_202505211029_008_25-SmartWheatGram-MS-30m-80-80;SmartWheatGram;SmartWheat - Graminor;MS;M3M-2;;;21-May-2025;;;;;;;;;;;;30m;85;80;;M3M-2;20250521 SmartWheatGram M3M-2 30m MS 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\20250521 SmartWheatGram M3M-2 30m MS 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\MS\20250521 SmartWheatGram M3M-2 30m MS 85 80
+101;DJI_202505281059_002_25-DLTFarming-MS-20m-85-80;RyeGrass;DLT-Farming;MS;M3M-1;;;28-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250528 RyeGrass M3M-1 20m MS 85 80;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250528 RyeGrass M3M-1 20m MS 85 80;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250528 RyeGrass M3M-1 20m MS 85 80
+102;DJI_202505281059_004_25-ProBarVoll-MS-20m-80-80;ProBarVoll;ProteinBar - Vollebekk;MS;M3M-1;;;28-May-2025;;;;;;;;;;;;20m;80;80;;M3M-1;20250528 ProBarVoll M3M-1 20m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\20250528 ProBarVoll M3M-1 20m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\MS\20250528 ProBarVoll M3M-1 20m MS 80 80
+103;DJI_202505281137_006_25-SmartWheatBox-MS-20m-85-80;SmartWheatBox;SmartWheat - DroughtBOX;MS;M3M-1;;;28-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250528 SmartWheatBox M3M-1 20m MS 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\20250528 SmartWheatBox M3M-1 20m MS 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\MS\20250528 SmartWheatBox M3M-1 20m MS 85 80
+104;DJI_202505281238_008_25-G2BOATFrontiers-MS-20m-85-80;G2BOatFrontiers;Gene2Bread;MS;M3M-1;;;28-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250528 G2BOatFrontiers M3M-1 20m MS 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\20250528 G2BOatFrontiers M3M-1 20m MS 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\MS\20250528 G2BOatFrontiers M3M-1 20m MS 85 80
+105;DJI_202505281128_002_25-SmartWheatGram-MS-30m-80-80;SmartWheatGram;SmartWheat - Graminor;MS;M3M-2;;;28-May-2025;;;;;;;;;;;;30m;80;80;;M3M-2;20250528 SmartWheatGram M3M-2 30m MS 80 80;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\20250528 SmartWheatGram M3M-2 30m MS 80 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\MS\20250528 SmartWheatGram M3M-2 30m MS 80 80
+106;DJI_202505281237_005_25-DiversityOats-MS-30m-85-80;DiversityOats;DiversityOats;MS;M3M-2;;;28-May-2025;;;;;;;;;;;;30m;85;80;;M3M-2;20250528 DiversityOats M3M-2 30m MS 85 80;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\20250528 DiversityOats M3M-2 30m MS 85 80;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\MS\20250528 DiversityOats M3M-2 30m MS 85 80
+107;DJI_202505281133_001_25-DLTFarming-Oblique-20m-75-70;RyeGrass;DLT-Farming;3D;M4T;;;28-May-2025;;;;;;;;;;;;20m;75;70;;M4T;20250528 RyeGrass M4T 20m 3D 75 70;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250528 RyeGrass M4T 20m 3D 75 70;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250528 RyeGrass M4T 20m 3D 75 70
+108;DJI_202505281133_002_25-ProBarVoll-Oblique-20m-75-70;ProBarVoll;ProteinBar - Vollebekk;3D;M4T;;;28-May-2025;;;;;;;;;;;;20m;75;70;;M4T;20250528 ProBarVoll M4T 20m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\20250528 ProBarVoll M4T 20m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\3D\20250528 ProBarVoll M4T 20m 3D 75 70
+109;DJI_202505281133_003_25-SmartWheatBox-Thermal-20m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;Thermal;M4T;;;28-May-2025;;;;;;;;;;;;20m;85;80;;M4T;20250528 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\20250528 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\Thermal\20250528 SmartWheatBox M4T 20m Thermal 85 80
+110;DJI_202505281133_004_25-SmartWheatBox-Oblique-20m-75-70;SmartWheatBox;SmartWheat - DroughtBOX;3D;M4T;;;28-May-2025;;;;;;;;;;;;20m;70;75;;M4T;20250528 SmartWheatBox M4T 20m 3D 70 75;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\20250528 SmartWheatBox M4T 20m 3D 70 75;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\3D\20250528 SmartWheatBox M4T 20m 3D 70 75
+111;DJI_202505281218_005_25-SmartWheatGram-Oblique-20m-75-70;SmartWheatGram;SmartWheat - Graminor;3D;M4T;;;28-May-2025;;;;;;;;;;;;22m;75;70;;M4T;20250528 SmartWheatGram M4T 22m 3D 75 70;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\20250528 SmartWheatGram M4T 22m 3D 75 70;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\3D\20250528 SmartWheatGram M4T 22m 3D 75 70
+112;DJI_202505281218_008_25-SmartWheatGram-Thermal-20m-75-70;SmartWheatGram;SmartWheat - Graminor;Thermal;M4T;;;28-May-2025;;;;;;;;;;;;50m;75;70;;M4T;20250528 SmartWheatGram M4T 50m Thermal 75 70;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\Thermal\20250528 SmartWheatGram M4T 50m Thermal 75 70;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\Thermal\20250528 SmartWheatGram M4T 50m Thermal 75 70
+113;DJI_202505281258_010_25-G2BOatFrontiers-Oblique-20m-75-70;G2BOatFrontiers;Gene2Bread;3D;M4T;;;28-May-2025;;;;;;;;;;;;20m;75;70;;M4T;20250528 G2BOatFrontiers M4T 20m 3D 75 70;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\20250528 G2BOatFrontiers M4T 20m 3D 75 70;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\3D\20250528 G2BOatFrontiers M4T 20m 3D 75 70
+114;DJI_202505281059_002_25-DLTFarming-MS-20m-85-80;RyeGrass;DLT-Farming;MS;M3M-1;;;28-May-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250528 RyeGrass M3M-1 20m MS 85 80;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250528 RyeGrass M3M-1 20m MS 85 80;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250528 RyeGrass M3M-1 20m MS 85 80
+115;DJI_202505301400_002_25-Søråsjordet-MS-30m-80-80;ProBarSørås;ProteinBar - Søråsjordet;MS;M3M-2;;;30-May-2025;;;;;;;;;;;;30m;80;80;;M3M-2;20250530 ProBarSørås M3M-2 30m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\20250530 ProBarSørås M3M-2 30m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\MS\20250530 ProBarSørås M3M-2 30m MS 80 80
+116;DJI_202505301334_001_25-DiversityOats-Oblique-20m-75-70;DiversityOats;DiversityOats;3D;M4T;;;30-May-2025;;;;;;;;;;;;20m;75;70;;M4T;20250530 DiversityOats M4T 20m 3D 75 70;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\20250530 DiversityOats M4T 20m 3D 75 70;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\3D\20250530 DiversityOats M4T 20m 3D 75 70
+117;DJI_202505301357_003_25-Søråsjordet-Oblique-20m-75-70;ProBarSørås;ProteinBar - Søråsjordet;3D;M4T;;;30-May-2025;;;;;;;;;;;;20m;75;70;;M4T;20250530 ProBarSørås M4T 20m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\20250530 ProBarSørås M4T 20m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\3D\20250530 ProBarSørås M4T 20m 3D 75 70
+118;DJI_202506021111_003_25-SmartWheatBox-Oblique-20m-75-70;SmartWheatBox;SmartWheat - DroughtBOX;3D;M4T;;;2-Jun-2025;;;;;;;;;;;;20m;70;75;;M4T;20250602 SmartWheatBox M4T 20m 3D 70 75;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\20250602 SmartWheatBox M4T 20m 3D 70 75;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\3D\20250602 SmartWheatBox M4T 20m 3D 70 75
+119;DJI_202506021111_001_25-SmartWheatGram-Oblique-20m-75-70;SmartWheatGram;SmartWheat - Graminor;3D;M4T;;;2-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250602 SmartWheatGram M4T 20m 3D 75 70;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\20250602 SmartWheatGram M4T 20m 3D 75 70;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\3D\20250602 SmartWheatGram M4T 20m 3D 75 70
+120;DJI_202506021215_006_25-DiversityOats-Oblique-20m-75-70;DiversityOats;DiversityOats;3D;M4T;;;2-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250602 DiversityOats M4T 20m 3D 75 70;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\20250602 DiversityOats M4T 20m 3D 75 70;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\3D\20250602 DiversityOats M4T 20m 3D 75 70
+121;DJI_202506021235_007_25-G2BOatFrontiers-Oblique-20m-75-70;G2BOatFrontiers;Gene2Bread;3D;M4T;;;2-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250602 G2BOatFrontiers M4T 20m 3D 75 70;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\20250602 G2BOatFrontiers M4T 20m 3D 75 70;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\3D\20250602 G2BOatFrontiers M4T 20m 3D 75 70
+122;DJI_202506021111_002_25-ProBarVoll-Oblique-20m-75-70;ProBarVoll;ProteinBar - Vollebekk;3D;M4T;;;2-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250602 ProBarVoll M4T 20m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\20250602 ProBarVoll M4T 20m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\3D\20250602 ProBarVoll M4T 20m 3D 75 70
+123;DJI_202506031018_003_25-E166-MS-30m-85-80;ProBarE166;Proteinbar - E166;MS;M3M-2;;;3-Jun-2025;;;;;;;;;;;;30m;85;80;;M3M-2;20250603 ProBarE166 M3M-2 30m MS 85 80;P:\PheNo\ProteinBar\1_flights\ProBarE166\MS\;P:\PheNo\ProteinBar\1_flights\ProBarE166\MS\20250603 ProBarE166 M3M-2 30m MS 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarE166\MS\20250603 ProBarE166 M3M-2 30m MS 85 80
+124;DJI_202506031018_004_25-E166-Oblique-20m-85-80;ProBarE166;Proteinbar - E166;3D;M3M-2;;;3-Jun-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250603 ProBarE166 M3M-2 20m 3D 85 80;P:\PheNo\ProteinBar\1_flights\ProBarE166\3D\;P:\PheNo\ProteinBar\1_flights\ProBarE166\3D\20250603 ProBarE166 M3M-2 20m 3D 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarE166\3D\20250603 ProBarE166 M3M-2 20m 3D 85 80
+125;DJI_202506031043_007_25-Soldeling-MS-30m-80-85;Soldeling;Soldeling i Landbruk;MS;M3M-2;;;3-Jun-2025;;;;;;;;;;;;30m;80;85;;M3M-2;20250603 Soldeling M3M-2 30m MS 80 85;P:\PheNo\Soldeling\1_flights\Soldeling\MS\;P:\PheNo\Soldeling\1_flights\Soldeling\MS\20250603 Soldeling M3M-2 30m MS 80 85;P:\PheNo\Soldeling\2_1_pix4d\Soldeling\MS\20250603 Soldeling M3M-2 30m MS 80 85
+126;DJI_202506031110_009_25-Søråsjordet-MS-30m-80-80;ProBarSørås;ProteinBar - Søråsjordet;MS;M3M-2;;;3-Jun-2025;;;;;;;;;;;;30m;80;80;;M3M-2;20250603 ProBarSørås M3M-2 30m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\20250603 ProBarSørås M3M-2 30m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\MS\20250603 ProBarSørås M3M-2 30m MS 80 80
+127;DJI_202506031201_002_RobOat-12m-MS-85-80;RobOat;RobOat;MS;M3M-2;;;3-Jun-2025;;;;;;;;;;;;12m;85;80;;M3M-2;20250603 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250603 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250603 RobOat M3M-2 12m MS 85 80
+128;DJI_202506031003_002_25-SmartWheatGram-MS-30m-80-80;SmartWheatGram;SmartWheat - Graminor;MS;M3M-1;;;3-Jun-2025;;;;;;;;;;;;30m;80;80;;M3M-1;20250603 SmartWheatGram M3M-1 30m MS 80 80;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\20250603 SmartWheatGram M3M-1 30m MS 80 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\MS\20250603 SmartWheatGram M3M-1 30m MS 80 80
+129;DJI_202506031003_003_25-ProBarVoll-MS-20m-80-80;ProBarVoll;ProteinBar - Vollebekk;MS;M3M-1;;;3-Jun-2025;;;;;;;;;;;;20m;80;80;;M3M-1;20250603 ProBarVoll M3M-1 20m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\20250603 ProBarVoll M3M-1 20m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\MS\20250603 ProBarVoll M3M-1 20m MS 80 80
+130;DJI_202506031031_006_25-SmartWheatBox-MS-20m-85-80;SmartWheatBox;SmartWheat - DroughtBOX;MS;M3M-1;;;3-Jun-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250603 SmartWheatBox M3M-1 20m MS 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\20250603 SmartWheatBox M3M-1 20m MS 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\MS\20250603 SmartWheatBox M3M-1 20m MS 85 80
+131;DJI_202506031031_008_25-DiversityOats-MS-30m-85-80;DiversityOats;DiversityOats;MS;M3M-1;;;3-Jun-2025;;;;;;;;;;;;30m;85;80;;M3M-1;20250603 DiversityOats M3M-1 30m MS 85 80;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\20250603 DiversityOats M3M-1 30m MS 85 80;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\MS\20250603 DiversityOats M3M-1 30m MS 85 80
+132;DJI_202506031053_010_25-G2BOatFrontiers-MS-20m-85-80;G2BOatFrontiers;Gene2Bread;MS;M3M-1;;;3-Jun-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250603 G2BOatFrontiers M3M-1 20m MS 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\20250603 G2BOatFrontiers M3M-1 20m MS 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\MS\20250603 G2BOatFrontiers M3M-1 20m MS 85 80
+133;DJI_202506031020_001_25-Soldeling-Oblique-20m-70-75;Soldeling;Soldeling i Landbruk;3D;M4T;;;3-Jun-2025;;;;;;;;;;;;20m;70;75;;M4T;20250603 Soldeling M4T 20m 3D 70 75;P:\PheNo\Soldeling\1_flights\Soldeling\3D\;P:\PheNo\Soldeling\1_flights\Soldeling\3D\20250603 Soldeling M4T 20m 3D 70 75;P:\PheNo\Soldeling\2_1_pix4d\Soldeling\3D\20250603 Soldeling M4T 20m 3D 70 75
+134;DJI_202506031020_003_25-Pilot-Oblique-30m-70-75;ProBarPilot;Proteinbar - Pilot;3D;M4T;;;3-Jun-2025;;;;;;;;;;;;30m;70;75;;M4T;20250603 ProBarPilot M4T 30m 3D 70 75;P:\PheNo\ProteinBar\1_flights\ProBarPilot\3D\;P:\PheNo\ProteinBar\1_flights\ProBarPilot\3D\20250603 ProBarPilot M4T 30m 3D 70 75;P:\PheNo\ProteinBar\2_1_pix4d\ProBarPilot\3D\20250603 ProBarPilot M4T 30m 3D 70 75
+135;DJI_202506031109_004_25-Søråsjordet-Oblique-20m-75-70;ProBarSørås;ProteinBar - Søråsjordet;3D;M4T;;;3-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250603 ProBarSørås M4T 20m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\20250603 ProBarSørås M4T 20m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\3D\20250603 ProBarSørås M4T 20m 3D 75 70
+136;DJI_202506031207_006_25-SmartWheatBox-RGB-12m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;RGB;M4T;;;3-Jun-2025;;;;;;;;;;;;12m;85;80;;M4T;20250603 SmartWheatBox M4T 12m RGB 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\20250603 SmartWheatBox M4T 12m RGB 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\RGB\20250603 SmartWheatBox M4T 12m RGB 85 80
+137;DJI_202506031207_007_25-SmartWheatBox-Thermal-20m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;Thermal;M4T;;;3-Jun-2025;;;;;;;;;;;;20m;85;80;;M4T;20250603 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\20250603 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\Thermal\20250603 SmartWheatBox M4T 20m Thermal 85 80
+138;DJI_202506031237_010_25-SmartWheatGram-Thermal-20m-75-70;SmartWheatGram;SmartWheat - Graminor;Thermal;M4T;;;3-Jun-2025;;;;;;;;;;;;50m;75;70;;M4T;20250603 SmartWheatGram M4T 50m Thermal 75 70;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\Thermal\20250603 SmartWheatGram M4T 50m Thermal 75 70;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\Thermal\20250603 SmartWheatGram M4T 50m Thermal 75 70
+139;DJI_202506111017_002_25-SmartWheatGram-MS-30m-80-80;SmartWheatGram;SmartWheat - Graminor;MS;M3M-1;;;11-Jun-2025;;;;;;;;;;;;30m;80;80;;M3M-1;20250611 SmartWheatGram M3M-1 30m MS 80 80;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\20250611 SmartWheatGram M3M-1 30m MS 80 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\MS\20250611 SmartWheatGram M3M-1 30m MS 80 80
+140;DJI_202506111017_003_25-ProBarVoll-MS-20m-80-80;ProBarVoll;ProteinBar - Vollebekk;MS;M3M-1;;;11-Jun-2025;;;;;;;;;;;;20m;80;80;;M3M-1;20250611 ProBarVoll M3M-1 20m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\20250611 ProBarVoll M3M-1 20m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\MS\20250611 ProBarVoll M3M-1 20m MS 80 80
+141;DJI_202506111017_004_25-DLTFarming-MS-20m-85-80;RyeGrass;DLT-Farming;MS;M3M-1;;;11-Jun-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250611 RyeGrass M3M-1 20m MS 85 80;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250611 RyeGrass M3M-1 20m MS 85 80;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250611 RyeGrass M3M-1 20m MS 85 80
+142;DJI_202506111052_006_25-DiversityOats-MS-30m-85-80;DiversityOats;DiversityOats;MS;M3M-1;;;11-Jun-2025;;;;;;;;;;;;30m;85;80;;M3M-1;20250611 DiversityOats M3M-1 30m MS 85 80;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\20250611 DiversityOats M3M-1 30m MS 85 80;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\MS\20250611 DiversityOats M3M-1 30m MS 85 80
+143;DJI_202506111052_007_25-G2BoatFrontiers-MS-20m-85-80;G2BOatFrontiers;Gene2Bread;MS;M3M-1;;;11-Jun-2025;;;;;;;;;;;;20m;85;80;;M3M-1;20250611 G2BOatFrontiers M3M-1 20m MS 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\20250611 G2BOatFrontiers M3M-1 20m MS 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\MS\20250611 G2BOatFrontiers M3M-1 20m MS 85 80
+144;DJI_202506111020_002_25-RobOat-12m-MS-85-80;RobOat;RobOat;MS;M3M-2;;;11-Jun-2025;;;;;;;;;;;;12m;85;80;;M3M-2;20250611 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250611 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250611 RobOat M3M-2 12m MS 85 80
+145;DJI_202506111020_002_25-RobOat-12m-MS-85-80;RobOat;RobOat;MS;M3M-2;;;11-Jun-2025;;;;;;;;;;;;12m;85;80;;M3M-2;20250611 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250611 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250611 RobOat M3M-2 12m MS 85 80
+146;DJI_202506111020_004_25-SmartWheatBox-MS-20m-85-80;SmartWheatBox;SmartWheat - DroughtBOX;MS;M3M-2;;;11-Jun-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250611 SmartWheatBox M3M-2 20m MS 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\20250611 SmartWheatBox M3M-2 20m MS 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\MS\20250611 SmartWheatBox M3M-2 20m MS 85 80
+147;DJI_202506111044_007_25-SmartWheatGram-MS-30m-80-80;SmartWheatGram;SmartWheat - Graminor;MS;M3M-2;;;11-Jun-2025;;;;;;;;;;;;30m;80;80;;M3M-2;20250611 SmartWheatGram M3M-2 30m MS 80 80;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\20250611 SmartWheatGram M3M-2 30m MS 80 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\MS\20250611 SmartWheatGram M3M-2 30m MS 80 80
+148;DJI_202506111135_010_25-ProBarVoll-MS-20m-80-80;ProBarVoll;ProteinBar - Vollebekk;MS;M3M-2;;;11-Jun-2025;;;;;;;;;;;;20m;80;80;;M3M-2;20250611 ProBarVoll M3M-2 20m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\20250611 ProBarVoll M3M-2 20m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\MS\20250611 ProBarVoll M3M-2 20m MS 80 80
+149;DJI_202506110941_001_25-SmartWheatGram-Oblique-20m-75-70;SmartWheatGram;SmartWheat - Graminor;3D;M4T;;;11-Jun-2025;;;;;;;;;;;;22m;75;70;;M4T;20250611 SmartWheatGram M4T 22m 3D 75 70;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\20250611 SmartWheatGram M4T 22m 3D 75 70;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\3D\20250611 SmartWheatGram M4T 22m 3D 75 70
+150;DJI_202506110941_002_25-ProBarVoll-Oblique-20m-75-70;ProBarVoll;ProteinBar - Vollebekk;3D;M4T;;;11-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250611 ProBarVoll M4T 20m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\20250611 ProBarVoll M4T 20m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\3D\20250611 ProBarVoll M4T 20m 3D 75 70
+151;DJI_202506110941_003_25-SmartWheatBox-Oblique-20m-75-70;SmartWheatBox;SmartWheat - DroughtBOX;3D;M4T;;;11-Jun-2025;;;;;;;;;;;;20m;70;75;;M4T;20250611 SmartWheatBox M4T 20m 3D 70 75;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\20250611 SmartWheatBox M4T 20m 3D 70 75;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\3D\20250611 SmartWheatBox M4T 20m 3D 70 75
+152;DJI_202506111012_005_25-SmartWheatBox-RGB-12m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;RGB;M4T;;;11-Jun-2025;;;;;;;;;;;;12m;85;80;;M4T;20250611 SmartWheatBox M4T 12m RGB 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\20250611 SmartWheatBox M4T 12m RGB 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\RGB\20250611 SmartWheatBox M4T 12m RGB 85 80
+153;DJI_202506111012_007_25-SmartWheatGram-Thermal-20m-75-70;SmartWheatGram;SmartWheat - Graminor;Thermal;M4T;;;11-Jun-2025;;;;;;;;;;;;50m;75;70;;M4T;20250611 SmartWheatGram M4T 50m Thermal 75 70;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\Thermal\20250611 SmartWheatGram M4T 50m Thermal 75 70;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\Thermal\20250611 SmartWheatGram M4T 50m Thermal 75 70
+154;DJI_202506111046_010_25-SmartWheatBox-Thermal-20m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;Thermal;M4T;;;11-Jun-2025;;;;;;;;;;;;20m;85;80;;M4T;20250611 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\20250611 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\Thermal\20250611 SmartWheatBox M4T 20m Thermal 85 80
+155;DJI_202506111046_011_25-DLTFarming-Oblique-20m-75-70;RyeGrass;DLT-Farming;3D;M4T;;;11-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250611 RyeGrass M4T 20m 3D 75 70;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250611 RyeGrass M4T 20m 3D 75 70;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250611 RyeGrass M4T 20m 3D 75 70
+156;DJI_202506111118_013_25-DiversityOats-Oblique-20m-75-70;DiversityOats;DiversityOats;3D;M4T;;;11-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250611 DiversityOats M4T 20m 3D 75 70;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\20250611 DiversityOats M4T 20m 3D 75 70;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\3D\20250611 DiversityOats M4T 20m 3D 75 70
+157;DJI_202506111135_015_25-G2BOatFrontiers-Oblique-20m-75-70;G2BOatFrontiers;Gene2Bread;3D;M4T;;;11-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250611 G2BOatFrontiers M4T 20m 3D 75 70;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\20250611 G2BOatFrontiers M4T 20m 3D 75 70;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\3D\20250611 G2BOatFrontiers M4T 20m 3D 75 70
+158;20250611 RobOat M3M-2 12m MS_FIELD;RobOat;RobOat;MS_FIELD;M3M-2;;;11-Jun-2025;;;;;;;;;;;;;;;;M3M-2;20251106 RobOat M3M-2  MS_FIELD  ;P:\PheNo\RobOat\1_flights\RobOat\MS_FIELD\;P:\PheNo\RobOat\1_flights\RobOat\MS_FIELD\20251106 RobOat M3M-2  MS_FIELD  ;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS_FIELD\20251106 RobOat M3M-2  MS_FIELD  
+159;DJI_202506121112_004_25-Soldeling-Oblique-20m-70-75;Soldeling;Soldeling i Landbruk;3D;M4T;;;12-Jun-2025;;;;;;;;;;;;20m;70;75;;M4T;20250612 Soldeling M4T 20m 3D 70 75;P:\PheNo\Soldeling\1_flights\Soldeling\3D\;P:\PheNo\Soldeling\1_flights\Soldeling\3D\20250612 Soldeling M4T 20m 3D 70 75;P:\PheNo\Soldeling\2_1_pix4d\Soldeling\3D\20250612 Soldeling M4T 20m 3D 70 75
+160;DJI_202506121113_002_25-Soldeling-MS-30m-80-85;Soldeling;Soldeling i Landbruk;MS;M3M-2;;;12-Jun-2025;;;;;;;;;;;;30m;80;85;;M3M-2;20250612 Soldeling M3M-2 30m MS 80 85;P:\PheNo\Soldeling\1_flights\Soldeling\MS\;P:\PheNo\Soldeling\1_flights\Soldeling\MS\20250612 Soldeling M3M-2 30m MS 80 85;P:\PheNo\Soldeling\2_1_pix4d\Soldeling\MS\20250612 Soldeling M3M-2 30m MS 80 85
+161;DJI_202506121113_003_25-E166-MS-30m-85-80;ProBarE166;Proteinbar - E166;MS;M3M-2;;;12-Jun-2025;;;;;;;;;;;;30m;85;80;;M3M-2;20250612 ProBarE166 M3M-2 30m MS 85 80;P:\PheNo\ProteinBar\1_flights\ProBarE166\MS\;P:\PheNo\ProteinBar\1_flights\ProBarE166\MS\20250612 ProBarE166 M3M-2 30m MS 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarE166\MS\20250612 ProBarE166 M3M-2 30m MS 85 80
+162;DJI_202506121112_003_25-Pilot-Oblique-30m-70-75;ProBarPilot;Proteinbar - Pilot;3D;M4T;;;12-Jun-2025;;;;;;;;;;;;30m;70;75;;M4T;20250612 ProBarPilot M4T 30m 3D 70 75;P:\PheNo\ProteinBar\1_flights\ProBarPilot\3D\;P:\PheNo\ProteinBar\1_flights\ProBarPilot\3D\20250612 ProBarPilot M4T 30m 3D 70 75;P:\PheNo\ProteinBar\2_1_pix4d\ProBarPilot\3D\20250612 ProBarPilot M4T 30m 3D 70 75
+163;DJI_202506121134_007_25-Pilot-30m-MS-70-75;ProBarPilot;Proteinbar - Pilot;MS;M3M-1;;;12-Jun-2025;;;;;;;;;;;;30m;70;75;;M3M-1;20250612 ProBarPilot M3M-1 30m MS 70 75;P:\PheNo\ProteinBar\1_flights\ProBarPilot\MS\;P:\PheNo\ProteinBar\1_flights\ProBarPilot\MS\20250612 ProBarPilot M3M-1 30m MS 70 75;P:\PheNo\ProteinBar\2_1_pix4d\ProBarPilot\MS\20250612 ProBarPilot M3M-1 30m MS 70 75
+164;DJI_202506121022_002_25-Søråsjordet-Oblique-20m-75-70-copy;ProBarSørås;ProteinBar - Søråsjordet;3D;M4T;;;12-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250612 ProBarSørås M4T 20m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\20250612 ProBarSørås M4T 20m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\3D\20250612 ProBarSørås M4T 20m 3D 75 70
+165;DJI_202506121025_003_25-Søråsjordet-MS-30m-80-80;ProBarSørås;ProteinBar - Søråsjordet;MS;M3M-1;;;12-Jun-2025;;;;;;;;;;;;30m;80;80;;M3M-1;20250612 ProBarSørås M3M-1 30m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\20250612 ProBarSørås M3M-1 30m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\MS\20250612 ProBarSørås M3M-1 30m MS 80 80
+166;;RobOat;RobOat;3D;M4T;Frederic;New;13-Jun-2025;10:54;11:01;;;;;;;;;;20m;80;85;;M4T;20250613 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\1_flights\RobOat\3D\;P:\PheNo\RobOat\1_flights\RobOat\3D\20250613 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\3D\20250613 RobOat M4T 20m 3D 80 85
+167;;RobOat;RobOat;MS;M3M-1;Ivar;New;13-Jun-2025;11:02;11:15;;;;;;;;;;12m;85;80;;M3M-1;20250613 RobOat M3M-1 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250613 RobOat M3M-1 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250613 RobOat M3M-1 12m MS 85 80
+168;;RobOat;RobOat;Thermal;M4T;Frederic;New;13-Jun-2025;11:16;11:20;;Reflectance panel Thermal misssing;;;;;;;;30m;80;85;;M4T;20250613 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\1_flights\RobOat\Thermal\;P:\PheNo\RobOat\1_flights\RobOat\Thermal\20250613 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\Thermal\20250613 RobOat M4T 30m Thermal 80 85
+169;DJI_202506161110_009_25-Søråsjordet-MS-30m-80-80;ProBarSørås;ProteinBar - Søråsjordet;MS;M3M-2;Frederic;Old;16-Jun-2025;;;;;;;;;;;;30m;80;80;;M3M-2;20250616 ProBarSørås M3M-2 30m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\20250616 ProBarSørås M3M-2 30m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\MS\20250616 ProBarSørås M3M-2 30m MS 80 80
+170;DJI_202506161040_003_25-DLTFarming-MS-20m-85-80;RyeGrass;DLT-Farming;MS;M3M-1;Ludvik;New;16-Jun-2025;10:42;10:53;;;;;;;;;;20m;85;80;;M3M-1;20250616 RyeGrass M3M-1 20m MS 85 80;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250616 RyeGrass M3M-1 20m MS 85 80;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250616 RyeGrass M3M-1 20m MS 85 80
+171;DJI_202506151038_002_25-Pilot-30m-MS-70-75;ProBarPilot;Proteinbar - Pilot;MS;M3M-2;Ivar;Old;15-Jun-2025;;;;;;;;;;;;30m;70;75;;M3M-2;20250615 ProBarPilot M3M-2 30m MS 70 75;P:\PheNo\ProteinBar\1_flights\ProBarPilot\MS\;P:\PheNo\ProteinBar\1_flights\ProBarPilot\MS\20250615 ProBarPilot M3M-2 30m MS 70 75;P:\PheNo\ProteinBar\2_1_pix4d\ProBarPilot\MS\20250615 ProBarPilot M3M-2 30m MS 70 75
+172;DJI_202506151038_004_25-Soldeling-MS-30m-80-85;Soldeling;Soldeling i Landbruk;MS;M3M-2;Frederic;Old;15-Jun-2025;;;;;;;;;;;;30m;80;85;;M3M-2;20250615 Soldeling M3M-2 30m MS 80 85;P:\PheNo\Soldeling\1_flights\Soldeling\MS\;P:\PheNo\Soldeling\1_flights\Soldeling\MS\20250615 Soldeling M3M-2 30m MS 80 85;P:\PheNo\Soldeling\2_1_pix4d\Soldeling\MS\20250615 Soldeling M3M-2 30m MS 80 85
+173;DJI_202506161038_006_25-E166-MS-30m-85-80;ProBarE166;Proteinbar - E166;MS;M3M-2;Frederic;Old;16-Jun-2025;;;;;;;;;;;;30m;85;80;;M3M-2;20250616 ProBarE166 M3M-2 30m MS 85 80;P:\PheNo\ProteinBar\1_flights\ProBarE166\MS\;P:\PheNo\ProteinBar\1_flights\ProBarE166\MS\20250616 ProBarE166 M3M-2 30m MS 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarE166\MS\20250616 ProBarE166 M3M-2 30m MS 85 80
+174;DJI_202506161038_007_25-E166-Oblique-20m-85-80;ProBarE166;Proteinbar - E166;3D;M3M-2;Frederic;Old;16-Jun-2025;;;;;;;;;;;;20m;85;80;;M3M-2;20250616 ProBarE166 M3M-2 20m 3D 85 80;P:\PheNo\ProteinBar\1_flights\ProBarE166\3D\;P:\PheNo\ProteinBar\1_flights\ProBarE166\3D\20250616 ProBarE166 M3M-2 20m 3D 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarE166\3D\20250616 ProBarE166 M3M-2 20m 3D 85 80
+175;DJI_202506161125_009_25-SmartWheatBox-MS-20m-85-80;SmartWheatBox;SmartWheat - DroughtBOX;MS;M3M-1;Ludvik;New;16-Jun-2025;11:28;11:30;;;;;;;;;;20m;85;80;;M3M-1;20250616 SmartWheatBox M3M-1 20m MS 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\20250616 SmartWheatBox M3M-1 20m MS 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\MS\20250616 SmartWheatBox M3M-1 20m MS 85 80
+176;DJI_202506161131_012_25-DiversityOats-MS-30m-85-80;DiversityOats;DiversityOats;MS;M3M-1;Ludvik;New;16-Jun-2025;11:39;11:48;;;;;;;;;;30m;85;80;;M3M-1;20250616 DiversityOats M3M-1 30m MS 85 80;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\20250616 DiversityOats M3M-1 30m MS 85 80;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\MS\20250616 DiversityOats M3M-1 30m MS 85 80
+177;DJI_202506161150_014_25-G2BOatFrontiers-MS-20m-85-80;G2BOatFrontiers;Gene2Bread;MS;M3M-1;Ludvik;New;16-Jun-2025;11:52;12:00;;;;;;;;;;20m;85;80;;M3M-1;20250616 G2BOatFrontiers M3M-1 20m MS 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\20250616 G2BOatFrontiers M3M-1 20m MS 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\MS\20250616 G2BOatFrontiers M3M-1 20m MS 85 80
+178;DJI_202506161214_017_25-ProBarVoll-MS-20m-80-80;ProBarVoll;ProteinBar - Vollebekk;MS;M3M-1;Ludvik;New;16-Jun-2025;12:16;12:25;;;;;;;;;;20m;80;80;;M3M-1;20250616 ProBarVoll M3M-1 20m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\20250616 ProBarVoll M3M-1 20m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\MS\20250616 ProBarVoll M3M-1 20m MS 80 80
+179;DJI_202506161008_001_25-Soldeling-Oblique-20m-70-75;Soldeling;Soldeling i Landbruk;3D;M4T;Christopher;;16-Jun-2025;;;;;;;;;;;;20m;70;75;;M4T;20250616 Soldeling M4T 20m 3D 70 75;P:\PheNo\Soldeling\1_flights\Soldeling\3D\;P:\PheNo\Soldeling\1_flights\Soldeling\3D\20250616 Soldeling M4T 20m 3D 70 75;P:\PheNo\Soldeling\2_1_pix4d\Soldeling\3D\20250616 Soldeling M4T 20m 3D 70 75
+180;DJI_202506161008_005_25-Pilot-Oblique-30m-70-75;ProBarPilot;Proteinbar - Pilot;3D;M4T;Christopher;;16-Jun-2025;;;;;;;;;;;;30m;70;75;;M4T;20250616 ProBarPilot M4T 30m 3D 70 75;P:\PheNo\ProteinBar\1_flights\ProBarPilot\3D\;P:\PheNo\ProteinBar\1_flights\ProBarPilot\3D\20250616 ProBarPilot M4T 30m 3D 70 75;P:\PheNo\ProteinBar\2_1_pix4d\ProBarPilot\3D\20250616 ProBarPilot M4T 30m 3D 70 75
+181;DJI_202506161109_006_25-Søråsjordet-Oblique-20m-75-70;ProBarSørås;ProteinBar - Søråsjordet;3D;M4T;Christopher;;16-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250616 ProBarSørås M4T 20m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\20250616 ProBarSørås M4T 20m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\3D\20250616 ProBarSørås M4T 20m 3D 75 70
+182;DJI_202506161154_009_25-Soldeling-Thermal-30m-80-85;Soldeling;Soldeling i Landbruk;Thermal;M4T;Christopher;Old;16-Jun-2025;;;;;;;;;;;;30m;80;85;;M4T;20250616 Soldeling M4T 30m Thermal 80 85;P:\PheNo\Soldeling\1_flights\Soldeling\Thermal\;P:\PheNo\Soldeling\1_flights\Soldeling\Thermal\20250616 Soldeling M4T 30m Thermal 80 85;P:\PheNo\Soldeling\2_1_pix4d\Soldeling\Thermal\20250616 Soldeling M4T 30m Thermal 80 85
+183;DJI_202506161226_011_25-SmartWheatGram-Oblique-20m-75-70;SmartWheatGram;SmartWheat - Graminor;3D;M4T;Frederic;;16-Jun-2025;;;;;;;;;;;;22m;75;70;;M4T;20250616 SmartWheatGram M4T 22m 3D 75 70;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\20250616 SmartWheatGram M4T 22m 3D 75 70;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\3D\20250616 SmartWheatGram M4T 22m 3D 75 70
+184;DJI_202506161226_012_25-ProBarVoll-Oblique-20m-75-70;ProBarVoll;ProteinBar - Vollebekk;3D;M4T;Frederic;;16-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250616 ProBarVoll M4T 20m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\20250616 ProBarVoll M4T 20m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\3D\20250616 ProBarVoll M4T 20m 3D 75 70
+185;DJI_202506161226_013_25-SmartWheatBox-Oblique-20m-75-70;SmartWheatBox;SmartWheat - DroughtBOX;3D;M4T;Frederic;;16-Jun-2025;;;;;;;;;;;;20m;70;75;;M4T;20250616 SmartWheatBox M4T 20m 3D 70 75;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\20250616 SmartWheatBox M4T 20m 3D 70 75;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\3D\20250616 SmartWheatBox M4T 20m 3D 70 75
+186;DJI_202506161306_015_25-SmartWheatGram-Thermal-20m-75-70;SmartWheatGram;SmartWheat - Graminor;Thermal;M4T;Frederic;Old;16-Jun-2025;;;;;;;;;;;;50m;75;70;;M4T;20250616 SmartWheatGram M4T 50m Thermal 75 70;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\Thermal\20250616 SmartWheatGram M4T 50m Thermal 75 70;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\Thermal\20250616 SmartWheatGram M4T 50m Thermal 75 70
+187;DJI_202506161306_017_25-SmartWheatBox-Thermal-20m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;Thermal;M4T;Frederic;Old;16-Jun-2025;;;;;;;;;;;;20m;85;80;;M4T;20250616 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\20250616 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\Thermal\20250616 SmartWheatBox M4T 20m Thermal 85 80
+188;DJI_202506161306_018_25-SmartWheatBox-RGB-12m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;RGB;M4T;Frederic;Old;16-Jun-2025;;;;;;;;;;;;12m;85;80;;M4T;20250616 SmartWheatBox M4T 12m RGB 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\20250616 SmartWheatBox M4T 12m RGB 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\RGB\20250616 SmartWheatBox M4T 12m RGB 85 80
+189;DJI_202506161306_019_25-DLTFarming-Oblique-20m-75-70;RyeGrass;DLT-Farming;3D;M4T;Frederic;;16-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250616 RyeGrass M4T 20m 3D 75 70;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250616 RyeGrass M4T 20m 3D 75 70;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250616 RyeGrass M4T 20m 3D 75 70
+190;DJI_202506161338_020_25-G2BOatFrontiers-Oblique-20m-75-70;G2BOatFrontiers;Gene2Bread;3D;M4T;Ivar;;16-Jun-2025;;;;;;;;;;;Wrong file name?;20m;75;70;;M4T;20250616 G2BOatFrontiers M4T 20m 3D 75 70;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\20250616 G2BOatFrontiers M4T 20m 3D 75 70;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\3D\20250616 G2BOatFrontiers M4T 20m 3D 75 70
+191;DJI_202506161338_021_25-DiversityOats-Oblique-20m-75-70;DiversityOats;DiversityOats;3D;M4T;Ivar;;16-Jun-2025;;;;Some parts may be cloudy, but should overall be good;;;;;;;;20m;75;70;;M4T;20250616 DiversityOats M4T 20m 3D 75 70;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\20250616 DiversityOats M4T 20m 3D 75 70;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\3D\20250616 DiversityOats M4T 20m 3D 75 70
+192;DJI_202506171432_002_25-RobOat-12m-MS-85-80;RobOat;RobOat;MS;M3M-1;Frederic;New;17-Jun-2025;;;;;;;;;;;;12m;85;80;;M3M-1;20250617 RobOat M3M-1 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250617 RobOat M3M-1 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250617 RobOat M3M-1 12m MS 85 80
+193;DJI_202506171419_027_25-RobOat-20m-Oblique-80-85;RobOat;RobOat;3D;M4T;Fahad;;17-Jun-2025;;;;;;;;;;;;20m;80;85;;M4T;20250617 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\1_flights\RobOat\3D\;P:\PheNo\RobOat\1_flights\RobOat\3D\20250617 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\3D\20250617 RobOat M4T 20m 3D 80 85
+194;DJI_202506171419_024_25-RobOat-30m-Thermal-80-85;RobOat;RobOat;Thermal;M4T;Fahad;New;17-Jun-2025;;;;;;;;;;;;30m;80;85;;M4T;20250617 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\1_flights\RobOat\Thermal\;P:\PheNo\RobOat\1_flights\RobOat\Thermal\20250617 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\Thermal\20250617 RobOat M4T 30m Thermal 80 85
+195;DJI_202506191046_002_25-RobOat-30m-Thermal-80-85;RobOat;RobOat;Thermal;M4T;Christopher;New;19-Jun-2025;;;;;;;;;;;;30m;80;85;;M4T;20250619 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\1_flights\RobOat\Thermal\;P:\PheNo\RobOat\1_flights\RobOat\Thermal\20250619 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\Thermal\20250619 RobOat M4T 30m Thermal 80 85
+196;DJI_202506191046_003_25-RobOat-20m-Oblique-80-85;RobOat;RobOat;3D;M4T;Christopher;;19-Jun-2025;;;;;;;;;;;;20m;80;85;;M4T;20250619 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\1_flights\RobOat\3D\;P:\PheNo\RobOat\1_flights\RobOat\3D\20250619 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\3D\20250619 RobOat M4T 20m 3D 80 85
+197;DJI_202506181423_002_25-RobOat-12m-MS-85-80;RobOat;RobOat;MS;M3M-2;Christopher;New;18-Jun-2025;;;;;;;;;;;date wrong, correct 19.06.2025;12m;85;80;;M3M-2;20250618 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250618 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250618 RobOat M3M-2 12m MS 85 80
+198;DJI_202506161040_005_25-SmartWheatGram-MS-30m-80-80;SmartWheatGram;SmartWheat - Graminor;MS;M3M-1;Ludvik;New;16-Jun-2025;10:58;11:08;;;;;;;;;;30m;80;80;;M3M-1;20250616 SmartWheatGram M3M-1 30m MS 80 80;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\20250616 SmartWheatGram M3M-1 30m MS 80 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\MS\20250616 SmartWheatGram M3M-1 30m MS 80 80
+199;DJI_202506211208_003_25-RobOat-30m-Thermal-80-85;RobOat;RobOat;Thermal;M4T;Ludvik;New;21-Jun-2025;12:10;12:13;;;;;;;;;;30m;80;85;;M4T;20250621 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\1_flights\RobOat\Thermal\;P:\PheNo\RobOat\1_flights\RobOat\Thermal\20250621 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\Thermal\20250621 RobOat M4T 30m Thermal 80 85
+200;DJI_202506211208_005_25-RobOat-20m-Oblique-80-85;RobOat;RobOat;3D;M4T;Ludvik;New;21-Jun-2025;12:16;12:24;;;;;;;;;;20m;80;85;;M4T;20250621 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\1_flights\RobOat\3D\;P:\PheNo\RobOat\1_flights\RobOat\3D\20250621 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\3D\20250621 RobOat M4T 20m 3D 80 85
+201;DJI_202506211149_006_25-RobOat-12m-MS-85-80;RobOat;RobOat;MS;M3M-1;Ludvik;New;21-Jun-2025;11:52;12:02;;;;;;;;;;12m;85;80;;M3M-1;20250621 RobOat M3M-1 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250621 RobOat M3M-1 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250621 RobOat M3M-1 12m MS 85 80
+202;DJI_202506231248_001_25-RobOat-30m-Thermal-80-85;RobOat;RobOat;Thermal;M4T;Christopher;New;23-Jun-2025;;;;uneven clouds, wet ground;;;;;;;;30m;80;85;;M4T;20250623 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\1_flights\RobOat\Thermal\;P:\PheNo\RobOat\1_flights\RobOat\Thermal\20250623 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\Thermal\20250623 RobOat M4T 30m Thermal 80 85
+203;DJI_202506231211_003_25-RobOat-20m-Oblique-80-85;RobOat;RobOat;3D;M4T;Christopher;New;23-Jun-2025;;;;;;;;;;;;20m;80;85;;M4T;20250623 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\1_flights\RobOat\3D\;P:\PheNo\RobOat\1_flights\RobOat\3D\20250623 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\3D\20250623 RobOat M4T 20m 3D 80 85
+204;DJI_202506231153_002_25-RobOat-12m-MS-85-80;RobOat;RobOat;MS;M3M-2;Christopher;New;23-Jun-2025;;;;uneven clouds, wet ground;;;;;;;;12m;85;80;;M3M-2;20250623 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250623 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250623 RobOat M3M-2 12m MS 85 80
+205;DJI_202506240954_001_25-Søråsjordet-Oblique-20m-75-70;ProBarSørås;ProteinBar - Søråsjordet;3D;M4T;Christopher;old;24-Jun-2025;;;;Uneven clouds;;;;;;;;20m;75;70;;M4T;20250624 ProBarSørås M4T 20m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\3D\20250624 ProBarSørås M4T 20m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\3D\20250624 ProBarSørås M4T 20m 3D 75 70
+206;DJI_202506241029_003_25-Pilot-Oblique-30m-70-75;ProBarPilot;Proteinbar - Pilot;3D;M4T;Christopher;;24-Jun-2025;;;;;;;;;;;;30m;70;75;;M4T;20250624 ProBarPilot M4T 30m 3D 70 75;P:\PheNo\ProteinBar\1_flights\ProBarPilot\3D\;P:\PheNo\ProteinBar\1_flights\ProBarPilot\3D\20250624 ProBarPilot M4T 30m 3D 70 75;P:\PheNo\ProteinBar\2_1_pix4d\ProBarPilot\3D\20250624 ProBarPilot M4T 30m 3D 70 75
+207;DJI_202506241029_004_25-Soldeling-Oblique-20m-70-75;Soldeling;Soldeling i Landbruk;3D;M4T;Christopher;;24-Jun-2025;;;;;;;;;;;;20m;70;75;;M4T;20250624 Soldeling M4T 20m 3D 70 75;P:\PheNo\Soldeling\1_flights\Soldeling\3D\;P:\PheNo\Soldeling\1_flights\Soldeling\3D\20250624 Soldeling M4T 20m 3D 70 75;P:\PheNo\Soldeling\2_1_pix4d\Soldeling\3D\20250624 Soldeling M4T 20m 3D 70 75
+208;DJI_202506241029_006_25-Soldeling-Thermal-30m-80-85;Soldeling;Soldeling i Landbruk;Thermal;M4T;Christopher;old;24-Jun-2025;;;;Uneven clouds;;;;;;;;30m;80;85;;M4T;20250624 Soldeling M4T 30m Thermal 80 85;P:\PheNo\Soldeling\1_flights\Soldeling\Thermal\;P:\PheNo\Soldeling\1_flights\Soldeling\Thermal\20250624 Soldeling M4T 30m Thermal 80 85;P:\PheNo\Soldeling\2_1_pix4d\Soldeling\Thermal\20250624 Soldeling M4T 30m Thermal 80 85
+209;DJI_202506241146_009_25-SmartWheatBox-Oblique-20m-75-70;SmartWheatBox;SmartWheat - DroughtBOX;3D;M4T;Christopher;;24-Jun-2025;;;;;;;;;;;;20m;70;75;;M4T;20250624 SmartWheatBox M4T 20m 3D 70 75;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\3D\20250624 SmartWheatBox M4T 20m 3D 70 75;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\3D\20250624 SmartWheatBox M4T 20m 3D 70 75
+210;DJI_202506241146_010_25-DLTFarming-Oblique-20m-75-70;RyeGrass;DLT-Farming;3D;M4T;Christopher;;24-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250624 RyeGrass M4T 20m 3D 75 70;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\3D\20250624 RyeGrass M4T 20m 3D 75 70;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\3D\20250624 RyeGrass M4T 20m 3D 75 70
+211;DJI_202506241146_014_25-SmartWheatBox-Thermal-20m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;Thermal;M4T;Christopher;new+extra;24-Jun-2025;;;;Uneven clouds;;;;;;;;20m;85;80;;M4T;20250624 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\Thermal\20250624 SmartWheatBox M4T 20m Thermal 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\Thermal\20250624 SmartWheatBox M4T 20m Thermal 85 80
+212;DJI_202506241146_015_25-SmartWheatBox-RGB-12m-80-85;SmartWheatBox;SmartWheat - DroughtBOX;RGB;M4T;Christopher;;24-Jun-2025;;;;;;;;;;;;12m;85;80;;M4T;20250624 SmartWheatBox M4T 12m RGB 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\RGB\20250624 SmartWheatBox M4T 12m RGB 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\RGB\20250624 SmartWheatBox M4T 12m RGB 85 80
+213;DJI_202506241219_018_25-SmartWheatGram-Thermal-20m-75-70;SmartWheatGram;SmartWheat - Graminor;Thermal;M4T;Christopher;new+extra;24-Jun-2025;;;;Uneven clouds;;;;;;;;50m;75;70;;M4T;20250624 SmartWheatGram M4T 50m Thermal 75 70;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\Thermal\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\Thermal\20250624 SmartWheatGram M4T 50m Thermal 75 70;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\Thermal\20250624 SmartWheatGram M4T 50m Thermal 75 70
+214;DJI_202506241219_019_25-ProBarVoll-Oblique-20m-75-70;ProBarVoll;ProteinBar - Vollebekk;3D;M4T;Christopher;;24-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250624 ProBarVoll M4T 20m 3D 75 70;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\3D\20250624 ProBarVoll M4T 20m 3D 75 70;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\3D\20250624 ProBarVoll M4T 20m 3D 75 70
+215;DJI_202506241219_020_25-RobOat-20m-Oblique-80-85;RobOat;RobOat;3D;M4T;Christopher;;24-Jun-2025;;;;;;;;;;;;20m;80;85;;M4T;20250624 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\1_flights\RobOat\3D\;P:\PheNo\RobOat\1_flights\RobOat\3D\20250624 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\3D\20250624 RobOat M4T 20m 3D 80 85
+216;DJI_202506241032_005_25-Soldeling-MS-30m-80-85;Soldeling;Soldeling i Landbruk;MS;M3M-2;Kristoffer;old;24-Jun-2025;;;;Uneven clouds;;;;;;;;30m;80;85;;M3M-2;20250624 Soldeling M3M-2 30m MS 80 85;P:\PheNo\Soldeling\1_flights\Soldeling\MS\;P:\PheNo\Soldeling\1_flights\Soldeling\MS\20250624 Soldeling M3M-2 30m MS 80 85;P:\PheNo\Soldeling\2_1_pix4d\Soldeling\MS\20250624 Soldeling M3M-2 30m MS 80 85
+217;DJI_202506241219_021_25-RobOat-30m-Thermal-80-85;RobOat;RobOat;Thermal;M4T;Christopher;new+extra;24-Jun-2025;;;;Uneven clouds;;;;;;;;30m;80;85;;M4T;20250624 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\1_flights\RobOat\Thermal\;P:\PheNo\RobOat\1_flights\RobOat\Thermal\20250624 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\Thermal\20250624 RobOat M4T 30m Thermal 80 85
+218;DJI_202506240954_002_25-DLTFarming-MS-20m-85-80;RyeGrass;DLT-Farming;MS;M3M-1;Ivar;new+extra;24-Jun-2025;;;;Uneven clouds;;;;;;;;20m;85;80;;M3M-1;20250624 RyeGrass M3M-1 20m MS 85 80;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250624 RyeGrass M3M-1 20m MS 85 80;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250624 RyeGrass M3M-1 20m MS 85 80
+219;DJI_202506240954_003_25-ProBarVoll-MS-20m-80-80;ProBarVoll;ProteinBar - Vollebekk;MS;M3M_1;Ivar;new+extra;24-Jun-2025;;;;Uneven clouds;;;;;;;;20m;80;80;;M3M_1;20250624 ProBarVoll M3M_1 20m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\20250624 ProBarVoll M3M_1 20m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\MS\20250624 ProBarVoll M3M_1 20m MS 80 80
+220;DJI_202506241146_006_25-SmartWheatGram-MS-30m-80-80;SmartWheatGram;SmartWheat - Graminor;MS;M3M_1;Ivar;new+extra;24-Jun-2025;;;;Uneven clouds;;;;;;;;30m;80;80;;M3M_1;20250624 SmartWheatGram M3M_1 30m MS 80 80;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\20250624 SmartWheatGram M3M_1 30m MS 80 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\MS\20250624 SmartWheatGram M3M_1 30m MS 80 80
+221;DJI_202506241146_007_25-SmartWheatBox-MS-20m-85-80;SmartWheatBox;SmartWheat - DroughtBOX;MS;M3M_1;Ivar;new+extra;24-Jun-2025;;;;Uneven clouds;;;;;;;;20m;85;80;;M3M_1;20250624 SmartWheatBox M3M_1 20m MS 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\20250624 SmartWheatBox M3M_1 20m MS 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\MS\20250624 SmartWheatBox M3M_1 20m MS 85 80
+222;DJI_202506241256_025_25-DiversityOats-Oblique-20m-75-70;DiversityOats;DiversityOats;3D;M4T;Christopher;;24-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250624 DiversityOats M4T 20m 3D 75 70;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\;P:\PheNo\DiversityOats\1_flights\DiversityOats\3D\20250624 DiversityOats M4T 20m 3D 75 70;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\3D\20250624 DiversityOats M4T 20m 3D 75 70
+223;DJI_202506241209_009_25-RobOat-12m-MS-85-80;RobOat;RobOat;MS;M3M_1;Ivar;new+extra;24-Jun-2025;;;;Uneven clouds;;;;;;;;12m;85;80;;M3M_1;20250624 RobOat M3M_1 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250624 RobOat M3M_1 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250624 RobOat M3M_1 12m MS 85 80
+224;DJI_202506240955_002_25-Søråsjordet-MS-30m-80-80;ProBarSørås;ProteinBar - Søråsjordet;MS;M3M-2;Kristoffer;Old;24-Jun-2025;;;;Uneven clouds;;;;;;;;30m;80;80;;M3M-2;20250624 ProBarSørås M3M-2 30m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\20250624 ProBarSørås M3M-2 30m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\MS\20250624 ProBarSørås M3M-2 30m MS 80 80
+225;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+226;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+227;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+228;DJI_202506241044_007_25-Pilot-30m-MS-70-75;ProBarPilot;Proteinbar - Pilot;MS;M3M-2;Kristoffer;Old;24-Jun-2025;;;;Uneven clouds;;;;;;;;30m;70;75;;M3M-2;20250624 ProBarPilot M3M-2 30m MS 70 75;P:\PheNo\ProteinBar\1_flights\ProBarPilot\MS\;P:\PheNo\ProteinBar\1_flights\ProBarPilot\MS\20250624 ProBarPilot M3M-2 30m MS 70 75;P:\PheNo\ProteinBar\2_1_pix4d\ProBarPilot\MS\20250624 ProBarPilot M3M-2 30m MS 70 75
+229;DJI_202506241103_009_25-E166-MS-30m-85-80;ProBarE166;Proteinbar - E166;MS;M3M-2;Kristoffer ;Old;24-Jun-2025;;;;Uneven clouds;;;;;;;;30m;85;80;;M3M-2;20250624 ProBarE166 M3M-2 30m MS 85 80;P:\PheNo\ProteinBar\1_flights\ProBarE166\MS\;P:\PheNo\ProteinBar\1_flights\ProBarE166\MS\20250624 ProBarE166 M3M-2 30m MS 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarE166\MS\20250624 ProBarE166 M3M-2 30m MS 85 80
+230;DJI_202506241103_010_25-E166-Oblique-20m-85-80;ProBarE166;Proteinbar - E166;3D;M4T;Kristoffer ;Old;24-Jun-2025;;;;Uneven clouds;;;;;;;;20m;85;80;;M4T;20250624 ProBarE166 M4T 20m 3D 85 80;P:\PheNo\ProteinBar\1_flights\ProBarE166\3D\;P:\PheNo\ProteinBar\1_flights\ProBarE166\3D\20250624 ProBarE166 M4T 20m 3D 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarE166\3D\20250624 ProBarE166 M4T 20m 3D 85 80
+231;DJI_202506241151_013_25-G2BOatFrontiers-MS-20m-85-80;G2BOatFrontiers;Gene2Bread;MS;M3M-2;Kristoffer;Old;24-Jun-2025;;;;Uneven clouds;;;;;;;;20m;85;80;;M3M-2;20250624 G2BOatFrontiers M3M-2 20m MS 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\20250624 G2BOatFrontiers M3M-2 20m MS 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\MS\20250624 G2BOatFrontiers M3M-2 20m MS 85 80
+232;DJI_202506241151_015_25-DiversityOats-MS-30m-85-80;DiversityOats;DiversityOats;MS;M3M-2;Kristoffer;Old;24-Jun-2025;;;;Uneven clouds;;;;;;;;30m;85;80;;M3M-2;20250624 DiversityOats M3M-2 30m MS 85 80;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\20250624 DiversityOats M3M-2 30m MS 85 80;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\MS\20250624 DiversityOats M3M-2 30m MS 85 80
+233;DJI_202506251219_002_25-RobOat-30m-Thermal-80-85;RobOat;RobOat;Thermal;M4T;Christopher;new+extra;25-Jun-2025;;;;;;;;;;;;30m;80;85;;M4T;20250625 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\1_flights\RobOat\Thermal\;P:\PheNo\RobOat\1_flights\RobOat\Thermal\20250625 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\Thermal\20250625 RobOat M4T 30m Thermal 80 85
+234;DJI_202506251219_004_25-RobOat-20m-Oblique-80-85;RobOat;RobOat;3D;M4T;Christopher;;25-Jun-2025;;;;;;;;;;;;20m;80;85;;M4T;20250625 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\1_flights\RobOat\3D\;P:\PheNo\RobOat\1_flights\RobOat\3D\20250625 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\3D\20250625 RobOat M4T 20m 3D 80 85
+235;DJI_202506251249_006_25-G2BOatFrontiers-Oblique-20m-75-70;G2BOatFrontiers;Gene2Bread;3D;M4T;Christopher;;25-Jun-2025;;;;;;;;;;;;20m;75;70;;M4T;20250625 G2BOatFrontiers M4T 20m 3D 75 70;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\3D\20250625 G2BOatFrontiers M4T 20m 3D 75 70;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\3D\20250625 G2BOatFrontiers M4T 20m 3D 75 70
+236;DJI_202506251202_002_25-RobOat-12m-MS-85-80;RobOat;RobOat;MS;M3M-2;Christopher;new+extra;25-Jun-2025;;;;;;;;;;;;12m;85;80;;M3M-2;20250625 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250625 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250625 RobOat M3M-2 12m MS 85 80
+237;DJI_202506261038_003_25-RobOat-30m-Thermal-80-85;RobOat;RobOat;Thermal;M4T;Ludvik;new;26-Jun-2025;10:58;11:01;;Overcast;;;;;;;;30m;80;85;6,533333333;M4T;20250626 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\1_flights\RobOat\Thermal\;P:\PheNo\RobOat\1_flights\RobOat\Thermal\20250626 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\Thermal\20250626 RobOat M4T 30m Thermal 80 85
+238;DJI_202506261038_001_25-RobOat-20m-Oblique-80-85;RobOat;RobOat;3D;M4T;Ludvik;;26-Jun-2025;10:40;10:48;;;;;;;;;;20m;80;85;6,333333333;M4T;20250626 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\1_flights\RobOat\3D\;P:\PheNo\RobOat\1_flights\RobOat\3D\20250626 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\3D\20250626 RobOat M4T 20m 3D 80 85
+239;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+240;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+241;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+242;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+243;DJI_202506260914_002_25-SmartWheatGram-MS-30m-80-80;SmartWheatGram;SmartWheat - Graminor;MS;M3M-2;Kristoffer;Old;26-Jun-2025;09:17;09:28;;Cloudy and windy;;;;;;;;30m;80;80;6,77;M3M-2;20250626 SmartWheatGram M3M-2 30m MS 80 80;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\20250626 SmartWheatGram M3M-2 30m MS 80 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\MS\20250626 SmartWheatGram M3M-2 30m MS 80 80
+244;DJI_202506260914_003_25-ProBarVoll-MS-20m-80-80;ProBarVoll;ProteinBar - Vollebekk;MS;M3M-2;Kristoffer;Old;26-Jun-2025;09:30;09:38;;Cloudy and windy;;;;;;;;20m;80;80;6,95;M3M-2;20250626 ProBarVoll M3M-2 20m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\20250626 ProBarVoll M3M-2 20m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\MS\20250626 ProBarVoll M3M-2 20m MS 80 80
+245;DJI_202506260940_006_25-SmartWheatBox-MS-20m-85-80;SmartWheatBox;SmartWheat - DroughtBOX;MS;M3M-2;Kristoffer;Old;26-Jun-2025;09:43;09:47;;Cloudy and windy;;;;;;;;20m;85;80;4,03;M3M-2;20250626 SmartWheatBox M3M-2 20m MS 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\20250626 SmartWheatBox M3M-2 20m MS 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\MS\20250626 SmartWheatBox M3M-2 20m MS 85 80
+246;DJI_202506260940_008_25-DLTFarming-MS-20m-85-80;RyeGrass;DLT-Farming;MS;M3M-2;Kristoffer;Old;26-Jun-2025;09:48;09:59;;Cloudy and windy;;;;;;;;20m;85;80;7,13;M3M-2;20250626 RyeGrass M3M-2 20m MS 85 80;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\;P:\PheNo\DLT-Farming\1_flights\RyeGrass\MS\20250626 RyeGrass M3M-2 20m MS 85 80;P:\PheNo\DLT-Farming\2_1_pix4d\RyeGrass\MS\20250626 RyeGrass M3M-2 20m MS 85 80
+247;DJI_202506260940_010_25-RobOat-12m-MS-85-80;RobOat;RobOat;MS;M3M-2;Kristoffer;Old;26-Jun-2025;10:00;10:13;;Changed battery, so two flights. Cloudy and windy;;;;;;;;12m;85;80;6,45;M3M-2;20250626 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250626 RobOat M3M-2 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250626 RobOat M3M-2 12m MS 85 80
+248;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+249;DJI_202506261030_014_25-DiversityOats-MS-30m-85-80;DiversityOats;DiversityOats;MS;M3M-2;Kristoffer;Old;26-Jun-2025;10:33;10:44;;Cloudy and windy;;;;;;;;30m;85;80;6,5;M3M-2;20250626 DiversityOats M3M-2 30m MS 85 80;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\;P:\PheNo\DiversityOats\1_flights\DiversityOats\MS\20250626 DiversityOats M3M-2 30m MS 85 80;P:\PheNo\DiversityOats\2_1_pix4d\DiversityOats\MS\20250626 DiversityOats M3M-2 30m MS 85 80
+250;DJI_202506261059_018_25-G2BOatFrontiers-MS-20m-85-80;G2BOatFrontiers;Gene2Bread;MS;M3M-2;Kristoffer;Old;26-Jun-2025;11:02;11:11;;Cloudy and windy;;;;;;;;20m;85;80;6,77;M3M-2;20250626 G2BOatFrontiers M3M-2 20m MS 85 80;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\;P:\PheNo\Gene2Bread\1_flights\G2BOatFrontiers\MS\20250626 G2BOatFrontiers M3M-2 20m MS 85 80;P:\PheNo\Gene2Bread\2_1_pix4d\G2BOatFrontiers\MS\20250626 G2BOatFrontiers M3M-2 20m MS 85 80
+251;DJI_202506260915_002_25-Soldeling-MS-30m-80-85;Soldeling;Soldeling i Landbruk;MS;M3M-1;Ivar;New;26-Jun-2025;09:17;09:23;;Cloudy;;;;;;;;30m;80;85;6,2;M3M-1;20250626 Soldeling M3M-1 30m MS 80 85;P:\PheNo\Soldeling\1_flights\Soldeling\MS\;P:\PheNo\Soldeling\1_flights\Soldeling\MS\20250626 Soldeling M3M-1 30m MS 80 85;P:\PheNo\Soldeling\2_1_pix4d\Soldeling\MS\20250626 Soldeling M3M-1 30m MS 80 85
+252;DJI_202506260915_003_25-E166-MS-30m-85-80;ProBarE166;Proteinbar - E166;MS;M3M-1;Ivar;New;26-Jun-2025;09:24;09:26;;Cloudy;;;;;;;;30m;85;80;5,5;M3M-1;20250626 ProBarE166 M3M-1 30m MS 85 80;P:\PheNo\ProteinBar\1_flights\ProBarE166\MS\;P:\PheNo\ProteinBar\1_flights\ProBarE166\MS\20250626 ProBarE166 M3M-1 30m MS 85 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarE166\MS\20250626 ProBarE166 M3M-1 30m MS 85 80
+253;DJI_202506260948_006_25-Pilot-30m-MS-70-75;ProBarPilot;Proteinbar - Pilot;MS;M3M-1;Ivar;New;26-Jun-2025;09:49;10:05;;Windy, could see the grass move in the pictures;;;;;;;;30m;70;75;5,2;M3M-1;20250626 ProBarPilot M3M-1 30m MS 70 75;P:\PheNo\ProteinBar\1_flights\ProBarPilot\MS\;P:\PheNo\ProteinBar\1_flights\ProBarPilot\MS\20250626 ProBarPilot M3M-1 30m MS 70 75;P:\PheNo\ProteinBar\2_1_pix4d\ProBarPilot\MS\20250626 ProBarPilot M3M-1 30m MS 70 75
+254;DJI_202506261023_009_25-Søråsjordet-MS-30m-80-80;ProBarSørås;ProteinBar - Søråsjordet;MS;M3M-1;Ivar;New;26-Jun-2025;10:28;10:44;;Uneven clouds, tried to stop when sunny, had to pause two or three times;;;;;;;;30m;80;80;5,166666667;M3M-1;20250626 ProBarSørås M3M-1 30m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\;P:\PheNo\ProteinBar\1_flights\ProBarSørås\MS\20250626 ProBarSørås M3M-1 30m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarSørås\MS\20250626 ProBarSørås M3M-1 30m MS 80 80
+255;DJI_202506271049_002_25-SmartWheatGram-MS-30m-80-80;SmartWheatGram;SmartWheat - Graminor;MS;M3M-1;Ivar;New;27-Jun-2025;10:51;11:02;;;;;;;;;;30m;80;80;6,766666667;M3M-1;20250627 SmartWheatGram M3M-1 30m MS 80 80;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\MS\20250627 SmartWheatGram M3M-1 30m MS 80 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\MS\20250627 SmartWheatGram M3M-1 30m MS 80 80
+256;DJI_202506271049_003_25-SmartWheatBox-MS-20m-85-80;SmartWheatBox;SmartWheat - DroughtBOX;MS;M3M-1;Ivar;New;27-Jun-2025;11:03;11:06;;;;;;;;;;20m;85;80;6,25;M3M-1;20250627 SmartWheatBox M3M-1 20m MS 85 80;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\;P:\PheNo\SmartWheat\1_flights\SmartWheatBox\MS\20250627 SmartWheatBox M3M-1 20m MS 85 80;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatBox\MS\20250627 SmartWheatBox M3M-1 20m MS 85 80
+257;DJI_202506271108_006_25-RobOat-12m-MS-85-80;RobOat;RobOat;MS;M3M-1;Ivar;New;27-Jun-2025;11:10;11:20;;;;;;;;;;12m;85;80;3,95;M3M-1;20250627 RobOat M3M-1 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250627 RobOat M3M-1 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250627 RobOat M3M-1 12m MS 85 80
+258;DJI_202506271140_001_25-RobOat-20m-Oblique-80-85;RobOat;RobOat;3D;M4T;Ivar;;27-Jun-2025;11:42;11:50;;;;;;;;;;20m;80;85;3,75;M4T;20250627 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\1_flights\RobOat\3D\;P:\PheNo\RobOat\1_flights\RobOat\3D\20250627 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\3D\20250627 RobOat M4T 20m 3D 80 85
+259;DJI_202506271140_003_25-RobOat-30m-Thermal-80-85;RobOat;RobOat;Thermal;M4T;Ivar;New;27-Jun-2025;11:52;11:55;;;;;;;;;;30m;80;85;5,85;M4T;20250627 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\1_flights\RobOat\Thermal\;P:\PheNo\RobOat\1_flights\RobOat\Thermal\20250627 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\Thermal\20250627 RobOat M4T 30m Thermal 80 85
+260;DJI_202506271214_005_25-SmartWheatGram-Oblique-20m-75-70;SmartWheatGram;SmartWheat - Graminor;3D;M4T;Ivar;;27-Jun-2025;12:16;12:30;;;;;;;;;;22m;75;70;7,7;M4T;20250627 SmartWheatGram M4T 22m 3D 75 70;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\;P:\PheNo\SmartWheat\1_flights\SmartWheatGram\3D\20250627 SmartWheatGram M4T 22m 3D 75 70;P:\PheNo\SmartWheat\2_1_pix4d\SmartWheatGram\3D\20250627 SmartWheatGram M4T 22m 3D 75 70
+261;DJI_202506281014_002_25-RobOat-12m-MS-85-80;RobOat;RobOat;MS;M3M-1;Ivar;New;28-Jun-2025;10:15;10:26;;Fully cloudy;;;;;;;;12m;85;80;2,966666667;M3M-1;20250628 RobOat M3M-1 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250628 RobOat M3M-1 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250628 RobOat M3M-1 12m MS 85 80
+262;DJI_202506280957_002_25-RobOat-30m-Thermal-80-85;RobOat;RobOat;Thermal;M4T;Ivar;New;28-Jun-2025;09:59;10:02;;Fully cloudy;;;;;;;;30m;80;85;3,3;M4T;20250628 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\1_flights\RobOat\Thermal\;P:\PheNo\RobOat\1_flights\RobOat\Thermal\20250628 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\Thermal\20250628 RobOat M4T 30m Thermal 80 85
+263;DJI_202506280957_003_25-RobOat-20m-Oblique-80-85;RobOat;RobOat;3D;M4T;Ivar;;28-Jun-2025;10:03;10:12;;Fully cloudy;;;;;;;;20m;80;85;4,833333333;M4T;20250628 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\1_flights\RobOat\3D\;P:\PheNo\RobOat\1_flights\RobOat\3D\20250628 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\3D\20250628 RobOat M4T 20m 3D 80 85
+264;DJI_202506291016_002_25-RobOat-12m-MS-85-80;RobOat;RobOat;MS;M3M-1;Ivar;New;29-Jun-2025;10:17;10:28;;;;;;;;;;12m;85;80;3,333333333;M3M-1;20250629 RobOat M3M-1 12m MS 85 80;P:\PheNo\RobOat\1_flights\RobOat\MS\;P:\PheNo\RobOat\1_flights\RobOat\MS\20250629 RobOat M3M-1 12m MS 85 80;P:\PheNo\RobOat\2_1_pix4d\RobOat\MS\20250629 RobOat M3M-1 12m MS 85 80
+265;DJI_202506291026_001_25-RobOat-20m-Oblique-80-85;RobOat;RobOat;3D;M4T;Ivar;;29-Jun-2025;10:28;10:37;;;;;;;;;;20m;80;85;3;M4T;20250629 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\1_flights\RobOat\3D\;P:\PheNo\RobOat\1_flights\RobOat\3D\20250629 RobOat M4T 20m 3D 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\3D\20250629 RobOat M4T 20m 3D 80 85
+266;DJI_202506291026_002_25-RobOat-30m-Thermal-80-85;RobOat;RobOat;Thermal;M4T;Ivar;New;29-Jun-2025;10:37;10:41;;;;;;;;;;30m;80;85;4,766666667;M4T;20250629 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\1_flights\RobOat\Thermal\;P:\PheNo\RobOat\1_flights\RobOat\Thermal\20250629 RobOat M4T 30m Thermal 80 85;P:\PheNo\RobOat\2_1_pix4d\RobOat\Thermal\20250629 RobOat M4T 30m Thermal 80 85
+267;DJI_202506301040_003_25-Pilot-30m-MS-70-75;ProBarPilot;Proteinbar - Pilot;MS;M3M-1;Jørgen;Old;30-Jun-2025;10:44;11:00;;;;;;;;;;30m;70;75;;M3M-1;20250630 ProBarPilot M3M-1 30m MS 70 75;P:\PheNo\ProteinBar\1_flights\ProBarPilot\MS\;P:\PheNo\ProteinBar\1_flights\ProBarPilot\MS\20250630 ProBarPilot M3M-1 30m MS 70 75;P:\PheNo\ProteinBar\2_1_pix4d\ProBarPilot\MS\20250630 ProBarPilot M3M-1 30m MS 70 75
+268;DJI_202506301101_005_25-Soldeling-MS-30m-80-85;Soldeling;Soldeling i Landbruk;MS;M3M-1;Jørgen;Old;30-Jun-2025;11:07;11:13;;;;;;;;;;30m;80;85;;M3M-1;yyyy0630 Soldeling M3M-1 30m MS 80 85;P:\PheNo\Soldeling\1_flights\Soldeling\MS\;P:\PheNo\Soldeling\1_flights\Soldeling\MS\yyyy0630 Soldeling M3M-1 30m MS 80 85;P:\PheNo\Soldeling\2_1_pix4d\Soldeling\MS\yyyy0630 Soldeling M3M-1 30m MS 80 85
+269;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+270;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+271;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+272;DJI_202506301024_004_25-ProBarVoll-MS-20m-80-80;ProBarVoll;ProteinBar - Vollebekk;MS;;;;30-Jun-2025;;;;;;;;;;;;20m;80;80;;0;yyyy0630 ProBarVoll 0 20m MS 80 80;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\;P:\PheNo\ProteinBar\1_flights\ProBarVoll\MS\yyyy0630 ProBarVoll 0 20m MS 80 80;P:\PheNo\ProteinBar\2_1_pix4d\ProBarVoll\MS\yyyy0630 ProBarVoll 0 20m MS 80 80
+273;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+274;;;;;;;;;c;;;;;;;;;;;;;;;;;;;
+275;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+276;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+277;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+278;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+279;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+280;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+281;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+282;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+283;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+284;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+285;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+286;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+287;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+288;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+289;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+290;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+291;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+292;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+293;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+294;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+295;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+296;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+297;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+298;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+299;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+300;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+301;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+302;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+303;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+304;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+305;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+306;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+307;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+308;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+309;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+310;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+311;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+312;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+313;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+314;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+315;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+316;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+317;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+318;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+319;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+320;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+321;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+322;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+323;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+324;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+325;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+326;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+327;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+328;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+329;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+330;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+331;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+332;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+333;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+334;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+335;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+336;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+337;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+338;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+339;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+340;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+341;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+342;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+343;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+344;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+345;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+346;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+347;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+348;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+349;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+350;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+351;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+352;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+353;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+354;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+355;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+356;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+357;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+358;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+359;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+360;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+361;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+362;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+363;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+364;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+365;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+366;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+367;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+368;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+369;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+370;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+371;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+372;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+373;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+374;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+375;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+376;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+377;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+378;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+379;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+380;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+381;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+382;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+383;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+384;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+385;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+386;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+387;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+388;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+389;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+390;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+391;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+392;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+393;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+394;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+395;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+396;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+397;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+398;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+399;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+400;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+401;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+402;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+403;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+404;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+405;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+406;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+407;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+408;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+409;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+410;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+411;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+412;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+413;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+414;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+415;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+416;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+417;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+418;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+419;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+420;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+421;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+422;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+423;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+424;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+425;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+426;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+427;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+428;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+429;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+430;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+431;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+432;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+433;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+434;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+435;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+436;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+437;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+438;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+439;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+440;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+441;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+442;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+443;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+444;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+445;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+446;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+447;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+448;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+449;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+450;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+451;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+452;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+453;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+454;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+455;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+456;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+457;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+458;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+459;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+460;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+461;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+462;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+463;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+464;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+465;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+466;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+467;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+468;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+469;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+470;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+471;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+472;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+473;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+474;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+475;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+476;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+477;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+478;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+479;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+480;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+481;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+482;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+483;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+484;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+485;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+486;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+487;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+488;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+489;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+490;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+491;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+492;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+493;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+494;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+495;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+496;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+497;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+498;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+499;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+500;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+501;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+502;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+503;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+504;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+505;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+506;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+507;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+508;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+509;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+510;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+511;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+512;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+513;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+514;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+515;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+516;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+517;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+518;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+519;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+520;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+521;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+522;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+523;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+524;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+525;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+526;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+527;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+528;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+529;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+530;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+531;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+532;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+533;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+534;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+535;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+536;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+537;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+538;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+539;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+540;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+541;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+542;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+543;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+544;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+545;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+546;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+547;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+548;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+549;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+550;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+551;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+552;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+553;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+554;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+555;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+556;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+557;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+558;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+559;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+560;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+561;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+562;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+563;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+564;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+565;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+566;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+567;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+568;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+569;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+570;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+571;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+572;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+573;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+574;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+575;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+576;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+577;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+578;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+579;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+580;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+581;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+582;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+583;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+584;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+585;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+586;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+587;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+588;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+589;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+590;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+591;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+592;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+593;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+594;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+595;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+596;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+597;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+598;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+599;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+600;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+601;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+602;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+603;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+604;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+605;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+606;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+607;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+608;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+609;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+610;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+611;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+612;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+613;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+614;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+615;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+616;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+617;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+618;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+619;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+620;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+621;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+622;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+623;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+624;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+625;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+626;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+627;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+628;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+629;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+630;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+631;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+632;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+633;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+634;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+635;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+636;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+637;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+638;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+639;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+640;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+641;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+642;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+643;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+644;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+645;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+646;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+647;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+648;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+649;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+650;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+651;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+652;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+653;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+654;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+655;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+656;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+657;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+658;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+659;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+660;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+661;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+662;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+663;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+664;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+665;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+666;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+667;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+668;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+669;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+670;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+671;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+672;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+673;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+674;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+675;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+676;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+677;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+678;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+679;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+680;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+681;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+682;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+683;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+684;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+685;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+686;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+687;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+688;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+689;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+690;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+691;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+692;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+693;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+694;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+695;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+696;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+697;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+698;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+699;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+700;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+701;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+702;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+703;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+704;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+705;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+706;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+707;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+708;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+709;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+710;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+711;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+712;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+713;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+714;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+715;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+716;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+717;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+718;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+719;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+720;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+721;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+722;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+723;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+724;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+725;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+726;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+727;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+728;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+729;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+730;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+731;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;
