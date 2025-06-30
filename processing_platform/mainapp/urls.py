@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     path('', views.home_view, name='home'),
     path('sd-card/', views.sd_card_view, name='sd_card'),
+    path('review_drone_flights/', views.review_drone_flights, name='review_drone_flights'),
     
     
 ]

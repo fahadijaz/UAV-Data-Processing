@@ -1,0 +1,89 @@
+{% extends "mainapp/base.html" %}
+<!-- Sep -->
+{% block title %}Review Drone Flights{% endblock %}
+<!-- Sep -->
+{% block content %}
+
+<h2 class="text-2xl font-semibold mb-4">Review Drone Flights</h2>
+
+<form action="/action_page.php">
+  <label for="field">Field:</label>
+  <select id="field" name="field">
+    <option value="all">All</option>
+    <option value="volvo">Volvo</option>
+    <option value="saab">Saab</option>
+    <option value="fiat">Fiat</option>
+    <option value="audi">Audi</option>
+  </select>
+  <br /><br />
+
+  <label for="flight_type">Flight Type:</label>
+  <select id="flight_type" name="flight_type">
+    <option value="all">All</option>
+    <option value="ms">MS</option>
+    <option value="thermal">Thermal</option>
+    <option value="3d">3D</option>
+  </select>
+  <br /><br />
+
+  <label for="drone_pilot">Drone Pilot:</label>
+  <select id="drone_pilot" name="drone_pilot">
+    <option value="all">All</option>
+    <option value="ivar">Ivar</option>
+    <option value="frederic">Frederic</option>
+    <option value="christopher">Christopher</option>
+    <option value="kristoffer">Kristoffer</option>
+    <option value="jorgen">Jorgen</option>
+    <option value="ludvik">Ludvik</option>
+    <option value="fahad">Fahad</option>
+  </select>
+  <br /><br />
+
+  <label for="date_from">Date From:</label>
+  <input type="date" id="date_from" name="date_from" />
+  <br /><br />
+
+  <label for="date_to">Date To:</label>
+  <input type="date" id="date_to" name="date_to" />
+  <br /><br />
+
+  <input type="submit" value="Submit" />
+</form>
+
+<br /><br />
+<br /><br />
+
+<style>
+  table,
+  th,
+  td {
+    border: 1px solid black;
+  }
+</style>
+<table style="width: 100%">
+  <tr>
+    <th>Field</th>
+    <th>Date</th>
+    <th>Image Type</th>
+    <th>Drone Pilot</th>
+    <th>Processing Status</th>
+    <th>Coordinates Correct?</th>
+  </tr>
+  <tr>
+    <td>RobOat</td>
+    <td>30/06/2025</td>
+    <td>MS</td>
+    <td>Ivar</td>
+    <td>NOT Completed</td>
+    <td>YES</td>
+  </tr>
+  <tr>
+    <td>SmartWheatGram</td>
+    <td>31/06/2025</td>
+    <td>3D</td>
+    <td>Frederic</td>
+    <td>Completed</td>
+    <td>YES</td>
+  </tr>
+</table>
+{%endblock%}

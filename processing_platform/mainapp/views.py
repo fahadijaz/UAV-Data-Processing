@@ -8,3 +8,5 @@ def sd_card_view(request):
     sd_cards = detect_sd_cards()
     return render(request, 'mainapp/sd_card.html', {'sd_cards': sd_cards})
 
+def review_drone_flights(request):
+    return render(request, 'mainapp/review_drone_flights.html')
