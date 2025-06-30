@@ -10,10 +10,17 @@
   <label for="field">Field:</label>
   <select id="field" name="field">
     <option value="all">All</option>
-    <option value="volvo">Volvo</option>
-    <option value="saab">Saab</option>
-    <option value="fiat">Fiat</option>
-    <option value="audi">Audi</option>
+    <option value="g2b_oat_frontiers">G2BOatFrontiers</option>
+    <option value="pro_bar_e166">ProBarE166</option>
+    <option value="pro_bar_pilot">ProBarPilot</option>
+    <option value="pro_bar_soraas">ProBarSoraas</option>
+    <option value="pro_bar_voll">ProBarVoll</option>
+    <option value="rob_oat">RobOat</option>
+    <option value="smart_wheat_box">SmartWheatBox</option>
+    <option value="smart_wheat_gram">SmartWheatGram</option>
+    <option value="smart_wheat_tunnel">SmartWheatTunnel</option>
+    <option value="soldeling">Soldeling</option>
+    <option value="vollebekk">Vollebekk</option>
   </select>
   <br /><br />
 
@@ -46,6 +53,12 @@
   <label for="date_to">Date To:</label>
   <input type="date" id="date_to" name="date_to" />
   <br /><br />
+
+  <script>
+    // Get today's date in YYYY-MM-DD format
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("date_to").value = today;
+  </script>
 
   <input type="submit" value="Submit" />
 </form>
