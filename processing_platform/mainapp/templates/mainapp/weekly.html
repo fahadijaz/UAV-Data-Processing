@@ -2,42 +2,53 @@
 {% block title %}Weekly Status{% endblock %}
 
 {% block content %}
-<h2 class="text-xl font-bold mb-4">
+<div class="mb-4 flex justify-between items-center">
+  <div class="space-x-2">
+    <a href="{% url 'weekly_with_offset' week_offset|add:'-4' %}" class="bg-gray-200 px-3 py-1 rounded">« 4 weeks</a>
+    <a href="{% url 'weekly_with_offset' week_offset|add:'-1' %}" class="bg-gray-200 px-3 py-1 rounded">« 1 week</a>
+    <a href="{% url 'weekly' %}" class="bg-blue-200 px-3 py-1 rounded">Today</a>
+  </div>
+
+  <h2 class="text-xl font-bold text-center">
     Week {{ week_num }}: {{ start_date|date:"M d" }} – {{ end_date|date:"M d" }}
   </h2>
-  
-  <table class="w-full border-collapse text-sm">
-    <thead>
-      <tr class="bg-gray-300 text-left">
-        <th class="p-2">Field</th>
-        <th class="p-2">Type</th>
-        <th class="p-2">Flown?</th>
-        <th class="p-2">Processed?</th>
-      </tr>
-    </thead>
-    <tbody>
-        {% for flight in flights %}
-          <tr
-            class="border
-              {% if flight.status_level == 0 %}
-                bg-red-200 border-red-300
-              {% elif flight.status_level == 1 %}
-                bg-orange-200 border-orange-300
-              {% else %}
-                bg-green-200 border-green-300
-              {% endif %}">
-            <td class="p-2 font-semibold">{{ flight.field }}</td>
-            <td class="p-2">{{ flight.type }}</td>
-            <td class="p-2">
-              {% if flight.flown %}complete{% else %}not completed{% endif %}
-            </td>
-            <td class="p-2">
-              {% if flight.processed %}complete{% else %}not completed{% endif %}
-            </td>
-          </tr>
-        {% endfor %}
-      </tbody>
-  </table>
-  
-  
+
+  <div class="space-x-2">
+    <a href="{% url 'weekly_with_offset' week_offset|add:'1' %}" class="bg-gray-200 px-3 py-1 rounded">+1 week »</a>
+    <a href="{% url 'weekly_with_offset' week_offset|add:'4' %}" class="bg-gray-200 px-3 py-1 rounded">+4 weeks »</a>
+  </div>
+</div>
+
+<table class="w-full border-collapse text-sm">
+  <thead>
+    <tr class="bg-gray-300 text-left">
+      <th class="p-2">Field</th>
+      <th class="p-2">Type</th>
+      <th class="p-2">Flown?</th>
+      <th class="p-2">Processed?</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for flight in flights %}
+    <tr
+      class="border
+        {% if flight.status_level == 0 %}
+          bg-red-200 border-red-300
+        {% elif flight.status_level == 1 %}
+          bg-orange-200 border-orange-300
+        {% else %}
+          bg-green-200 border-green-300
+        {% endif %}">
+      <td class="p-2 font-semibold">{{ flight.field }}</td>
+      <td class="p-2">{{ flight.type }}</td>
+      <td class="p-2">
+        {% if flight.flown %}complete{% else %}not completed{% endif %}
+      </td>
+      <td class="p-2">
+        {% if flight.processed %}complete{% else %}not completed{% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
 {% endblock %}

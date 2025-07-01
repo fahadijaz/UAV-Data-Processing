@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 from . import views
 
 urlpatterns = [
@@ -7,6 +7,7 @@ urlpatterns = [
     path('review_drone_flights/', views.review_drone_flights, name='review_drone_flights'),
     path("read-csv/", views.read_local_csv),
     path('weekly/', views.weekly_view, name='weekly'),
+    re_path(r"^weekly/(?P<week_offset>-?\d+)/$", views.weekly_view, name="weekly_with_offset"),
     path('details/', views.details_view, name='details'),
     path('add-routes/', views.add_routes_view, name='add_routes'),
 ]

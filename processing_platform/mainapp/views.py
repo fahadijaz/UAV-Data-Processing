@@ -119,8 +119,6 @@ def add_routes_view(request):
 
 def flight_events(request):
     events = []
-
-
     for flight in Flight.objects.all():
         color = "#00cc66" if flight.flown else "#ff6666"  # green if flown, red if not
         title = f"{flight.title} - {flight.pilot.name if flight.pilot else 'Unassigned'}"
@@ -139,40 +137,26 @@ def flight_events(request):
     return JsonResponse(events, safe=False)
 
 def folder_exists_for_week(base_path, start_date, end_date):
-    if not os.path.exists(base_path):
-        return False
-    
-    try:
-        for name in os.listdir(base_path):
-            if len(name) >= 8 and name[:8].isdigit():
-                try:
-                    folder_date = datetime.datetime.strptime(name[:8], "%Y%m%d").date()
-                    if start_date <= folder_date <= end_date:
-                        return True
-                except ValueError:
-                    continue
-    except PermissionError:
-        return False
-    
-    return False
+    return os.path.exists(base_path)
 
+def weekly_view(request, week_offset=0):
+    week_offset = int(week_offset)
 
-def weekly_view(request):
     csv_path = os.path.join(settings.BASE_DIR, 'mainapp', 'data', 'flight_list.csv')
     all_flights = []
 
-    # Get current week range
+    # Calculate the week's date range based on offset
     today = datetime.date.today()
-    start_of_week = today - datetime.timedelta(days=today.weekday())
+    start_of_week = today - datetime.timedelta(days=today.weekday()) + datetime.timedelta(weeks=week_offset)
     end_of_week = start_of_week + datetime.timedelta(days=6)
-    week_num = today.isocalendar()[1]
+    week_num = start_of_week.isocalendar()[1]
 
+    # Read and process CSV
     with open(csv_path, newline='') as csvfile:
         reader = csv.DictReader(csvfile, delimiter=';')
         for row in reader:
             field_name = row["Field folder name"].strip()
             flight_type = row["Type of flight"].strip()
-
             flown_path = row["1_flight path"].strip()
             processed_path = row["2_1_pix4d path"].strip()
 
@@ -200,7 +184,8 @@ def weekly_view(request):
         "flights": all_flights,
         "week_num": week_num,
         "start_date": start_of_week,
-        "end_date": end_of_week
+        "end_date": end_of_week,
+        "week_offset": week_offset
     }
 
     return render(request, "mainapp/weekly.html", context)
