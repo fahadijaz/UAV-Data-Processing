@@ -1,48 +1,31 @@
 {% extends "mainapp/base.html" %}
-<!-- Sep -->
 {% block title %}Review Drone Flights{% endblock %}
-<!-- Sep -->
 {% block content %}
 
 <h2 class="text-2xl font-semibold mb-4">Review Drone Flights</h2>
 
-<form action="/action_page.php">
+<form action="{% url 'review_drone_flights' %}" method="get">
   <label for="field">Field:</label>
   <select id="field" name="field">
-    <option value="all">All</option>
-    <option value="g2b_oat_frontiers">G2BOatFrontiers</option>
-    <option value="pro_bar_e166">ProBarE166</option>
-    <option value="pro_bar_pilot">ProBarPilot</option>
-    <option value="pro_bar_soraas">ProBarSoraas</option>
-    <option value="pro_bar_voll">ProBarVoll</option>
-    <option value="rob_oat">RobOat</option>
-    <option value="smart_wheat_box">SmartWheatBox</option>
-    <option value="smart_wheat_gram">SmartWheatGram</option>
-    <option value="smart_wheat_tunnel">SmartWheatTunnel</option>
-    <option value="soldeling">Soldeling</option>
-    <option value="vollebekk">Vollebekk</option>
+    {% for field in fields %}
+      <option value="{{ field.value }}">{{ field.label }}</option>
+    {% endfor %}
   </select>
   <br /><br />
 
   <label for="flight_type">Flight Type:</label>
   <select id="flight_type" name="flight_type">
-    <option value="all">All</option>
-    <option value="ms">MS</option>
-    <option value="thermal">Thermal</option>
-    <option value="3d">3D</option>
+    {% for ft in flight_types %}
+      <option value="{{ ft.value }}">{{ ft.label }}</option>
+    {% endfor %}
   </select>
   <br /><br />
 
   <label for="drone_pilot">Drone Pilot:</label>
   <select id="drone_pilot" name="drone_pilot">
-    <option value="all">All</option>
-    <option value="ivar">Ivar</option>
-    <option value="frederic">Frederic</option>
-    <option value="christopher">Christopher</option>
-    <option value="kristoffer">Kristoffer</option>
-    <option value="jorgen">Jorgen</option>
-    <option value="ludvik">Ludvik</option>
-    <option value="fahad">Fahad</option>
+    {% for pilot in drone_pilots %}
+      <option value="{{ pilot.value }}">{{ pilot.label }}</option>
+    {% endfor %}
   </select>
   <br /><br />
 
@@ -55,24 +38,40 @@
   <br /><br />
 
   <script>
-    // Get today's date in YYYY-MM-DD format
     const today = new Date().toISOString().split("T")[0];
     document.getElementById("date_to").value = today;
+
+    document.querySelector("form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const field = document.getElementById("field").value;
+      const flightType = document.getElementById("flight_type").value;
+      const dronePilot = document.getElementById("drone_pilot").value;
+      const dateFrom = document.getElementById("date_from").value;
+      const dateTo = document.getElementById("date_to").value;
+
+      console.log("Selected values:");
+      console.log("Field:", field);
+      console.log("Flight Type:", flightType);
+      console.log("Drone Pilot:", dronePilot);
+      console.log("Date From:", dateFrom);
+      console.log("Date To:", dateTo);
+
+      this.submit(); // Allow actual submission
+    });
   </script>
 
   <input type="submit" value="Submit" />
 </form>
 
 <br /><br />
-<br /><br />
 
 <style>
-  table,
-  th,
-  td {
+  table, th, td {
     border: 1px solid black;
   }
 </style>
+
 <table style="width: 100%">
   <tr>
     <th>Field</th>
@@ -82,21 +81,18 @@
     <th>Processing Status</th>
     <th>Coordinates Correct?</th>
   </tr>
-  <tr>
-    <td>RobOat</td>
-    <td>30/06/2025</td>
-    <td>MS</td>
-    <td>Ivar</td>
-    <td>NOT Completed</td>
-    <td>YES</td>
-  </tr>
-  <tr>
-    <td>SmartWheatGram</td>
-    <td>31/06/2025</td>
-    <td>3D</td>
-    <td>Frederic</td>
-    <td>Completed</td>
-    <td>YES</td>
-  </tr>
+  {% for flight in flights %}
+    <tr>
+      <td>{{ flight.field }}</td>
+      <td>{{ flight.date }}</td>
+      <td>{{ flight.image_type }}</td>
+      <td>{{ flight.drone_pilot }}</td>
+      <td>{{ flight.processing_status }}</td>
+      <td>{{ flight.coordinates_correct }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6">No flights found.</td></tr>
+  {% endfor %}
 </table>
-{%endblock%}
+
+{% endblock %}
