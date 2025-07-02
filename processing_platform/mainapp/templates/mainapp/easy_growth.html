@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <title>EASY GROWTH</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Sensor-grafer</h1>
+
+    {% if error %}
+        <p style="color:red;">{{ error }}</p>
+    {% endif %}
+
+    {% for graph in graphs %}
+        <h3>{{ graph.label }}</h3>
+        <canvas id="chart_{{ graph.label }}" width="400" height="200"></canvas>
+        <script>
+            new Chart(document.getElementById("chart_{{ graph.label }}"), {
+                type: 'line',
+                data: {
+                    labels: {{ labels|safe }},
+                    datasets: [{
+                        label: '{{ graph.label }}',
+                        data: {{ graph.data|safe }},
+                        borderWidth: 2,
+                        fill: false,
+                        tension: 0.3
+                    }]
+                }
+            });
+        </script>
+    {% endfor %}
+</body>
+</html>
