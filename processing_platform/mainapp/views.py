@@ -39,8 +39,13 @@ def flight_events(request):
         })
     return JsonResponse(events, safe=False)
 
-def parse_date(datestr):
-    return datetime.datetime.strptime(datestr, "%d-%b-%Y").date()
+def parse_date_from_foldername(foldername):
+    parts = foldername.split('_')
+    if len(parts) < 2:
+        raise ValueError(f"Unexpected foldername format: {foldername}")
+    ts = parts[1]
+    date_part = ts[:8]
+    return datetime.datetime.strptime(date_part, "%Y%m%d").date()
 
 def weekly_view(request, week_offset=0):
     week_offset = int(week_offset)
@@ -51,17 +56,18 @@ def weekly_view(request, week_offset=0):
     end_of_week   = start_of_week + datetime.timedelta(days=6)
     week_num      = start_of_week.isocalendar()[1]
 
-    log_csv = os.path.join(settings.BASE_DIR,'mainapp', 'data', 'Flight_log.csv')
-
+    log_csv = os.path.join(settings.BASE_DIR,
+                           'mainapp', 'data', 'Flight_log.csv')
     flown_folders    = set()
     processed_folders = set()
 
     with open(log_csv, newline='') as logfile:
         reader = csv.DictReader(logfile, delimiter=';')
         for row in reader:
+            foldername = row["Foldername"].strip()
             try:
-                flight_date = parse_date(row["Flight Date"].strip())
-            except (ValueError, KeyError):
+                flight_date = parse_date_from_foldername(foldername)
+            except Exception:
                 continue
 
             if not (start_of_week <= flight_date <= end_of_week):
@@ -70,14 +76,16 @@ def weekly_view(request, week_offset=0):
             raw_folder   = row["Flight path"].strip()
             pix4d_folder = row["Pix4D path"].strip()
 
-            if os.path.isdir(raw_folder):
+            if raw_folder:
                 flown_folders.add(raw_folder)
-            if os.path.isdir(pix4d_folder):
+
+            if pix4d_folder and os.path.isdir(pix4d_folder):
                 processed_folders.add(pix4d_folder)
 
-    schedule_csv = os.path.join(settings.BASE_DIR,'mainapp', 'data', 'flight_list.csv')
-
+    schedule_csv = os.path.join(settings.BASE_DIR,
+                                'mainapp', 'data', 'flight_list.csv')
     all_flights = []
+
     with open(schedule_csv, newline='') as schedfile:
         reader = csv.DictReader(schedfile, delimiter=';')
         for row in reader:
@@ -86,8 +94,8 @@ def weekly_view(request, week_offset=0):
             flown_path     = row["1_flight path"].strip()
             processed_path = row["2_1_pix4d path"].strip()
 
-            flown     = (flown_path    in flown_folders)
-            processed = (processed_path in processed_folders)
+            flown    = flown_path    in flown_folders
+            processed = processed_path in processed_folders
 
             if not flown:
                 status_level = 0   # red
@@ -106,11 +114,10 @@ def weekly_view(request, week_offset=0):
 
     all_flights.sort(key=lambda x: x["status_level"])
 
-    context = {
+    return render(request, "mainapp/weekly.html", {
         "flights":     all_flights,
         "week_num":    week_num,
         "start_date":  start_of_week,
         "end_date":    end_of_week,
         "week_offset": week_offset,
-    }
-    return render(request, "mainapp/weekly.html", context)
+    })
