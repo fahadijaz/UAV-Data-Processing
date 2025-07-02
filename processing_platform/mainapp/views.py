@@ -39,54 +39,62 @@ def flight_events(request):
         })
     return JsonResponse(events, safe=False)
 
-def folder_has_flight_in_week(base_path, start_date, end_date):
-    if not os.path.isdir(base_path):
-        return False
-
-    for root, dirs, files in os.walk(base_path):
-        for fn in files:
-            fp = os.path.join(root, fn)
-            try:
-                mtime = datetime.date.fromtimestamp(os.path.getmtime(fp))
-            except OSError:
-                continue
-
-            if start_date <= mtime <= end_date:
-                return True
-
-    return False
-
+def parse_date(datestr):
+    return datetime.datetime.strptime(datestr, "%d-%b-%Y").date()
 
 def weekly_view(request, week_offset=0):
-
     week_offset = int(week_offset)
 
-    csv_path = os.path.join(settings.BASE_DIR, 'mainapp', 'data', 'flight_list.csv')
-    all_flights = []
-
-    today = datetime.date.today()
-    start_of_week = today - datetime.timedelta(days=today.weekday()) + datetime.timedelta(weeks=week_offset)
+    today         = datetime.date.today()
+    start_of_week = today - datetime.timedelta(days=today.weekday()) \
+                    + datetime.timedelta(weeks=week_offset)
     end_of_week   = start_of_week + datetime.timedelta(days=6)
     week_num      = start_of_week.isocalendar()[1]
 
-    # Read the flight list CSV
-    with open(csv_path, newline='') as csvfile:
-        reader = csv.DictReader(csvfile, delimiter=';')
-        for row in reader:
-            field_name      = row["Field folder name"].strip()
-            flight_type     = row["Type of flight"].strip()
-            flown_path      = row["1_flight path"].strip()
-            processed_path  = row["2_1_pix4d path"].strip()
+    log_csv = os.path.join(settings.BASE_DIR,'mainapp', 'data', 'Flight_log.csv')
 
-            flown     = folder_has_flight_in_week(flown_path,     start_of_week, end_of_week)
-            processed = folder_has_flight_in_week(processed_path, start_of_week, end_of_week)
+    flown_folders    = set()
+    processed_folders = set()
+
+    with open(log_csv, newline='') as logfile:
+        reader = csv.DictReader(logfile, delimiter=';')
+        for row in reader:
+            try:
+                flight_date = parse_date(row["Flight Date"].strip())
+            except (ValueError, KeyError):
+                continue
+
+            if not (start_of_week <= flight_date <= end_of_week):
+                continue
+
+            raw_folder   = row["Flight path"].strip()
+            pix4d_folder = row["Pix4D path"].strip()
+
+            if os.path.isdir(raw_folder):
+                flown_folders.add(raw_folder)
+            if os.path.isdir(pix4d_folder):
+                processed_folders.add(pix4d_folder)
+
+    schedule_csv = os.path.join(settings.BASE_DIR,'mainapp', 'data', 'flight_list.csv')
+
+    all_flights = []
+    with open(schedule_csv, newline='') as schedfile:
+        reader = csv.DictReader(schedfile, delimiter=';')
+        for row in reader:
+            field_name     = row["Field folder name"].strip()
+            flight_type    = row["Type of flight"].strip()
+            flown_path     = row["1_flight path"].strip()
+            processed_path = row["2_1_pix4d path"].strip()
+
+            flown     = (flown_path    in flown_folders)
+            processed = (processed_path in processed_folders)
 
             if not flown:
-                status_level = 0  # red: no flight data
+                status_level = 0   # red
             elif not processed:
-                status_level = 1  # orange: flight flown but not processed
+                status_level = 1   # orange
             else:
-                status_level = 2  # green: flown & processed
+                status_level = 2   # green
 
             all_flights.append({
                 "field":        field_name,
