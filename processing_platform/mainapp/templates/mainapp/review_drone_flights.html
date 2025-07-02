@@ -84,7 +84,8 @@
   {% for flight in flights %}
     <tr>
       <td>{{ flight.field }}</td>
-      {# <td>{{ flight.date }}</td> #}
+      <td>{{ flight.date_display }}</td>
+      {# <td>NaN</td> #}
       <td>{{ flight.image_type }}</td>
       <td>{{ flight.drone_pilot }}</td>
       <td>{{ flight.processing_status }}</td>

@@ -57,6 +57,7 @@ def review_drone_flights(request):
             df_renamed = pd.DataFrame()
             df_renamed['field'] = df['Flight Field ID']
             df_renamed['date'] = pd.to_datetime(df['Flight Date'])
+            df_renamed['date_display'] = pd.to_datetime(df['Flight Date']).dt.strftime('%B %d, %Y')
             df_renamed['image_type'] = df['Route type (MS, 3D, Thermal, RGB)']
             df_renamed['drone_pilot'] = df['Drone Pilot']
             df_renamed['processing_status'] = df['P4D Processing']
