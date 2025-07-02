@@ -1,0 +1,99 @@
+{% extends "mainapp/base.html" %}
+{% block title %}Review Drone Flights{% endblock %}
+{% block content %}
+
+<h2 class="text-2xl font-semibold mb-4">Review Drone Flights</h2>
+
+<form action="{% url 'review_drone_flights' %}" method="get">
+  <label for="field">Field:</label>
+  <select id="field" name="field">
+    {% for field in fields %}
+      <option value="{{ field.value }}">{{ field.label }}</option>
+    {% endfor %}
+  </select>
+  <br /><br />
+
+  <label for="flight_type">Flight Type:</label>
+  <select id="flight_type" name="flight_type">
+    {% for ft in flight_types %}
+      <option value="{{ ft.value }}">{{ ft.label }}</option>
+    {% endfor %}
+  </select>
+  <br /><br />
+
+  <label for="drone_pilot">Drone Pilot:</label>
+  <select id="drone_pilot" name="drone_pilot">
+    {% for pilot in drone_pilots %}
+      <option value="{{ pilot.value }}">{{ pilot.label }}</option>
+    {% endfor %}
+  </select>
+  <br /><br />
+
+  <label for="date_from">Date From:</label>
+  <input type="date" id="date_from" name="date_from" />
+  <br /><br />
+
+  <label for="date_to">Date To:</label>
+  <input type="date" id="date_to" name="date_to" />
+  <br /><br />
+
+  <script>
+    const today = new Date().toISOString().split("T")[0];
+    document.getElementById("date_to").value = today;
+
+    document.querySelector("form").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const field = document.getElementById("field").value;
+      const flightType = document.getElementById("flight_type").value;
+      const dronePilot = document.getElementById("drone_pilot").value;
+      const dateFrom = document.getElementById("date_from").value;
+      const dateTo = document.getElementById("date_to").value;
+
+      console.log("Selected values:");
+      console.log("Field:", field);
+      console.log("Flight Type:", flightType);
+      console.log("Drone Pilot:", dronePilot);
+      console.log("Date From:", dateFrom);
+      console.log("Date To:", dateTo);
+
+      this.submit(); // Allow actual submission
+    });
+  </script>
+
+  <input type="submit" value="Submit" />
+</form>
+
+<br /><br />
+
+<style>
+  table, th, td {
+    border: 1px solid black;
+  }
+</style>
+
+<table style="width: 100%">
+  <tr>
+    <th>Field</th>
+    <th>Date</th>
+    <th>Image Type</th>
+    <th>Drone Pilot</th>
+    <th>Processing Status</th>
+    <th>Coordinates Correct?</th>
+  </tr>
+  {% for flight in flights %}
+    <tr>
+      <td>{{ flight.field }}</td>
+      <td>{{ flight.date_display }}</td>
+      {# <td>NaN</td> #}
+      <td>{{ flight.image_type }}</td>
+      <td>{{ flight.drone_pilot }}</td>
+      <td>{{ flight.processing_status }}</td>
+      <td>{{ flight.coordinates_correct }}</td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="6">No flights found.</td></tr>
+  {% endfor %}
+</table>
+
+{% endblock %}
