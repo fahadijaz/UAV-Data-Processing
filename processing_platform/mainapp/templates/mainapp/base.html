@@ -6,8 +6,6 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex">
-
-  <!-- Sidebar -->
   <nav class="w-64 bg-white shadow-lg h-screen p-6 space-y-4">
     <h1 class="text-2xl font-bold text-gray-800 mb-8">UAV Data Processing</h1>
 
@@ -16,13 +14,15 @@
       <li><a href="{% url 'sd_card' %}" class="block hover:text-blue-600">Add flights</a></li>
       <li><a href="{% url 'review_drone_flights' %}" class="block hover:text-blue-600">Review Drone Flights</a></li>
       <!-- Add more links here -->
+      <li><a href="{% url 'weekly' %}" class="block hover:text-blue-600">Weekly Overview</a></li>
+      <li><a href="{% url 'sd_card' %}" class="block hover:text-blue-600">Upload SD-card</a></li>
+      <li><a href="{% url 'details' %}" class="block hover:text-blue-600">Flight Details</a></li>
+      <li><a href="{% url 'add_routes' %}" class="block hover:text-blue-600">Add routes</a></li>
     </ul>
   </nav>
 
-  <!-- Main Content -->
   <main class="flex-1 p-8">
     {% block content %}
-    <!-- Child templates fill this in -->
     {% endblock %}
   </main>
 
