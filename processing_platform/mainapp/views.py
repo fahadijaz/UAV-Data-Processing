@@ -25,6 +25,8 @@ def easy_growth_view(request):
     then plots the data given the datestamp into different small plots.
     """
     try:
+        selected_sensor = request.GET.get("sensor")
+        # needs to get the api! send selected_sensor as parameter
         response = requests.get("url!!!")
         response.raise_for_status()
         data = response.json()
