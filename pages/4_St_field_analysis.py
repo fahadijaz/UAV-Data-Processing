@@ -1,3 +1,10 @@
+import sys
+import os
+# Ensuring the project root is in the correct path
+current_dir = os.path.dirname(__file__)
+parent_dir = os.path.abspath(os.path.join(current_dir, '..'))
+sys.path.append(parent_dir)
+
 import streamlit as st
 import pandas as pd
 from modules.flight_log_preprocessing import preprocessing
@@ -7,13 +14,14 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import math
 
+
 df_flight_log, df_flight_routes, df_fields, df_flight_log_merged, df_processing_status = preprocessing()
 
 #df_flight_log_merged
 
 flight_log_selection = df_flight_log_merged.copy()
 
-qgis_folder_path = "D:/PhenoCrop/3_qgis"
+qgis_folder_path = "24PROBARG20_Vollebekk_2024.xlsx"
 
 # Reading the excel files (these are test files)
 #df0 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240607 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
@@ -24,6 +32,8 @@ qgis_folder_path = "D:/PhenoCrop/3_qgis"
 #df5 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240708 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
 #df6 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240806 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
 #df7 = pd.DataFrame(pd.read_csv("P:/PhenoCrop/Test_Folder/Test_SINDRE/Phenocrop_M3MS_boxplot/data/20240812 PRO_BAR_VOLL M3M 30m MS 80 85.csv"))
+df = pd.read_excel("24PROBARG20_Vollebekk_2024.xlsx")
+print(df)
 
 # Returns a list of paths to the qgis result files and a list of their dates
 def get_qgis_results(qgis_folder_path, selected_field):
@@ -210,15 +220,6 @@ def display_statistics_boxplot():
             # plt.legend(frameon=False, fontsize=15, loc='lower left')
             # add_cosmetics(xlabel='Flights', ylabel='Index value')
             # # ============================================================================================================================ #
-
-
-
-
-
-
-
-
-
 
             # Showing the plot in the correct cell of the grid
             row, col = get_grid_position(idx, 2)
