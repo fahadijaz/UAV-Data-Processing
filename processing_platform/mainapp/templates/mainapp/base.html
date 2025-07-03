@@ -6,17 +6,31 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex">
-  <nav class="w-64 bg-white shadow-lg h-screen p-6 space-y-4">
-    <h1 class="text-2xl font-bold text-gray-800 mb-8">UAV Data Processing</h1>
-
-    <ul class="space-y-3 text-gray-700 font-medium">
-      <li><a href="{% url 'home' %}" class="block hover:text-blue-600">Overview</a></li>
-      <li><a href="{% url 'weekly' %}" class="block hover:text-blue-600">Weekly Overview</a></li>
-      <li><a href="{% url 'sd_card' %}" class="block hover:text-blue-600">Upload SD-card</a></li>
-      <li><a href="{% url 'details' %}" class="block hover:text-blue-600">Flight Details</a></li>
-      <li><a href="{% url 'add_routes' %}" class="block hover:text-blue-600">Add routes</a></li>
-    </ul>
+  <nav class="w-64 bg-white shadow-lg h-screen p-6 flex flex-col">
+    <div>
+      <h1 class="text-2xl font-bold text-gray-800 mb-8">UAV Data Processing</h1>
+      <ul class="space-y-3 text-gray-700 font-medium">
+        <li><a href="{% url 'home' %}" class="block hover:text-blue-600">Overview</a></li>
+        <li><a href="{% url 'weekly' %}" class="block hover:text-blue-600">Weekly Overview</a></li>
+        <li><a href="{% url 'sd_card' %}" class="block hover:text-blue-600">Upload SD-card</a></li>
+        <li><a href="{% url 'details' %}" class="block hover:text-blue-600">Flight Details</a></li>
+        <li><a href="{% url 'add_routes' %}" class="block hover:text-blue-600">Add routes</a></li>
+      </ul>
+    </div>
+  
+    {% if request.user.is_superuser %}
+      <div class="mt-auto">
+        <a
+          href="{% url 'admin_panel' %}"
+          class="w-full block text-center bg-red-600 text-white font-semibold py-2 rounded hover:bg-red-700 transition"
+        >
+          Admin panel
+        </a>
+      </div>
+    {% endif %}
   </nav>
+  
+    
 
   <main class="flex-1 p-8">
     {% block content %}

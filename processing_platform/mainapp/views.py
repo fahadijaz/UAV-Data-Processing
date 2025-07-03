@@ -1,10 +1,38 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .sd_card import detect_sd_cards
 from .models import Flight
 from django.conf import settings
 import os
 import csv
 import datetime
+from django.shortcuts import render, redirect
+from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required, user_passes_test
+from .forms import AdminUserCreationForm
+
+User = get_user_model()
+
+def superuser_required(view_func):
+    return login_required(
+        user_passes_test(lambda u: u.is_superuser, login_url='login')(view_func)
+    )
+
+@superuser_required
+def admin_panel(request):
+    users = User.objects.all().order_by('username')
+
+    if request.method == 'POST':
+        form = AdminUserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('admin_panel')
+    else:
+        form = AdminUserCreationForm()
+
+    return render(request, 'admin/admin_panel.html', {
+        'users': users,
+        'form': form,
+    })
 
 
 def home_view(request):
