@@ -15,6 +15,9 @@ def sd_card_view(request):
     sd_cards = detect_sd_cards()
     return render(request, 'mainapp/sd_card.html', {'sd_cards': sd_cards})
 
+def data_visualisation_view(request):
+    return render(request, 'mainapp/data_visualisation.html')
+
 df = pd.read_csv("~/Downloads/Drone_Flying_Schedule_2025.csv")
 print(df.columns)  # See what columns actually exist
 
