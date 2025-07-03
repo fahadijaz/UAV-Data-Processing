@@ -3,10 +3,15 @@ from .sd_card import detect_sd_cards
 import os
 import pandas as pd
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_not_required
 from .models import Flight
 from django.conf import settings
 import csv
 import datetime
+
+@login_not_required
+def health(request):
+    return JsonResponse({"ok": True})
 
 def home_view(request):
     return render(request, 'mainapp/home.html')

@@ -1,2 +1,3 @@
 __pycache__
 processing_platform/mainapp/data
+processing_platform/.env.processing
