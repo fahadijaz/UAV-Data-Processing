@@ -1,0 +1,49 @@
+{% extends "mainapp/base.html" %}
+<!--Test-->
+{% block title %}Weekly Flight Status{% endblock %} {% block content %}
+
+
+<h2 class="text-xl font-bold mb-4">
+  Week {{ week_num }}: {{ start_date|date:"M d" }} – {{ end_date|date:"M d" }}
+</h2>
+
+<div class="mb-4 flex gap-4">
+  <a
+    href="?week_offset={{ week_offset|add:"-1" }}"
+    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded"
+  >
+    ← Previous Week
+  </a>
+
+{% if not is_current_week %}
+  <a href="?week_offset={{ week_offset|add:"1" }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded">Next Week →</a>
+{% endif %}
+</div>
+
+<table class="w-full border-collapse text-sm">
+  <thead>
+    <tr class="bg-gray-300 text-left">
+      <th class="p-2">Field</th>
+      <th class="p-2">Flight Type</th>
+      <th class="p-2">Flown?</th>
+      <th class="p-2">Processed?</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for entry in fields_status %}
+    <tr
+      class="border {% if entry.status_level == 0 %} bg-red-100 border-red-300 {% elif entry.status_level == 1 %} bg-yellow-100 border-yellow-300 {% else %} bg-green-100 border-green-300 {% endif %}"
+    >
+      <td class="p-2 font-medium">{{ entry.field }}</td>
+      <td class="p-2">{{ entry.type }}</td>
+      <td class="p-2">
+        {% if entry.flown %} ✅ Yes {% else %} ❌ No {% endif %}
+      </td>
+      <td class="p-2">
+        {% if entry.processed %} ✅ Yes {% else %} ❌ No {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

@@ -88,6 +88,44 @@ class Flight_Log(models.Model):
     p4d_path = models.CharField(max_length=200, null=True, blank=True)
 
 
+class Fields(models.Model):
+    YES_NO_CHOICES = [
+        ("Yes", "Yes"),
+        ("No", "No"),
+    ]
+    project = models.CharField(max_length=100, null=True, blank=True)
+    short_id = models.CharField(max_length=100, null=True, blank=True)
+    long_id = models.CharField(max_length=100, null=True, blank=True)
+    crop = models.CharField(max_length=100, null=True, blank=True)
+    location_of_field_plot = models.CharField(max_length=100, null=True, blank=True)
+    multispectral = models.CharField(
+        max_length=100, choices=YES_NO_CHOICES, null=True, blank=True
+    )
+    three_dimensional = models.CharField(
+        max_length=100, choices=YES_NO_CHOICES, null=True, blank=True
+    )
+    thermal = models.CharField(
+        max_length=100, choices=YES_NO_CHOICES, null=True, blank=True
+    )
+    rgb = models.CharField(
+        max_length=100, choices=YES_NO_CHOICES, null=True, blank=True
+    )
+    flying_frequency = models.CharField(max_length=100, null=True, blank=True)
+    start_date = models.DateField(null=True, blank=True)
+    end_date = models.DateField(null=True, blank=True)
+    submission_id = models.CharField(max_length=100, null=True, blank=True)
+    created_at = models.CharField(max_length=100, null=True, blank=True)
+    name = models.CharField(max_length=100, null=True, blank=True)
+    department = models.CharField(max_length=100, null=True, blank=True)
+    email = models.CharField(max_length=100, null=True, blank=True)
+    project_number = models.CharField(max_length=100, null=True, blank=True)
+    description = models.CharField(max_length=300, null=True, blank=True)
+    data_delivery_method = models.CharField(max_length=100, null=True, blank=True)
+    vollebekk_responsible = models.CharField(max_length=100, null=True, blank=True)
+    sowing_date = models.CharField(max_length=100, null=True, blank=True)
+    measuring_ground_level = models.CharField(max_length=100, null=True, blank=True)
+
+
 class Pilot(models.Model):
     name = models.CharField(max_length=100)
 

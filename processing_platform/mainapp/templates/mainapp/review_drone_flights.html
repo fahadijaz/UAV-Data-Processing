@@ -8,7 +8,7 @@
   <label for="field">Field:</label>
   <select id="field" name="field">
     {% for field in fields %}
-      <option value="{{ field.value }}">{{ field.label }}</option>
+      <option value="{{ field.value }}" {% if field.value == selected_field %}selected{% endif %}>{{ field.label }}</option>
     {% endfor %}
   </select>
   <br /><br />
@@ -16,7 +16,7 @@
   <label for="flight_type">Flight Type:</label>
   <select id="flight_type" name="flight_type">
     {% for ft in flight_types %}
-      <option value="{{ ft.value }}">{{ ft.label }}</option>
+      <option value="{{ ft.value }}" {% if ft.value == selected_flight_type %}selected{% endif %}>{{ ft.label }}</option>
     {% endfor %}
   </select>
   <br /><br />
@@ -24,40 +24,28 @@
   <label for="drone_pilot">Drone Pilot:</label>
   <select id="drone_pilot" name="drone_pilot">
     {% for pilot in drone_pilots %}
-      <option value="{{ pilot.value }}">{{ pilot.label }}</option>
+      <option value="{{ pilot.value }}" {% if pilot.value == selected_drone_pilot %}selected{% endif %}>{{ pilot.label }}</option>
     {% endfor %}
   </select>
   <br /><br />
 
   <label for="date_from">Date From:</label>
-  <input type="date" id="date_from" name="date_from" />
+  <input type="date" id="date_from" name="date_from" value="{{ selected_date_from }}">
   <br /><br />
 
   <label for="date_to">Date To:</label>
-  <input type="date" id="date_to" name="date_to" />
+  <input type="date" id="date_to" name="date_to" value="{{ selected_date_to }}">
   <br /><br />
 
   <script>
     const today = new Date().toISOString().split("T")[0];
-    document.getElementById("date_to").value = today;
+    if (!document.getElementById("date_to").value) {
+      document.getElementById("date_to").value = today;
+    }
 
     document.querySelector("form").addEventListener("submit", function (e) {
       e.preventDefault();
-
-      const field = document.getElementById("field").value;
-      const flightType = document.getElementById("flight_type").value;
-      const dronePilot = document.getElementById("drone_pilot").value;
-      const dateFrom = document.getElementById("date_from").value;
-      const dateTo = document.getElementById("date_to").value;
-
-      console.log("Selected values:");
-      console.log("Field:", field);
-      console.log("Flight Type:", flightType);
-      console.log("Drone Pilot:", dronePilot);
-      console.log("Date From:", dateFrom);
-      console.log("Date To:", dateTo);
-
-      this.submit(); // Allow actual submission
+      this.submit();
     });
   </script>
 
@@ -69,6 +57,16 @@
 <style>
   table, th, td {
     border: 1px solid black;
+    border-collapse: collapse;
+    padding: 8px;
+  }
+
+  tr.clickable-row {
+    cursor: pointer;
+  }
+
+  tr.clickable-row:hover {
+    background-color: #f0f0f0;
   }
 </style>
 
@@ -82,7 +80,7 @@
     <th>Coordinates Correct?</th>
   </tr>
   {% for flight in flights %}
-    <tr>
+    <tr class="clickable-row" data-href="{% url 'flight_detail' flight.id %}">
       <td>{{ flight.field }}</td>
       <td>{{ flight.date_display }}</td>
       <td>{{ flight.image_type }}</td>
@@ -94,5 +92,16 @@
     <tr><td colspan="6">No flights found.</td></tr>
   {% endfor %}
 </table>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const rows = document.querySelectorAll("tr.clickable-row");
+    rows.forEach(row => {
+      row.addEventListener("click", () => {
+        window.location.href = row.dataset.href;
+      });
+    });
+  });
+</script>
 
 {% endblock %}

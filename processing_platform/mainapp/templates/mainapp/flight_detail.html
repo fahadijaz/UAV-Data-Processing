@@ -1,0 +1,50 @@
+{% extends "mainapp/base.html" %}
+<!--test-->
+{% block title %}Flight Detail{% endblock %}
+<!--test-->
+{% block content %}
+
+<h2 class="text-2xl font-bold mb-6">Flight Detail</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <!-- Flight Log Table -->
+  <div>
+    <h3 class="text-xl font-semibold mb-2">Flight_Log Data</h3>
+    <table class="min-w-full border-collapse border border-gray-300 w-full">
+      <tbody>
+        {% for name, value in flight_fields %}
+        <tr class="border border-gray-300">
+          <td class="p-2 font-semibold bg-gray-100">{{ name }}</td>
+          <td class="p-2">{{ value }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Fields Table -->
+  <div>
+    <h3 class="text-xl font-semibold mb-2">Field Info (from Fields model)</h3>
+    {% if field_fields %}
+    <table class="min-w-full border-collapse border border-gray-300 w-full">
+      <tbody>
+        {% for name, value in field_fields %}
+        <tr class="border border-gray-300">
+          <td class="p-2 font-semibold bg-gray-100">{{ name }}</td>
+          <td class="p-2">{{ value }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="text-gray-600">No matching field info found.</p>
+    {% endif %}
+  </div>
+</div>
+
+<br />
+<a href="{% url 'review_drone_flights' %}" class="text-blue-600 hover:underline"
+  >← Back to flight list</a
+>
+
+{% endblock %}

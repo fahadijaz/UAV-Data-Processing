@@ -1,20 +1,92 @@
 import csv
 import datetime
 import os
+from datetime import date, timedelta
 
 import pandas as pd
 from django.conf import settings
 from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils.dateparse import parse_date
+from django.utils.timezone import now
 
-from .models import Flight, Flight_Log
+from .models import Fields, Flight, Flight_Log
 from .sd_card import detect_sd_cards
 
 
 def home_view(request):
     return render(request, "mainapp/home.html")
+
+
+FIELD_FLIGHT_MODES = {
+    "G2BOatFrontiers": ["3D", "MS"],
+    "ProBarE166": ["3D", "MS"],
+    "ProBarPilot": ["3D", "MS"],
+    "ProBarSørås": ["3D", "MS"],
+    "ProBarVoll": ["3D", "MS"],
+    "RobOat": ["Thermal", "3D", "MS"],
+    "SmartWheatBox": ["Thermal", "3D", "MS", "RGB"],
+    "SmartWheatGram": ["Thermal", "3D", "MS"],
+    "SmartWheatTunnel": ["Thermal", "3D", "MS", "RGB"],
+    "Soldeling": ["Thermal", "3D", "MS"],
+    "Vollebekk": ["RGB"],
+}
+
+
+def get_current_week_dates():
+    today = date.today()
+    monday = today - timedelta(days=today.weekday())  # Monday
+    sunday = monday + timedelta(days=6)
+    return monday, sunday
+
+
+def weekly_overview(request):
+    week_offset = int(request.GET.get("week_offset", 0))
+
+    base_date = date.today() + timedelta(weeks=week_offset)
+    start_date = base_date - timedelta(days=base_date.weekday())
+    end_date = start_date + timedelta(days=6)
+    week_num = start_date.isocalendar().week
+
+    fields_status = []
+
+    for field, flight_types in FIELD_FLIGHT_MODES.items():
+        for flight_type in flight_types:
+            logs = Flight_Log.objects.filter(
+                flight_field_id=field,
+                flight_type=flight_type,
+                flight_date__range=(start_date, end_date),
+            )
+
+            flown = logs.exists()
+            processed = logs.filter(p4d_processing="Yes").exists()
+
+            status_level = 2 if flown and processed else 1 if flown else 0
+
+            fields_status.append(
+                {
+                    "field": field,
+                    "type": flight_type,
+                    "flown": flown,
+                    "processed": processed,
+                    "status_level": status_level,
+                }
+            )
+
+    # ✅ Add this line:
+    is_current_week = week_offset == 0
+
+    context = {
+        "week_num": week_num,
+        "start_date": start_date,
+        "end_date": end_date,
+        "fields_status": fields_status,
+        "week_offset": week_offset,
+        "is_current_week": is_current_week,  # 🔥 This enables your template check!
+    }
+
+    return render(request, "mainapp/weekly_overview.html", context)
 
 
 def sd_card_view(request):
@@ -87,6 +159,7 @@ def review_drone_flights(request):
 
         flights.append(
             {
+                "id": flight.id,
                 "field": flight.flight_field_id,
                 "date": flight_date_obj,
                 "date_display": (
@@ -131,6 +204,34 @@ def review_drone_flights(request):
     }
 
     return render(request, "mainapp/review_drone_flights.html", context)
+
+
+def flight_detail(request, flight_id):
+    flight = get_object_or_404(Flight_Log, id=flight_id)
+
+    # Flight_Log fields
+    flight_fields = []
+    for field in flight._meta.fields:
+        name = field.verbose_name.title()
+        value = field.value_from_object(flight)
+        flight_fields.append((name, value))
+
+    # Try to fetch related Fields instance by matching short_id
+    field_data = Fields.objects.filter(long_id=flight.flight_field_id).first()
+
+    field_fields = []
+    if field_data:
+        for field in field_data._meta.fields:
+            name = field.verbose_name.title()
+            value = field.value_from_object(field_data)
+            field_fields.append((name, value))
+
+    context = {
+        "flight": flight,
+        "flight_fields": flight_fields,
+        "field_fields": field_fields,
+    }
+    return render(request, "mainapp/flight_detail.html", context)
 
 
 def details_view(request):
