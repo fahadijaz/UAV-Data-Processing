@@ -55,3 +55,8 @@ class Command(BaseCommand):
                     "p4d_path": row.get("Pix4D path"),
                 },
             )
+
+            if created:
+                self.stdout.write(f"Created new record for {row.get('Foldername')}")
+            else:
+                self.stdout.write(f"Updated record for {row.get('Foldername')}")
