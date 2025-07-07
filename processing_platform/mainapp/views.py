@@ -12,7 +12,7 @@ from django.contrib import messages
 import logging
 
 from .models import Flight, Flight_Log
-from .sd_card import detect_sd_cards, parse_dji_filename
+from .sd_card import detect_sd_cards
 
 
 def home_view(request):
@@ -21,41 +21,41 @@ def home_view(request):
 
 logger = logging.getLogger(__name__)
 
+# hard-coded root where folders get moved
+BASE_OUTPUT = r"E:\PheNo"
+
 def sd_card_view(request):
     sd_cards = detect_sd_cards()
     logger.debug("sd_cards = %r", sd_cards)
 
     if request.method == "POST":
         sd_card_dcim = request.POST.get("sd_card")
-        logger.debug("User picked SD card: %r", sd_card_dcim)
+        logger.debug("User picked SD card DCIM path: %r", sd_card_dcim)
 
+        if not sd_card_dcim:
+            messages.error(request, "Please pick an SD-card.")
+            return redirect("sd_card")
+
+        os.makedirs(BASE_OUTPUT, exist_ok=True)
         moved = 0
-        for root, dirs, files in os.walk(sd_card_dcim):
-            logger.debug("Walking %r, %d files", root, len(files))
-            for fname in files:
-                if not fname.startswith("DJI_"):
-                    continue
-                src = os.path.join(root, fname)
-                logger.debug(" → considering %r", src)
 
-                try:
-                    dest_folder = parse_dji_filename(fname)
-                except Exception as e:
-                    logger.warning("   parse failed for %r: %s", fname, e)
-                    continue
+        # for each immediate subfolder in DCIM (e.g. DJI_XXX or 100MEDIA)
+        for sub in os.listdir(sd_card_dcim):
+            src_folder = os.path.join(sd_card_dcim, sub)
+            if not os.path.isdir(src_folder):
+                continue
 
-                dest = os.path.join(dest_folder, fname)
-                logger.debug("   will move to %r", dest)
+            dest_folder = os.path.join(BASE_OUTPUT, sub)
+            logger.debug("Moving folder %r → %r", src_folder, dest_folder)
+            try:
+                shutil.move(src_folder, dest_folder)
+                moved += 1
+            except Exception as e:
+                logger.error("Failed to move %r: %s", src_folder, e)
+                messages.error(request, f"Failed to move {sub}: {e}")
 
-                try:
-                    os.makedirs(dest_folder, exist_ok=True)
-                    shutil.move(src, dest)
-                    moved += 1
-                except Exception as e:
-                    logger.error("   move error %r → %r: %s", src, dest, e)
-
-        logger.info("Total moved: %d", moved)
-        messages.success(request, f"Moved {moved} files from {sd_card_dcim}.")
+        logger.info("Total folders moved: %d", moved)
+        messages.success(request, f"Moved {moved} folders into {BASE_OUTPUT}.")
         return redirect("sd_card")
 
     return render(request, "mainapp/sd_card.html", { "sd_cards": sd_cards })
