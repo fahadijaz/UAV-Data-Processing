@@ -18,6 +18,40 @@ def sd_card_view(request):
 def data_visualisation_view(request):
     return render(request, 'mainapp/data_visualisation.html')
 
+STAT_OPTIONS = [
+
+    ("cv", "Coefficient of Variation"),
+    ("iqr", "Interquartile Range"),
+    ("kurtosis", "Kurtosis"),
+    ("majority", "Majority"),
+    ("max", "Maximum"),
+    ("mean", "Mean"),
+    ("median", "Median"),
+    ("min", "Minimum"),
+    ("minority", "Minority"),
+    ("q25", "25th Percentile (Q1)"),
+    ("q75", "75th Percentile (Q3)"),
+    ("range", "Range (Max - Min)"),
+    ("std", "Standard Deviation"),
+    ("sum", "Sum"),
+    ("top_10", "Top 10 Values"),
+    ("top_10_mean", "Mean of Top 10 Values"),
+    ("skewness", "Skewness"),
+]
+
+def data_visualisation(request):
+    selected_stats = request.GET.getlist("stats")
+    selected_dates = request.GET.getlist("date")
+    date = request.GET.getlist("date")
+
+    plots = []
+    return render(request, "data_visualisation.html", {
+        "plots": plots,
+        "stat_options": STAT_OPTIONS,
+        "selected_stats": selected_stats,
+        "date": date,
+    })
+
 df = pd.read_csv("~/Downloads/Drone_Flying_Schedule_2025.csv")
 print(df.columns)  # See what columns actually exist
 

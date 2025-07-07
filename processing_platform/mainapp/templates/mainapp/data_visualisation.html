@@ -4,10 +4,17 @@
 
 {% block content %}
   <h2 class="text-2xl font-semibold mb-4">Data visualisation</h2>
-  <p class="mb-4">Select statistical values to plot by date</p>
+  <p class="mb-4">Select a date and one or more statistical values to plot</p>
 
   <form method="get" class="mb-22">
+    <!-- Date input-->
+    <label for="date" class="block font-medium">Select a date:</label>
+    <input type="date" name="date" id="date" class="border rounded p-2 mb-4 w-full md:w-1/2" value="{{ request.GET.date }}">
+
+    <!-- Stats selector-->
+    <label for="stats" class="block mb-2 font-medium">Select statistical values:</label>
     <select name="stats" multiple class="border rounded p-2 w-full md:w-1/2">
+      <option value="all">All</option>
       <option value="cv">	Coefficient of Variation</option>
       <option value="iqr">Interquartile Range</option>
       <option value="kurtosis">Kurtosis</option>
