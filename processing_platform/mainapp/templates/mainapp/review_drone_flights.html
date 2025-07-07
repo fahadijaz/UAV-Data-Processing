@@ -65,7 +65,7 @@
       </thead>
       <tbody>
         {% for flight in flights %}
-          <tr class="{% cycle 'bg-white' 'bg-gray-50' %} border-b border-gray-200 hover:bg-blue-50 transition-colors duration-150 cursor-pointer" data-href="{% url 'flight_detail' flight.id %}">
+          <tr class="clickable-row {% cycle 'bg-white' 'bg-gray-50' %} border-b border-gray-200 hover:bg-blue-50 transition-colors duration-150 cursor-pointer" data-href="{% url 'flight_detail' flight.id %}">
             <td class="px-6 py-4 font-medium text-gray-900 border-r border-gray-200">{{ flight.field }}</td>
             <td class="px-6 py-4 text-gray-700 border-r border-gray-200">{{ flight.date_display }}</td>
             <td class="px-6 py-4 text-gray-700 border-r border-gray-200">{{ flight.image_type }}</td>
@@ -92,33 +92,9 @@
     e.preventDefault();
     this.submit();
   });
-</style>
-
-<table style="width: 100%">
-  <tr>
-    <th>Field</th>
-    <th>Date</th>
-    <th>Image Type</th>
-    <th>Drone Pilot</th>
-    <th>Processing Status</th>
-    <th>Coordinates Correct?</th>
-  </tr>
-  {% for flight in flights %}
-    <tr>
-      <td>{{ flight.field }}</td>
-      <td>{{ flight.date_display }}</td>
-      <td>{{ flight.image_type }}</td>
-      <td>{{ flight.drone_pilot }}</td>
-      <td>{{ flight.processing_status }}</td>
-      <td>{{ flight.coordinates_correct }}</td>
-    </tr>
-  {% empty %}
-    <tr><td colspan="6">No flights found.</td></tr>
-  {% endfor %}
-</table>
 
   document.addEventListener("DOMContentLoaded", function () {
-    const rows = document.querySelectorAll("tr[data-href]");
+    const rows = document.querySelectorAll("tr.clickable-row");
     rows.forEach(row => {
       row.addEventListener("click", () => {
         window.location.href = row.dataset.href;
