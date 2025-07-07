@@ -57,6 +57,7 @@ class Flight_Log(models.Model):
     flight_date = models.DateField(null=True, blank=True)
     flight_start = models.CharField(max_length=100, null=True, blank=True)
     flight_endstart = models.CharField(max_length=100, null=True, blank=True)
+    flight_date = models.DateField(null=True, blank=True)
     flight_comments = models.CharField(max_length=200, null=True, blank=True)
 
     p4d_step1 = models.CharField(max_length=100, null=True, blank=True)
@@ -70,6 +71,8 @@ class Flight_Log(models.Model):
     p4d_processing = models.CharField(
         max_length=100, choices=YES_NO_CHOICES, null=True, blank=True
     )
+
+    p4d_processing = models.CharField()
     p4d_processing_done_by = models.CharField(
         max_length=20, choices=DRONE_PILOT_CHOICES, null=True, blank=True
     )
