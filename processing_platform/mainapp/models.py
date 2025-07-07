@@ -88,14 +88,35 @@ class Flight_Log(models.Model):
     p4d_path = models.CharField(max_length=200, null=True, blank=True)
 
 
-class Pilot(models.Model):
-    name = models.CharField(max_length=100)
+class Flight_Paths(models.Model):
+    record_number = models.IntegerField(db_column='#')
 
+    project = models.CharField(max_length=100)
+    short_id = models.CharField(max_length=50)
+    project_folder_name = models.CharField(max_length=255)
+    field_folder_name = models.CharField(max_length=255)
+    flight_path_name = models.CharField(max_length=255)
+    location_of_field_plot = models.CharField(max_length=255)
+    type_of_flight = models.CharField(max_length=100)
+    frequency = models.FloatField(null=True, blank=True)
+    drone_model = models.CharField(max_length=100)
+    flight_height = models.FloatField(null=True, blank=True)
+    flight_speed = models.FloatField(null=True, blank=True)
+    side_overlap = models.FloatField(null=True, blank=True)
+    front_overlap = models.FloatField(null=True, blank=True)
+    camera_angle = models.FloatField(null=True, blank=True)
+    flight_pattern = models.CharField(max_length=100, null=True, blank=True)
+    flight_path_angle = models.FloatField(null=True, blank=True)
 
-class Flight(models.Model):
-    title = models.CharField(max_length=200)
-    scheduled_time = models.DateTimeField()
-    end_time = models.DateTimeField()
-    flown = models.BooleanField(default=False)
-    pilot = models.ForeignKey(Pilot, on_delete=models.SET_NULL, null=True, blank=True)
-    frequency_days = models.IntegerField(default=7)  # e.g. should be flown every X days
+    ortho_gsd = models.FloatField(db_column='Ortho GSD', null=True, blank=True)
+    oblique_gsd = models.FloatField(db_column='Oblique GSD', null=True, blank=True)
+    flight_length = models.FloatField(null=True, blank=True)
+    ortho_gsd_pix4d = models.FloatField(db_column='Ortho GSD Pix4D', null=True, blank=True)
+    oblique_gsd_pix4d = models.FloatField(db_column='Oblique GSD Pix4D', null=True, blank=True)
+
+    first_flight_path = models.CharField(max_length=255, db_column='1_flight path')
+    pix4d_path = models.CharField(max_length=255, db_column='2_1_pix4d path')
+
+    class Meta:
+        db_table = 'flight_paths'
+

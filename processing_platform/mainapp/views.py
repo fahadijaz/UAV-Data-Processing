@@ -1,69 +1,125 @@
 import csv
 import datetime
 import os
-
+import re
 import pandas as pd
+import logging
+import shutil
+import datetime
+
 from django.conf import settings
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.dateparse import parse_date
 from django.contrib import messages
-import logging
-import shutil
 
-from .models import Flight, Flight_Log
+from .models import Flight_Log
 from .sd_card import detect_sd_cards
 
 
 def home_view(request):
     return render(request, "mainapp/home.html")
 
-
 logger = logging.getLogger(__name__)
 
-# hard-coded root where folders get moved
+# Base output root; ensure this is accessible on your system
 BASE_OUTPUT = r"E:\PheNo"
+
+# Regex to extract the Flight Path Name portion of an SD-card folder:
+#   e.g. "25-DiversityOats-MS-30m-85-80" or
+#         "DJI_202506241029_003_25-Pilot-Oblique-30m-70-75"
+FOLDER_RE = re.compile(r'''
+    ^(?:DJI_[0-9]{12}_[0-9]{3}_)?   # optional DJI_ prefix
+    (?P<flight_path>               # capture the core flight-path name
+      \d+-                         # record number and dash
+      [^-]+-                       # short_ID and dash
+      [^-]+-                       # flight pattern and dash
+      \d+m-                       # height (e.g. 30m) and dash
+      \d+-                        # side overlap and dash
+      \d+                         # front overlap
+    )
+    (?:\..*)?$                    # optional extension/suffix
+''', re.VERBOSE)
+
 
 def sd_card_view(request):
     sd_cards = detect_sd_cards()
-    logger.debug("sd_cards = %r", sd_cards)
 
-    if request.method == "POST":
-        sd_card_dcim = request.POST.get("sd_card")
-        logger.debug("User picked SD card DCIM path: %r", sd_card_dcim)
+    drone_models = (
+        Flight_Paths.objects
+        .order_by()
+        .values_list('drone_model', flat=True)
+        .distinct()
+    )
+
+    if request.method == 'POST':
+        sd_card_dcim = request.POST.get('sd_card')
+        selected_drone = request.POST.get('drone_model')
 
         if not sd_card_dcim:
-            messages.error(request, "Please pick an SD-card.")
-            return redirect("sd_card")
+            messages.error(request, "Please pick an SD card.")
+            return redirect('sd_card')
+        if not selected_drone:
+            messages.error(request, "Please select a drone model.")
+            return redirect('sd_card')
 
-        os.makedirs(BASE_OUTPUT, exist_ok=True)
         moved = 0
+        os.makedirs(BASE_OUTPUT, exist_ok=True)
 
-        # for each immediate subfolder in DCIM (e.g. DJI_XXX or 100MEDIA)
         for sub in os.listdir(sd_card_dcim):
-            src_folder = os.path.join(sd_card_dcim, sub)
-            if not os.path.isdir(src_folder):
+            src = os.path.join(sd_card_dcim, sub)
+            if not os.path.isdir(src):
                 continue
 
-            dest_folder = os.path.join(BASE_OUTPUT, sub)
-            logger.debug("Moving folder %r → %r", src_folder, dest_folder)
+            m = FOLDER_RE.match(sub)
+            if not m:
+                logger.warning("Skipping folder with unexpected name: %r", sub)
+                continue
+
+            flight_path_key = m.group('flight_path')
+
             try:
-                shutil.move(src_folder, dest_folder)
+                fp = Flight_Paths.objects.get(flight_path_name__startswith=flight_path_key)
+            except Flight_Paths.DoesNotExist:
+                logger.warning("No DB entry matching Flight Path Name %r", flight_path_key)
+                continue
+            except Flight_Paths.MultipleObjectsReturned:
+                logger.warning("Multiple entries match Flight Path Name %r", flight_path_key)
+                continue
+
+            # Construct a descriptive folder name: YYYYMMDD_ShortID_Drone_Type_Side;Front
+            today = date.today().strftime('%Y%m%d')
+            side = str(int(fp.side_overlap)) if fp.side_overlap is not None else ''
+            front = str(int(fp.front_overlap)) if fp.front_overlap is not None else ''
+            new_folder = f"{today}_{fp.short_id}_{selected_drone}_{fp.type_of_flight}_{side};{front}"
+
+            dest_root = fp.first_flight_path
+            if not dest_root:
+                logger.error("No first_flight_path defined for %r", fp.flight_path_name)
+                continue
+
+            dest = os.path.join(dest_root, new_folder)
+            os.makedirs(dest, exist_ok=True)
+
+            try:
+                shutil.move(src, dest)
                 moved += 1
-            except Exception as e:
-                logger.error("Failed to move %r: %s", src_folder, e)
-                messages.error(request, f"Failed to move {sub}: {e}")
+                logger.info("Moved %r → %r", src, dest)
+            except Exception as exc:
+                logger.error("Failed to move %r: %s", src, exc)
+                messages.error(request, f"Failed to move {sub}: {exc}")
 
-        logger.info("Total folders moved: %d", moved)
         messages.success(request, f"Moved {moved} folders into {BASE_OUTPUT}.")
-        return redirect("sd_card")
+        return redirect('sd_card')
 
-    return render(request, "mainapp/sd_card.html", { "sd_cards": sd_cards })
+    return render(request, 'mainapp/sd_card.html', {
+        'sd_cards': sd_cards,
+        'drone_models': drone_models,
+    })
 
 
 def read_local_csv(request):
-    # Replace <YourUsername> with your actual username or use os.path.expanduser
     downloads_path = os.path.expanduser("~/Downloads")
     csv_file_path = os.path.join(downloads_path, "Drone_Flying_Schedule_2025.csv")
 
