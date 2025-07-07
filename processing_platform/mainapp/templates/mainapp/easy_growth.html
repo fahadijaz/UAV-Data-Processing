@@ -38,4 +38,11 @@
             });
         </script>
     {% endfor %}
+    <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <label for="files">choose one or more files:</label>
+    <input type="file" name="files" multiple required><br><br>
+
+    <button type="submit">submit</button>
+    </form>
 {% endblock %}

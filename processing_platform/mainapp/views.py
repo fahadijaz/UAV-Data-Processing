@@ -9,14 +9,21 @@ from django.conf import settings
 import csv
 import datetime
 import requests
+from models import SensorReading, Sensor
 
 
 def home_view(request):
     return render(request, "mainapp/home.html")
 
 
-import requests
-from django.shortcuts import render
+def upload_easy_growth_data(request):
+    if request.method == "POST":
+        files = request.FILES.getlist("files")
+
+    for file in files:
+        sensor_field = file.name.split()[0]
+        decoded_lines = file.read().decode("utf-8").splitlines()
+        reader = list(csv.reader(decoded_lines))
 
 
 def easy_growth_view(request):
