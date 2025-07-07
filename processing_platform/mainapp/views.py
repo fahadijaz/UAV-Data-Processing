@@ -18,44 +18,46 @@ def home_view(request):
     return render(request, "mainapp/home.html")
 
 
+logger = logging.getLogger(__name__)
+
 def sd_card_view(request):
     sd_cards = detect_sd_cards()
+    logger.debug("sd_cards = %r", sd_cards)
 
     if request.method == "POST":
-        pilot      = request.POST["pilot"]
-        wind1      = request.POST["wind_speed1"]
-        wind2      = request.POST["wind_speed2"]
-        wind3      = request.POST["wind_speed3"]
-        comments   = request.POST.get("comments", "")
         sd_card_dcim = request.POST.get("sd_card")
-
-        if not sd_card_dcim:
-            messages.error(request, "Please pick an SD-card to upload from.")
-            return redirect("sd_card")
+        logger.debug("User picked SD card: %r", sd_card_dcim)
 
         moved = 0
         for root, dirs, files in os.walk(sd_card_dcim):
+            logger.debug("Walking %r, %d files", root, len(files))
             for fname in files:
                 if not fname.startswith("DJI_"):
                     continue
                 src = os.path.join(root, fname)
+                logger.debug(" → considering %r", src)
+
                 try:
                     dest_folder = parse_dji_filename(fname)
-                except ValueError as e:
-                    # skip unrecognized file
+                except Exception as e:
+                    logger.warning("   parse failed for %r: %s", fname, e)
                     continue
 
-                os.makedirs(dest_folder, exist_ok=True)
                 dest = os.path.join(dest_folder, fname)
-                shutil.move(src, dest)
-                moved += 1
+                logger.debug("   will move to %r", dest)
 
+                try:
+                    os.makedirs(dest_folder, exist_ok=True)
+                    shutil.move(src, dest)
+                    moved += 1
+                except Exception as e:
+                    logger.error("   move error %r → %r: %s", src, dest, e)
+
+        logger.info("Total moved: %d", moved)
         messages.success(request, f"Moved {moved} files from {sd_card_dcim}.")
         return redirect("sd_card")
 
-    return render(request, "mainapp/sd_card.html", {
-        "sd_cards": sd_cards,
-    })
+    return render(request, "mainapp/sd_card.html", { "sd_cards": sd_cards })
 
 
 def read_local_csv(request):
