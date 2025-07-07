@@ -8,6 +8,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.utils.dateparse import parse_date
+from django.contrib import messages
 
 from .models import Flight, Flight_Log
 from .sd_card import detect_sd_cards, parse_dji_filename
