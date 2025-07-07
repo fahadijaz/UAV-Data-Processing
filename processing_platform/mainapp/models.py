@@ -41,7 +41,7 @@ class Flight_Log(models.Model):
     flight_field_id = models.CharField(max_length=100, null=True, blank=True)
     project = models.CharField(max_length=100, null=True, blank=True)
     flight_type = models.CharField(
-        max_length=10, choices=FLIGHT_TYPE_CHOICES, null=True, blank=True
+        max_length=100, choices=FLIGHT_TYPE_CHOICES, null=True, blank=True
     )
 
     drone_type = models.CharField(
@@ -51,12 +51,12 @@ class Flight_Log(models.Model):
         max_length=20, choices=DRONE_PILOT_CHOICES, null=True, blank=True
     )
     reflectance_panel = models.CharField(
-        max_length=10, choices=REFLECTANCE_PANEL_CHOICES, null=True, blank=True
+        max_length=100, choices=REFLECTANCE_PANEL_CHOICES, null=True, blank=True
     )
 
     flight_date = models.DateField(null=True, blank=True)
-    flight_start = models.CharField(max_length=10, null=True, blank=True)
-    flight_endstart = models.CharField(max_length=10, null=True, blank=True)
+    flight_start = models.CharField(max_length=100, null=True, blank=True)
+    flight_endstart = models.CharField(max_length=100, null=True, blank=True)
     flight_comments = models.CharField(max_length=200, null=True, blank=True)
 
     p4d_step1 = models.CharField(max_length=100, null=True, blank=True)
@@ -64,11 +64,11 @@ class Flight_Log(models.Model):
         max_length=20, choices=DRONE_PILOT_CHOICES, null=True, blank=True
     )
     p4d_step1_workable_data = models.CharField(
-        max_length=10, choices=YES_NO_CHOICES, null=True, blank=True
+        max_length=100, choices=YES_NO_CHOICES, null=True, blank=True
     )
 
     p4d_processing = models.CharField(
-        max_length=10, choices=YES_NO_CHOICES, null=True, blank=True
+        max_length=100, choices=YES_NO_CHOICES, null=True, blank=True
     )
     p4d_processing_done_by = models.CharField(
         max_length=20, choices=DRONE_PILOT_CHOICES, null=True, blank=True
@@ -76,11 +76,11 @@ class Flight_Log(models.Model):
     p4d_processing_pc = models.CharField(max_length=100, null=True, blank=True)
     p4d_processing_comments = models.CharField(max_length=200, null=True, blank=True)
 
-    flight_height = models.CharField(max_length=10, null=True, blank=True)
-    flight_side_over = models.CharField(max_length=10, null=True, blank=True)
-    flight_front_over = models.CharField(max_length=10, null=True, blank=True)
-    flight_wind_speed = models.CharField(max_length=10, null=True, blank=True)
-    flight_drone_type = models.CharField(max_length=10, null=True, blank=True)
+    flight_height = models.CharField(max_length=100, null=True, blank=True)
+    flight_side_over = models.CharField(max_length=100, null=True, blank=True)
+    flight_front_over = models.CharField(max_length=100, null=True, blank=True)
+    flight_wind_speed = models.CharField(max_length=100, null=True, blank=True)
+    flight_drone_type = models.CharField(max_length=100, null=True, blank=True)
 
     new_folder_name = models.CharField(max_length=200, null=True, blank=True)
     root_folder = models.CharField(max_length=200, null=True, blank=True)
@@ -119,7 +119,7 @@ class Fields(models.Model):
     department = models.CharField(max_length=100, null=True, blank=True)
     email = models.CharField(max_length=100, null=True, blank=True)
     project_number = models.CharField(max_length=100, null=True, blank=True)
-    description = models.CharField(max_length=300, null=True, blank=True)
+    description = models.CharField(max_length=500, null=True, blank=True)
     data_delivery_method = models.CharField(max_length=100, null=True, blank=True)
     vollebekk_responsible = models.CharField(max_length=100, null=True, blank=True)
     sowing_date = models.CharField(max_length=100, null=True, blank=True)
