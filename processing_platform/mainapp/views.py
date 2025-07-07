@@ -17,7 +17,7 @@ def home_view(request):
     return render(request, "mainapp/home.html")
 
 
-def sd_card(request):
+def sd_card_view(request):
     sd_cards = detect_sd_cards()
 
     if request.method == "POST":
