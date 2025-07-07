@@ -13,10 +13,10 @@ def find_sd_cards_windows(dcim_folder="DCIM"):
     sd_cards = []
     for drive_letter in string.ascii_uppercase:
         drive_path = f"{drive_letter}:/"
-        target_path = os.path.join(drive_path, dcim_folder)
+        candidate = os.path.join(drive_path, dcim_folder)
         try:
-            if is_removable_drive_windows(drive_letter) and os.path.exists(target_path):
-                sd_cards.append(target_path)
+            if is_removable_drive_windows(drive_letter) and os.path.isdir(candidate):
+                sd_cards.append(candidate)
         except Exception:
             pass
     return sd_cards
@@ -25,36 +25,31 @@ def find_sd_cards_unix(dcim_folder="DCIM"):
     base_dirs = ["/media", "/Volumes", "/mnt"]
     sd_cards = []
     for base_path in base_dirs:
-        if os.path.exists(base_path):
+        if os.path.isdir(base_path):
             for device in os.listdir(base_path):
-                device_path = os.path.join(base_path, device)
-                target_path = os.path.join(device_path, dcim_folder)
-                if os.path.isdir(target_path):
-                    sd_cards.append(target_path)
+                candidate = os.path.join(base_path, device, dcim_folder)
+                if os.path.isdir(candidate):
+                    sd_cards.append(candidate)
     return sd_cards
 
 def detect_sd_cards(dcim_folder="DCIM"):
-    system = platform.system()
-    if system == "Windows":
+    if platform.system() == "Windows":
         return find_sd_cards_windows(dcim_folder)
     else:
         return find_sd_cards_unix(dcim_folder)
 
+# placeholder for your DJI filename parser (unused for now)
 def parse_dji_filename(filename):
-    """
-    From 'DJI_202507061335_002_25-RobOat-20m-Oblique-80-85.ext'
-    → 'P:\\PheNo\\RobOat\\1_flights\\RobOat\\3D\\20250706 RobOat M4T 20m 3D 80 85'
-    """
     base_output = r"E:\PheNo"
-    sensor = "M4T"                              # sensor label
-    orient_map = {"Oblique": "3D"}             
+    sensor = "M4T"
+    orient_map = {"Oblique": "3D"}
 
     name, ext = os.path.splitext(filename)
     parts = name.split('_')
     if len(parts) != 4:
         raise ValueError(f"Bad DJI pattern: {filename}")
 
-    date = parts[1][:8]                         # "20250706"
+    date = parts[1][:8]
     flight_i, project, alt, orient_raw, ang_min, ang_max = parts[3].split('-')
     orient = orient_map.get(orient_raw, orient_raw)
 
@@ -62,23 +57,17 @@ def parse_dji_filename(filename):
     return os.path.join(base_output, project, orient, folder_name)
 
 if __name__ == "__main__":
+    # hard-coded destination root
+    BASE_OUTPUT = r"E:\PheNo"
+    os.makedirs(BASE_OUTPUT, exist_ok=True)
+
     for dcim_path in detect_sd_cards():
-        print(f"Scanning SD card at {dcim_path}…")
-        for root, dirs, files in os.walk(dcim_path):
-            for f in files:
-                if not f.startswith("DJI_"):
-                    continue
-                src = os.path.join(root, f)
-                try:
-                    dest_folder = parse_dji_filename(f)
-                except ValueError as e:
-                    print(f"Skipping {f}: {e}")
-                    continue
-
-                # ensure the folder exists
-                os.makedirs(dest_folder, exist_ok=True)
-
-                # move the file
-                dest = os.path.join(dest_folder, f)
-                print(f"Moving:\n  {src}\n→ {dest}\n")
-                shutil.move(src, dest)
+        print(f"Found DCIM at: {dcim_path}")
+        # move each immediate subfolder (e.g. DJI folders like 100MEDIA) out of DCIM
+        for sub in os.listdir(dcim_path):
+            src_folder = os.path.join(dcim_path, sub)
+            if not os.path.isdir(src_folder):
+                continue
+            dest_folder = os.path.join(BASE_OUTPUT, sub)
+            print(f"Moving:\n  {src_folder}\n→ {dest_folder}\n")
+            shutil.move(src_folder, dest_folder)
