@@ -1,49 +1,82 @@
 {% extends "mainapp/base.html" %}
 <!--Test-->
-{% block title %}Weekly Flight Status{% endblock %} {% block content %}
+{% block title %}Weekly Flight Status{% endblock %} 
 
-
-<h2 class="text-xl font-bold mb-4">
-  Week {{ week_num }}: {{ start_date|date:"M d" }} – {{ end_date|date:"M d" }}
-</h2>
-
-<div class="mb-4 flex gap-4">
-  <a
-    href="?week_offset={{ week_offset|add:"-1" }}"
-    class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded"
-  >
-    ← Previous Week
-  </a>
-
-{% if not is_current_week %}
-  <a href="?week_offset={{ week_offset|add:"1" }}" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-1 rounded">Next Week →</a>
-{% endif %}
-</div>
-
-<table class="w-full border-collapse text-sm">
-  <thead>
-    <tr class="bg-gray-300 text-left">
-      <th class="p-2">Field</th>
-      <th class="p-2">Flight Type</th>
-      <th class="p-2">Flown?</th>
-      <th class="p-2">Processed?</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for entry in fields_status %}
-    <tr
-      class="border {% if entry.status_level == 0 %} bg-red-100 border-red-300 {% elif entry.status_level == 1 %} bg-yellow-100 border-yellow-300 {% else %} bg-green-100 border-green-300 {% endif %}"
+{% block content %}
+<div class="p-6 bg-gray-50 min-h-screen">
+  <h2 class="text-2xl font-bold mb-6 text-gray-800">
+    Week {{ week_num }}: {{ start_date|date:"M d" }} – {{ end_date|date:"M d" }}
+  </h2>
+  
+  <div class="mb-6 flex gap-3">
+    <a
+      href="?week_offset={{ week_offset|add:"-1" }}"
+      class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm transition-colors duration-200 flex items-center gap-2"
     >
-      <td class="p-2 font-medium">{{ entry.field }}</td>
-      <td class="p-2">{{ entry.type }}</td>
-      <td class="p-2">
-        {% if entry.flown %} ✅ Yes {% else %} ❌ No {% endif %}
-      </td>
-      <td class="p-2">
-        {% if entry.processed %} ✅ Yes {% else %} ❌ No {% endif %}
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
+      ← Previous Week
+    </a>
+    {% if not is_current_week %}
+    <a 
+      href="?week_offset={{ week_offset|add:"1" }}" 
+      class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm transition-colors duration-200 flex items-center gap-2"
+    >
+      Next Week →
+    </a>
+    {% endif %}
+  </div>
+
+  <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+    <table class="w-full">
+      <thead>
+        <tr class="bg-gray-600 text-white">
+          <th class="px-6 py-4 text-left font-semibold border-r border-gray-500">Field</th>
+          <th class="px-6 py-4 text-left font-semibold border-r border-gray-500">Flight Type</th>
+          <th class="px-6 py-4 text-center font-semibold border-r border-gray-500">Flown?</th>
+          <th class="px-6 py-4 text-center font-semibold">Processed?</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% regroup fields_status by field as grouped_fields %}
+        {% for field_group in grouped_fields %}
+          {% for entry in field_group.list %}
+            <tr class="{% if forloop.parentloop.counter0|divisibleby:2 %}bg-gray-50{% else %}bg-white{% endif %} border-b border-gray-200 hover:bg-blue-50 transition-colors duration-150">
+              {% if forloop.first %}
+                <td class="px-6 py-4 font-bold text-gray-900 border-r border-gray-200 bg-gray-50" rowspan="{{ field_group.list|length }}">
+                  {{ field_group.grouper }}
+                </td>
+              {% endif %}
+              <td class="px-6 py-4 text-gray-700 border-r border-gray-200 pl-8">{{ entry.type }}</td>
+              <td class="px-6 py-4 border-r border-gray-200 text-center">
+                {% if entry.flown %}
+                  <span class="inline-flex items-center gap-1 text-green-700 font-medium">
+                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                    Yes
+                  </span>
+                {% else %}
+                  <span class="inline-flex items-center gap-1 text-red-700 font-medium">
+                    <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                    No
+                  </span>
+                {% endif %}
+              </td>
+              <td class="px-6 py-4 text-center">
+                {% if entry.processed %}
+                  <span class="inline-flex items-center gap-1 text-green-700 font-medium">
+                    <span class="w-2 h-2 bg-green-500 rounded-full"></span>
+                    Yes
+                  </span>
+                {% else %}
+                  <span class="inline-flex items-center gap-1 text-red-700 font-medium">
+                    <span class="w-2 h-2 bg-red-500 rounded-full"></span>
+                    No
+                  </span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}
