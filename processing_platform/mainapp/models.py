@@ -99,7 +99,18 @@ class Flight_Paths(models.Model):
     location_of_field_plot = models.CharField(max_length=255)
     type_of_flight = models.CharField(max_length=100)
     frequency = models.FloatField(null=True, blank=True)
-    drone_model = models.CharField(max_length=100)
+
+    DRONE_MODEL_CHOICES = [
+        ("M3M-1", "M3M-1"),
+        ("M3M-2", "M3M-2"),
+        ("M4T", "M4T"),
+    ]
+    
+    drone_model = models.CharField(
+       max_length=100,
+       choices=DRONE_MODEL_CHOICES,
+       help_text="One of M3M-1, M3M-2 or M4T"
+   )
     flight_height = models.FloatField(null=True, blank=True)
     flight_speed = models.FloatField(null=True, blank=True)
     side_overlap = models.FloatField(null=True, blank=True)

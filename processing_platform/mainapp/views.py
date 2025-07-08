@@ -54,14 +54,11 @@ def sd_card_view(request):
     print(">>> detect_sd_cards returned:", sd_cards)
     logger.debug("Detected SD cards: %r", sd_cards)
 
-    drone_models = (
-        Flight_Paths.objects
-        .order_by()
-        .values_list('drone_model', flat=True)
-        .distinct()
-    )
-    print(">>> available drone_models:", list(drone_models))
-    logger.debug("Available drone models: %r", list(drone_models))
+    # Hard-code drone models here, because the CSV is wrong
+    # Pull the machine-readable values from your Flight_Log model
+    drone_models = [choice[0] for choice in Flight_Log.DRONE_MODEL_CHOICES]
+    print(">>> available drone_models:", drone_models)
+    logger.debug("Available drone models: %r", drone_models)
 
     if request.method == 'POST':
         print(">>> sd_card_view handling POST, data:", dict(request.POST))
@@ -122,7 +119,9 @@ def sd_card_view(request):
             today_str = date.today().strftime('%Y%m%d')
             side      = str(int(fp.side_overlap)) if fp.side_overlap is not None else ''
             front     = str(int(fp.front_overlap)) if fp.front_overlap is not None else ''
-            new_folder = f"{today_str}_{fp.short_id}_{selected_drone}_{fp.type_of_flight}_{side};{front}"
+            # Use spaces between all components, no semicolons
+            parts = [today_str, fp.short_id, selected_drone, fp.type_of_flight, side, front]
+            new_folder = ' '.join(p for p in parts if p)
             print(">>> new_folder name:", new_folder)
             logger.debug("New folder name: %s", new_folder)
 
