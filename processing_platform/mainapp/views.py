@@ -45,17 +45,23 @@ def home_view(request):
 
 
 def sd_card_view(request):
+    logger.debug("⇒ Enter sd_card_view; method=%s", request.method)
     sd_cards = detect_sd_cards()
+    logger.debug("Detected SD cards: %r", sd_cards)
+
     drone_models = (
         Flight_Paths.objects
         .order_by()
         .values_list('drone_model', flat=True)
         .distinct()
     )
+    logger.debug("Available drone models: %r", list(drone_models))
 
     if request.method == 'POST':
+        logger.debug("Handling POST; POST data=%r", request.POST)
         sd_card_dcim = request.POST.get('sd_card')
         selected_drone = request.POST.get('drone_model')
+        logger.debug(" sd_card_dcim=%r, selected_drone=%r", sd_card_dcim, selected_drone)
 
         if not sd_card_dcim:
             messages.error(request, "Please pick an SD card.")
@@ -66,21 +72,27 @@ def sd_card_view(request):
 
         moved = 0
         os.makedirs(BASE_OUTPUT, exist_ok=True)
+        logger.debug("Ensured BASE_OUTPUT exists: %s", BASE_OUTPUT)
 
         for sub in os.listdir(sd_card_dcim):
+            logger.debug("Found entry in SD card: %s", sub)
             src = os.path.join(sd_card_dcim, sub)
             if not os.path.isdir(src):
+                logger.debug(" Skipping non-directory: %s", sub)
                 continue
 
             m = FOLDER_RE.match(sub)
             if not m:
                 logger.warning("Skipping folder with unexpected name: %r", sub)
                 continue
-
             flight_path_key = m.group('flight_path')
+            logger.debug("Regex matched flight_path_key=%r", flight_path_key)
 
             try:
-                fp = Flight_Paths.objects.get(flight_path_name__startswith=flight_path_key)
+                fp = Flight_Paths.objects.get(
+                    flight_path_name__startswith=flight_path_key
+                )
+                logger.debug("Found Flight_Paths entry: %r", fp)
             except Flight_Paths.DoesNotExist:
                 logger.warning("No DB entry matching Flight Path Name %r", flight_path_key)
                 continue
@@ -92,6 +104,7 @@ def sd_card_view(request):
             side = str(int(fp.side_overlap)) if fp.side_overlap is not None else ''
             front = str(int(fp.front_overlap)) if fp.front_overlap is not None else ''
             new_folder = f"{today_str}_{fp.short_id}_{selected_drone}_{fp.type_of_flight}_{side};{front}"
+            logger.debug("New folder name: %s", new_folder)
 
             dest_root = fp.first_flight_path
             if not dest_root:
@@ -100,11 +113,13 @@ def sd_card_view(request):
 
             dest = os.path.join(dest_root, new_folder)
             os.makedirs(dest, exist_ok=True)
+            logger.debug("Ensured destination exists: %s", dest)
 
             try:
+                logger.debug("Moving %r → %r …", src, dest)
                 shutil.move(src, dest)
                 moved += 1
-                logger.info("Moved %r → %r", src, dest)
+                logger.info("Moved %r → %r (total moved=%d)", src, dest, moved)
             except Exception as exc:
                 logger.error("Failed to move %r: %s", src, exc)
                 messages.error(request, f"Failed to move {sub}: {exc}")
