@@ -144,6 +144,7 @@ def sd_card_view(request):
     return render(request, 'mainapp/sd_card.html', {
         'sd_cards': sd_cards,
         'drone_models': drone_models,
+        'selected_drone': None,
     })
 
 
