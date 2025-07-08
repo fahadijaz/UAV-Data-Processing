@@ -1,8 +1,10 @@
+import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
+
 import csv
 import os
 import re
 import pandas as pd
-import logging
 import shutil
 
 # Date/time imports
@@ -23,30 +25,25 @@ logger = logging.getLogger(__name__)
 # Base output root; ensure this is accessible on your system
 BASE_OUTPUT = 'E:\\PheNo'
 
-# Regex to extract the Flight Path Name portion of an SD-card folder:
-#   e.g. "25-DiversityOats-MS-30m-85-80" or
-#         "DJI_202506241029_003_25-Pilot-Oblique-30m-70-75"
+# Regex to extract the Flight Path Name portion of an SD-card folder
 FOLDER_RE = re.compile(r'''
-    ^(?:DJI_[0-9]{12}_[0-9]{3}_)?   # optional DJI_ prefix
-    (?P<flight_path>               # capture the core flight-path name
-      \d+-                         # record number and dash
-      [^-]+-                       # short_ID and dash
-      [^-]+-                       # flight pattern and dash
-      \d+m-                        # height (e.g. 30m) and dash
-      \d+-                         # side overlap and dash
-      \d+                          # front overlap
-    )
-    (?:\..*)?$                     # optional extension/suffix
+    ^(?:DJI_[0-9]{12}_[0-9]{3}_)?
+    (?P<flight_path>\d+-[^-]+-[^-]+-\d+m-\d+-\d+)
+    (?:\..*)?$
 ''', re.VERBOSE)
 
 
 def home_view(request):
+    print(">>> ENTER home_view")
+    logger.debug("ENTER home_view")
     return render(request, "mainapp/home.html")
 
 
 def sd_card_view(request):
+    print(">>> ENTER sd_card_view, method:", request.method)
     logger.debug("⇒ Enter sd_card_view; method=%s", request.method)
     sd_cards = detect_sd_cards()
+    print(">>> detect_sd_cards returned:", sd_cards)
     logger.debug("Detected SD cards: %r", sd_cards)
 
     drone_models = (
@@ -55,12 +52,15 @@ def sd_card_view(request):
         .values_list('drone_model', flat=True)
         .distinct()
     )
+    print(">>> available drone_models:", list(drone_models))
     logger.debug("Available drone models: %r", list(drone_models))
 
     if request.method == 'POST':
+        print(">>> sd_card_view handling POST, data:", dict(request.POST))
         logger.debug("Handling POST; POST data=%r", request.POST)
         sd_card_dcim = request.POST.get('sd_card')
         selected_drone = request.POST.get('drone_model')
+        print(">>> POST values:", sd_card_dcim, selected_drone)
         logger.debug(" sd_card_dcim=%r, selected_drone=%r", sd_card_dcim, selected_drone)
 
         if not sd_card_dcim:
@@ -72,31 +72,39 @@ def sd_card_view(request):
 
         moved = 0
         os.makedirs(BASE_OUTPUT, exist_ok=True)
+        print(">>> ensured BASE_OUTPUT exists:", BASE_OUTPUT)
         logger.debug("Ensured BASE_OUTPUT exists: %s", BASE_OUTPUT)
 
         for sub in os.listdir(sd_card_dcim):
+            print(">>> iterating folder:", sub)
             logger.debug("Found entry in SD card: %s", sub)
             src = os.path.join(sd_card_dcim, sub)
             if not os.path.isdir(src):
+                print(">>> skipping non-dir:", sub)
                 logger.debug(" Skipping non-directory: %s", sub)
                 continue
 
             m = FOLDER_RE.match(sub)
             if not m:
+                print(">>> regex did not match:", sub)
                 logger.warning("Skipping folder with unexpected name: %r", sub)
                 continue
             flight_path_key = m.group('flight_path')
+            print(">>> flight_path_key:", flight_path_key)
             logger.debug("Regex matched flight_path_key=%r", flight_path_key)
 
             try:
                 fp = Flight_Paths.objects.get(
                     flight_path_name__startswith=flight_path_key
                 )
+                print(">>> found Flight_Paths:", fp)
                 logger.debug("Found Flight_Paths entry: %r", fp)
             except Flight_Paths.DoesNotExist:
+                print(">>> no Flight_Paths matching:", flight_path_key)
                 logger.warning("No DB entry matching Flight Path Name %r", flight_path_key)
                 continue
             except Flight_Paths.MultipleObjectsReturned:
+                print(">>> multiple Flight_Paths matching:", flight_path_key)
                 logger.warning("Multiple entries match Flight Path Name %r", flight_path_key)
                 continue
 
@@ -104,23 +112,29 @@ def sd_card_view(request):
             side = str(int(fp.side_overlap)) if fp.side_overlap is not None else ''
             front = str(int(fp.front_overlap)) if fp.front_overlap is not None else ''
             new_folder = f"{today_str}_{fp.short_id}_{selected_drone}_{fp.type_of_flight}_{side};{front}"
+            print(">>> new_folder name:", new_folder)
             logger.debug("New folder name: %s", new_folder)
 
             dest_root = fp.first_flight_path
             if not dest_root:
+                print(">>> fp.first_flight_path missing for:", fp)
                 logger.error("No first_flight_path defined for %r", fp.flight_path_name)
                 continue
 
             dest = os.path.join(dest_root, new_folder)
             os.makedirs(dest, exist_ok=True)
+            print(">>> ensured dest exists:", dest)
             logger.debug("Ensured destination exists: %s", dest)
 
             try:
+                print(f">>> moving {src} → {dest}")
                 logger.debug("Moving %r → %r …", src, dest)
                 shutil.move(src, dest)
                 moved += 1
+                print(">>> moved count:", moved)
                 logger.info("Moved %r → %r (total moved=%d)", src, dest, moved)
             except Exception as exc:
+                print(">>> move failed:", exc)
                 logger.error("Failed to move %r: %s", src, exc)
                 messages.error(request, f"Failed to move {sub}: {exc}")
 
@@ -132,6 +146,24 @@ def sd_card_view(request):
         'drone_models': drone_models,
     })
 
+
+def read_local_csv(request):
+    print(">>> ENTER read_local_csv")
+    logger.debug("ENTER read_local_csv")
+    downloads_path = os.path.expanduser("~/Downloads")
+    csv_file_path = os.path.join(downloads_path, "Drone_Flying_Schedule_2025.csv")
+
+    if not os.path.exists(csv_file_path):
+        return JsonResponse(
+            {"error": f"CSV file not found at {csv_file_path}"}, status=404
+        )
+
+    try:
+        df = pd.read_csv(csv_file_path)
+        data = df.to_dict(orient="records")
+        return JsonResponse(data, safe=False)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
 
 def read_local_csv(request):
     downloads_path = os.path.expanduser("~/Downloads")
