@@ -1,11 +1,12 @@
 import csv
-import datetime
 import os
 import re
 import pandas as pd
 import logging
 import shutil
-import datetime
+
+# Date/time imports
+from datetime import date, datetime
 
 from django.conf import settings
 from django.db.models import Q
@@ -14,17 +15,13 @@ from django.shortcuts import render, redirect
 from django.utils.dateparse import parse_date
 from django.contrib import messages
 
-from .models import Flight_Log
+from .models import Flight, Flight_Log, Flight_Paths
 from .sd_card import detect_sd_cards
-
-
-def home_view(request):
-    return render(request, "mainapp/home.html")
 
 logger = logging.getLogger(__name__)
 
 # Base output root; ensure this is accessible on your system
-BASE_OUTPUT = r"E:\PheNo"
+BASE_OUTPUT = 'E:\\PheNo'
 
 # Regex to extract the Flight Path Name portion of an SD-card folder:
 #   e.g. "25-DiversityOats-MS-30m-85-80" or
@@ -35,17 +32,20 @@ FOLDER_RE = re.compile(r'''
       \d+-                         # record number and dash
       [^-]+-                       # short_ID and dash
       [^-]+-                       # flight pattern and dash
-      \d+m-                       # height (e.g. 30m) and dash
-      \d+-                        # side overlap and dash
-      \d+                         # front overlap
+      \d+m-                        # height (e.g. 30m) and dash
+      \d+-                         # side overlap and dash
+      \d+                          # front overlap
     )
-    (?:\..*)?$                    # optional extension/suffix
+    (?:\..*)?$                     # optional extension/suffix
 ''', re.VERBOSE)
+
+
+def home_view(request):
+    return render(request, "mainapp/home.html")
 
 
 def sd_card_view(request):
     sd_cards = detect_sd_cards()
-
     drone_models = (
         Flight_Paths.objects
         .order_by()
@@ -88,11 +88,10 @@ def sd_card_view(request):
                 logger.warning("Multiple entries match Flight Path Name %r", flight_path_key)
                 continue
 
-            # Construct a descriptive folder name: YYYYMMDD_ShortID_Drone_Type_Side;Front
-            today = date.today().strftime('%Y%m%d')
+            today_str = date.today().strftime('%Y%m%d')
             side = str(int(fp.side_overlap)) if fp.side_overlap is not None else ''
             front = str(int(fp.front_overlap)) if fp.front_overlap is not None else ''
-            new_folder = f"{today}_{fp.short_id}_{selected_drone}_{fp.type_of_flight}_{side};{front}"
+            new_folder = f"{today_str}_{fp.short_id}_{selected_drone}_{fp.type_of_flight}_{side};{front}"
 
             dest_root = fp.first_flight_path
             if not dest_root:
