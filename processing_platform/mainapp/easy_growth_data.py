@@ -5,7 +5,7 @@ from django.shortcuts import render
 from django.db import IntegrityError
 from .models import Sensor, SensorReading
 
-sensor_data_path = "P:\\PheNo\\easy_growth_data"  # Husk riktig escaping av \
+sensor_data_path = "P:\\PheNo\\easy_growth_data"
 
 
 def parse_csv_date(datestring):
@@ -50,7 +50,6 @@ def upload_easy_growth_data(request):
                         "soil_type": row[8].strip() if len(row) > 8 else "",
                     }
 
-                    # Opprett eller hopp over hvis den finnes
                     obj, created = SensorReading.objects.get_or_create(
                         sensor=sensor, timestamp=timestamp, defaults=reading_data
                     )
@@ -61,5 +60,5 @@ def upload_easy_growth_data(request):
                 except Exception as e:
                     print(f"Feil ved behandling av rad: {row} – {e}")
 
-        return render(request, "upload_success.html")  # Tilpass etter mal
-    return render(request, "upload_form.html")  # Tilpass etter mal
+        return render(request, "upload_success.html")
+    return render(request, "upload_form.html")
