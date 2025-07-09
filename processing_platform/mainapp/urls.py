@@ -14,5 +14,5 @@ urlpatterns = [
     path("details/", views.details_view, name="details"),
     path("add-routes/", views.add_routes_view, name="add_routes"),
     path("weekly_overview/", views.weekly_overview, name="weekly_overview"),
-    path("upload/", views.upload_easy_growth_data, name="upload_easy_growth_data"),
+    path("upload/", views.easy_growth, name="easy_growth"),
 ]

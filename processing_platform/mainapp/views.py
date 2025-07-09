@@ -1,16 +1,14 @@
 import csv
 import datetime
 import os
-from datetime import date, timedelta, datetime
-import os
-import csv
-from django.contrib import messages
+from datetime import date, datetime, timedelta
 
 import pandas as pd
 from django.conf import settings
+from django.contrib import messages
 from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
 from django.utils.timezone import now
 
@@ -20,6 +18,10 @@ from .sd_card import detect_sd_cards
 
 def home_view(request):
     return render(request, "mainapp/home.html")
+
+
+def easy_growth(request):
+    return render(request, "mainapp/easy_growth.html")
 
 
 FIELD_FLIGHT_MODES = {
