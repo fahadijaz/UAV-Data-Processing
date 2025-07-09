@@ -1,17 +1,20 @@
 import csv
 import datetime
 import os
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
+import os
+import csv
+from django.contrib import messages
 
 import pandas as pd
 from django.conf import settings
 from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.dateparse import parse_date
 from django.utils.timezone import now
 
-from .models import Fields, Flight, Flight_Log
+from .models import Fields, Flight, Flight_Log, Sensor, SensorReading
 from .sd_card import detect_sd_cards
 
 
@@ -337,3 +340,87 @@ def weekly_view(request):
     }
 
     return render(request, "mainapp/weekly.html", context)
+
+
+def parse_csv_datetime(datetime_string):
+    """Trying to extract the date"""
+    try:
+        return datetime.strptime(datetime_string.strip(), "%d.%m.%Y %H:%M")
+    except ValueError:
+        return datetime.strptime(datetime_string.strip(), "%d.%m.%Y")
+
+
+def process_csv_data(file_content, sensor_id):
+    """reads csv files and puts the data into db, ignoring duplicates"""
+    sensor, _ = Sensor.objects.get_or_create(sensor_id=sensor_id)
+
+    decoded = file_content.decode("utf-8").splitlines()
+    reader = csv.reader(decoded)
+
+    try:
+        header = next(reader)
+    except StopIteration:
+        return
+
+    for row in reader:
+        if not row or not row[0].strip():
+            continue
+
+        try:
+            timestamp = parse_csv_datetime(row[0])
+
+            reading_data = {
+                "soil_temperature": float(row[1]) if row[1] else None,
+                "soil_moisture": float(row[2]) if row[2] else None,
+                "air_temperature": float(row[3]) if row[3] else None,
+                "air_humidity": float(row[4]) if row[4] else None,
+                "battery": float(row[5]) if row[5] else None,
+                "rainfall": float(row[6]) if row[6] else None,
+                "crop_type": row[7].strip() if len(row) > 7 else "",
+                "soil_type": row[8].strip() if len(row) > 8 else "",
+            }
+
+            SensorReading.objects.get_or_create(
+                sensor=sensor, timestamp=timestamp, defaults=reading_data
+            )
+
+        except Exception as e:
+            print(f"Feil i rad {row}: {e}")
+            continue
+
+
+def upload_easy_growth_data(request):
+    """Hovedvisningen for å laste opp sensorfiler fra brukerens maskin."""
+    if request.method == "POST":
+        source = request.POST.get("source")
+
+        if source == "files":
+            files = request.FILES.getlist("files")
+        elif source == "folder":
+            files = request.FILES.getlist("folder_files")
+        else:
+            files = []
+
+        if not files:
+            messages.error(request, "Ingen filer valgt.")
+            return redirect(request.path)
+
+        total = 0
+        for file in files:
+            filename_parts = (
+                file.name.split("/") if "/" in file.name else file.name.split("\\")
+            )
+            short_name = filename_parts[-1]
+
+            sensor_id = short_name.split()[0].strip()
+
+            try:
+                process_csv_data(file.read(), sensor_id)
+                total += 1
+            except Exception as e:
+                print(f"Feil i fil: {file.name} – {e}")
+
+        messages.success(request, f"{total} filer behandlet.")
+        return redirect(request.path)
+
+    return render(request, "mainapp/flight_details.html")
