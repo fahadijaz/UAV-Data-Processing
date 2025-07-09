@@ -3,7 +3,8 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(nam
 
 import csv
 import os
-import re
+from datetime import date, datetime, timedelta
+
 import pandas as pd
 import shutil
 
@@ -11,13 +12,14 @@ import shutil
 from datetime import date, datetime
 
 from django.conf import settings
+from django.contrib import messages
 from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
-from django.contrib import messages
+from django.utils.timezone import now
 
-from .models import Flight_Log, Flight_Paths
+from .models import Fields, Flight, Flight_Log, Sensor, SensorReading
 from .sd_card import detect_sd_cards
 
 logger = logging.getLogger(__name__)
@@ -44,6 +46,80 @@ def home_view(request):
     print(">>> ENTER home_view")
     logger.debug("ENTER home_view")
     return render(request, "mainapp/home.html")
+
+
+def easy_growth(request):
+    return render(request, "mainapp/easy_growth.html")
+
+
+FIELD_FLIGHT_MODES = {
+    "G2BOatFrontiers": ["3D", "MS"],
+    "ProBarE166": ["3D", "MS"],
+    "ProBarPilot": ["3D", "MS"],
+    "ProBarSørås": ["3D", "MS"],
+    "ProBarVoll": ["3D", "MS"],
+    "RobOat": ["Thermal", "3D", "MS"],
+    "SmartWheatBox": ["Thermal", "3D", "MS", "RGB"],
+    "SmartWheatGram": ["Thermal", "3D", "MS"],
+    "SmartWheatTunnel": ["Thermal", "3D", "MS", "RGB"],
+    "Soldeling": ["Thermal", "3D", "MS"],
+    "Vollebekk": ["RGB"],
+}
+
+
+def get_current_week_dates():
+    today = date.today()
+    monday = today - timedelta(days=today.weekday())  # Monday
+    sunday = monday + timedelta(days=6)
+    return monday, sunday
+
+
+def weekly_overview(request):
+    week_offset = int(request.GET.get("week_offset", 0))
+
+    base_date = date.today() + timedelta(weeks=week_offset)
+    start_date = base_date - timedelta(days=base_date.weekday())
+    end_date = start_date + timedelta(days=6)
+    week_num = start_date.isocalendar().week
+
+    fields_status = []
+
+    for field, flight_types in FIELD_FLIGHT_MODES.items():
+        for flight_type in flight_types:
+            logs = Flight_Log.objects.filter(
+                flight_field_id=field,
+                flight_type=flight_type,
+                flight_date__range=(start_date, end_date),
+            )
+
+            flown = logs.exists()
+            processed = logs.filter(p4d_processing="Yes").exists()
+
+            status_level = 2 if flown and processed else 1 if flown else 0
+
+            fields_status.append(
+                {
+                    "field": field,
+                    "type": flight_type,
+                    "flown": flown,
+                    "processed": processed,
+                    "status_level": status_level,
+                }
+            )
+
+    # ✅ Add this line:
+    is_current_week = week_offset == 0
+
+    context = {
+        "week_num": week_num,
+        "start_date": start_date,
+        "end_date": end_date,
+        "fields_status": fields_status,
+        "week_offset": week_offset,
+        "is_current_week": is_current_week,  # 🔥 This enables your template check!
+    }
+
+    return render(request, "mainapp/weekly_overview.html", context)
 
 
 def sd_card_view(request):
@@ -242,6 +318,7 @@ def review_drone_flights(request):
 
         flights.append(
             {
+                "id": flight.id,
                 "field": flight.flight_field_id,
                 "date": flight_date_obj,
                 "date_display": (
@@ -286,6 +363,34 @@ def review_drone_flights(request):
     }
 
     return render(request, "mainapp/review_drone_flights.html", context)
+
+
+def flight_detail(request, flight_id):
+    flight = get_object_or_404(Flight_Log, id=flight_id)
+
+    # Flight_Log fields
+    flight_fields = []
+    for field in flight._meta.fields:
+        name = field.verbose_name.title()
+        value = field.value_from_object(flight)
+        flight_fields.append((name, value))
+
+    # Try to fetch related Fields instance by matching short_id
+    field_data = Fields.objects.filter(long_id=flight.flight_field_id).first()
+
+    field_fields = []
+    if field_data:
+        for field in field_data._meta.fields:
+            name = field.verbose_name.title()
+            value = field.value_from_object(field_data)
+            field_fields.append((name, value))
+
+    context = {
+        "flight": flight,
+        "flight_fields": flight_fields,
+        "field_fields": field_fields,
+    }
+    return render(request, "mainapp/flight_detail.html", context)
 
 
 def details_view(request):
@@ -391,3 +496,87 @@ def weekly_view(request):
     }
 
     return render(request, "mainapp/weekly.html", context)
+
+
+def parse_csv_datetime(datetime_string):
+    """Trying to extract the date"""
+    try:
+        return datetime.strptime(datetime_string.strip(), "%d.%m.%Y %H:%M")
+    except ValueError:
+        return datetime.strptime(datetime_string.strip(), "%d.%m.%Y")
+
+
+def process_csv_data(file_content, sensor_id):
+    """reads csv files and puts the data into db, ignoring duplicates"""
+    sensor, _ = Sensor.objects.get_or_create(sensor_id=sensor_id)
+
+    decoded = file_content.decode("utf-8").splitlines()
+    reader = csv.reader(decoded)
+
+    try:
+        header = next(reader)
+    except StopIteration:
+        return
+
+    for row in reader:
+        if not row or not row[0].strip():
+            continue
+
+        try:
+            timestamp = parse_csv_datetime(row[0])
+
+            reading_data = {
+                "soil_temperature": float(row[1]) if row[1] else None,
+                "soil_moisture": float(row[2]) if row[2] else None,
+                "air_temperature": float(row[3]) if row[3] else None,
+                "air_humidity": float(row[4]) if row[4] else None,
+                "battery": float(row[5]) if row[5] else None,
+                "rainfall": float(row[6]) if row[6] else None,
+                "crop_type": row[7].strip() if len(row) > 7 else "",
+                "soil_type": row[8].strip() if len(row) > 8 else "",
+            }
+
+            SensorReading.objects.get_or_create(
+                sensor=sensor, timestamp=timestamp, defaults=reading_data
+            )
+
+        except Exception as e:
+            print(f"Feil i rad {row}: {e}")
+            continue
+
+
+def upload_easy_growth_data(request):
+    """Hovedvisningen for å laste opp sensorfiler fra brukerens maskin."""
+    if request.method == "POST":
+        source = request.POST.get("source")
+
+        if source == "files":
+            files = request.FILES.getlist("files")
+        elif source == "folder":
+            files = request.FILES.getlist("folder_files")
+        else:
+            files = []
+
+        if not files:
+            messages.error(request, "Ingen filer valgt.")
+            return redirect(request.path)
+
+        total = 0
+        for file in files:
+            filename_parts = (
+                file.name.split("/") if "/" in file.name else file.name.split("\\")
+            )
+            short_name = filename_parts[-1]
+
+            sensor_id = short_name.split()[0].strip()
+
+            try:
+                process_csv_data(file.read(), sensor_id)
+                total += 1
+            except Exception as e:
+                print(f"Feil i fil: {file.name} – {e}")
+
+        messages.success(request, f"{total} filer behandlet.")
+        return redirect(request.path)
+
+    return render(request, "mainapp/flight_details.html")
