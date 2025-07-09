@@ -15,8 +15,8 @@ def sd_card_view(request):
     sd_cards = detect_sd_cards()
     return render(request, 'mainapp/sd_card.html', {'sd_cards': sd_cards})
 
-def data_visualisation_view(request):
-    return render(request, 'mainapp/data_visualisation.html')
+"""def data_visualisation_view(request):
+    return render(request, 'mainapp/data_visualisation.html')"""
 
 STAT_OPTIONS = [
 
@@ -42,14 +42,30 @@ STAT_OPTIONS = [
 def data_visualisation(request):
     selected_stats = request.GET.getlist("stats")
     selected_dates = request.GET.getlist("date")
-    date = request.GET.getlist("date")
+
+
+    all_dates = []
+    downloads_path = os.path.expanduser("~/Downloads")
+    csv_file_path = os.path.join(downloads_path, "24BPROBARG20_Vollebekk_2024.csv")
+
+    if os.path.exists(csv_file_path):
+        df = pd.read_csv(csv_file_path)
+        if "date" in df.columns:
+            all_dates = (
+                pd.to_datetime(df["date"], errors="coerce")
+                .dt.strftime("%Y-%m-%d")
+                .drop_duplicates()
+                .sort_values()
+                .tolist()
+            )
 
     plots = []
-    return render(request, "data_visualisation.html", {
+    return render(request, "mainapp/data_visualisation.html", {
         "plots": plots,
         "stat_options": STAT_OPTIONS,
         "selected_stats": selected_stats,
-        "date": date,
+        "selected_dates": selected_dates,
+        "all_dates": all_dates,
     })
 
 df = pd.read_csv("~/Downloads/Drone_Flying_Schedule_2025.csv")

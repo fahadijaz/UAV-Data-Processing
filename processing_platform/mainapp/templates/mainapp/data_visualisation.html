@@ -8,31 +8,23 @@
 
   <form method="get" class="mb-22">
     <!-- Date input-->
-    <label for="date" class="block font-medium">Select a date:</label>
-    <input type="date" name="date" id="date" class="border rounded p-2 mb-4 w-full md:w-1/2" value="{{ request.GET.date }}">
-
+    {% for date in all_dates %}
+      <label class="block">
+        <input type="checkbox" name="date" value="{{ date }}"
+              {% if date in selected_dates %}checked{% endif %}>
+        {{ date }}
+      </label>
+    {% endfor %} 
+       
     <!-- Stats selector-->
-    <label for="stats" class="block mb-2 font-medium">Select statistical values:</label>
-    <select name="stats" multiple class="border rounded p-2 w-full md:w-1/2">
-      <option value="all">All</option>
-      <option value="cv">	Coefficient of Variation</option>
-      <option value="iqr">Interquartile Range</option>
-      <option value="kurtosis">Kurtosis</option>
-      <option value="majority">Majority</option>
-      <option value="max">Maximum</option>
-      <option value="mean">Mean</option>
-      <option value="median">Median</option>
-      <option value="min">Minimum</option>
-      <option value="minority">Minority</option>
-      <option value="q25">25th Percentile (Q1)</option>
-      <option value="q75">75th Percentile (Q3)</option>
-      <option value="range">Range (Max - Min)</option>
-      <option value="std">Standard Deviation</option>
-      <option value="sum">Sum</option>
-      <option value="top_10">Top 10 Values</option>
-      <option value="top_10_mean">Mean of Top 10 Values</option>
-      <option value="skewness">Skewness</option>
-    </select>
+     <label class="block mb-2 font-medium">Select statistical values:</label>
+      {% for key, label in stat_options %}
+        <label class="block">
+          <input type="checkbox" name="stats" value="{{ key }}"
+                {% if key in selected_stats %}checked{% endif %}>
+          {{ label }}
+        </label>
+      {% endfor %}
     <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
       Plot
     </button>
