@@ -71,8 +71,6 @@ class Flight_Log(models.Model):
     p4d_processing = models.CharField(
         max_length=100, choices=YES_NO_CHOICES, null=True, blank=True
     )
-
-    p4d_processing = models.CharField()
     p4d_processing_done_by = models.CharField(
         max_length=20, choices=DRONE_PILOT_CHOICES, null=True, blank=True
     )
