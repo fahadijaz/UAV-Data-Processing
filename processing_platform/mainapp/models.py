@@ -130,4 +130,3 @@ class Flight_Paths(models.Model):
 
     class Meta:
         db_table = 'flight_paths'
-

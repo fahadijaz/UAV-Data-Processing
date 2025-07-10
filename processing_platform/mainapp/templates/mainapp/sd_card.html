@@ -1,101 +1,101 @@
+{# templates/mainapp/sd_card.html #}
 {% extends "mainapp/base.html" %}
-{% load static %}
-{% block title %}SD Card Reader{% endblock %}
+{% load widget_tweaks %}
+
+{% block title %}Upload Flights{% endblock %}
 
 {% block content %}
-  {% if messages %}
-    <ul class="mb-4">
-      {% for msg in messages %}
-        <li class="p-2 {{ msg.tags }}">{{ msg }}</li>
-      {% endfor %}
-    </ul>
-  {% endif %}
+<div class="max-w-4xl mx-auto px-4">
+  <form method="post" enctype="multipart/form-data" class="space-y-8">
+    {% csrf_token %}
+    {{ formset.management_form }}
 
-  <div class="relative">
-    <div id="loading-overlay" class="hidden absolute inset-0 bg-white bg-opacity-75 flex items-center justify-center z-50">
-      <!-- spinner… -->
-    </div>
+    {% for form in formset %}
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <!-- header -->
+        <div class="bg-nmbu-green px-6 py-4 flex justify-between items-center">
+          <h2 class="text-xl font-semibold text-white truncate">
+            {{ form.flight_dir.value|cut:"/Volumes/SD_Card/DCIM/" }}
+          </h2>
+          <span class="bg-nmbu-dark text-white text-sm font-medium px-3 py-1 rounded">
+            Flight {{ forloop.counter }}
+          </span>
+        </div>
+        <!-- body -->
+        <div class="px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {{ form.flight_path_key }}{{ form.flight_dir }}
 
-    <div class="flex justify-center mt-20 bg-gray-100">
-      <div class="bg-gray-100 border shadow-md rounded-md p-8 w-full max-w-md">
-        <h2 class="text-xl font-bold mb-6">SD-card reader</h2>
-
-        <form id="sd-form" method="post" action="{% url 'sd_card' %}">
-          {% csrf_token %}
-
-          <!-- Pilot -->
-          <div class="mb-4">
-            <label for="pilot" class="block mb-1 text-sm font-medium">Pilot:</label>
-            <input type="text" id="pilot" name="pilot" required
-                   class="w-full bg-gray-300 p-2 rounded">
+          <div>
+            {{ form.pilot.label_tag|add_class:"block text-sm font-medium text-nmbu-green" }}
+            {{ form.pilot|add_class:"mt-1 block w-full border-gray-300 rounded-md p-2 focus:ring-nmbu-green focus:border-nmbu-green shadow-sm" }}
+            {{ form.pilot.errors }}
           </div>
 
-          <!-- Wind speeds -->
-          <h2 class="p-2 text-black mb-4">Wind speed:</h2>
-          <div class="flex space-x-6 mb-4">
-            {% for i in "123"|make_list %}
-              <div class="w-1/3">
-                <label for="wind_speed{{ i }}" class="block mb-1 text-sm font-medium"> {{ i }}:</label>
-                <input type="number" id="wind_speed{{ i }}" name="wind_speed{{ i }}" min="0" required
-                       class="w-full bg-gray-300 p-2 rounded">
-              </div>
-            {% endfor %}
+          <div>
+            {{ form.drone_model.label_tag|add_class:"block text-sm font-medium text-nmbu-green" }}
+            {{ form.drone_model|add_class:"mt-1 block w-full border-gray-300 rounded-md p-2 focus:ring-nmbu-green focus:border-nmbu-green shadow-sm bg-white" }}
+            {{ form.drone_model.errors }}
           </div>
 
-          <!-- Comments -->
-          <div class="mb-6">
-            <label for="comments" class="block mb-1 text-sm font-medium">Comments:</label>
-            <textarea id="comments" name="comments" rows="4"
-                      class="w-full bg-gray-300 p-2 rounded resize-none"></textarea>
-          </div>
-
-          <!-- Drone model selector -->
-          <div class="mb-6">
-            <label for="drone_model" class="block mb-1 text-sm font-medium">Drone model:</label>
-            <select id="drone_model" name="drone_model" required
-                    class="w-full bg-gray-300 p-2 rounded">
-              <option value="">— Select a drone —</option>
-              {% for model in drone_models %}
-                <option value="{{ model }}" {% if model == selected_drone %}selected{% endif %}>
-                  {{ model }}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <!-- SD Cards -->
-          <h2 class="text-lg font-semibold mb-2">Choose SD card:</h2>
-          {% if sd_cards %}
-            <div class="space-y-2 mb-6">
-              {% for card in sd_cards %}
-                <label class="flex items-center space-x-2">
-                  <input type="radio" name="sd_card" value="{{ card }}" required
-                         class="form-radio h-4 w-4 text-indigo-600"/>
-                  <span class="px-4 py-2 bg-indigo-300 rounded">{{ card }}</span>
-                </label>
-              {% endfor %}
+          <div class="lg:col-span-2">
+            <label class="block text-sm font-medium text-nmbu-green">Wind speed (m/s)</label>
+            <div class="flex space-x-3 mt-1">
+              {{ form.wind_speed1|add_class:"w-1/3 border-gray-300 rounded-md p-2 focus:ring-nmbu-green focus:border-nmbu-green shadow-sm" }}
+              {{ form.wind_speed2|add_class:"w-1/3 border-gray-300 rounded-md p-2 focus:ring-nmbu-green focus:border-nmbu-green shadow-sm" }}
+              {{ form.wind_speed3|add_class:"w-1/3 border-gray-300 rounded-md p-2 focus:ring-nmbu-green focus:border-nmbu-green shadow-sm" }}
             </div>
-          {% else %}
-            <p class="text-red-600 mb-6">
-              🚫 No SD cards with a <code>DCIM</code> folder were found.
-            </p>
-          {% endif %}
-
-          <div class="flex justify-center">
-            <button id="upload-btn" type="submit"
-                    class="px-6 py-2 rounded font-semibold bg-green-200 hover:bg-green-300">
-              UPLOAD
-            </button>
+            {{ form.wind_speed1.errors }}{{ form.wind_speed2.errors }}{{ form.wind_speed3.errors }}
           </div>
-        </form>
-      </div>
-    </div>
-  </div>
 
-  <script>
-    document.getElementById('sd-form').addEventListener('submit', function(){
-      document.getElementById('loading-overlay').classList.remove('hidden');
-      document.getElementById('upload-btn').disabled = true;
+          <div class="lg:col-span-2">
+            {{ form.comments.label_tag|add_class:"block text-sm font-medium text-nmbu-green" }}
+            {{ form.comments|add_class:"mt-1 block w-full border-gray-300 rounded-md p-2 h-24 resize-none focus:ring-nmbu-green focus:border-nmbu-green shadow-sm" }}
+            {{ form.comments.errors }}
+          </div>
+
+          <div class="lg:col-span-2 flex space-x-6 items-start mt-4">
+            <div class="flex-1">
+              {{ form.skyline_files.label_tag|add_class:"block text-sm font-medium text-nmbu-green" }}
+              {{ form.skyline_files
+                 | add_class:"mt-1 block w-full file:border file:border-gray-300 file:rounded-md file:px-3 file:py-2 file:bg-nmbu-green file:text-white hover:file:bg-nmbu-dark focus:ring-nmbu-green focus:border-nmbu-green shadow-sm"
+                 | attr:"multiple"
+                 | attr:"accept=image/jpeg"
+              }}
+              {{ form.skyline_files.errors }}
+              <p class="mt-1 text-xs text-gray-500"><span class="skyline-count font-medium">0</span> selected</p>
+              {{ form.skyline_names }}
+            </div>
+            <div class="flex-1">
+              {{ form.reflectance_dir.label_tag|add_class:"block text-sm font-medium text-nmbu-green" }}
+              {{ form.reflectance_dir|add_class:"mt-1 block w-full file:border file:border-gray-300 file:rounded-md file:px-3 file:py-2 hover:file:bg-gray-50 focus:ring-nmbu-green focus:border-nmbu-green shadow-sm" }}
+              {{ form.reflectance_dir.errors }}
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <p class="text-center text-gray-500">No flights detected on that card.</p>
+    {% endfor %}
+
+    <div class="flex justify-end">
+      <button name="upload" type="submit"
+              class="px-6 py-3 bg-nmbu-green text-white rounded-lg hover:bg-nmbu-dark transition">
+        Upload All
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll("input[type=file][multiple]").forEach(input => {
+      const c = input.closest("div").querySelector(".skyline-count");
+      input.addEventListener("change", () => {
+        c.textContent = input.files.length;
+      });
     });
-  </script>
+  });
+</script>
 {% endblock %}
