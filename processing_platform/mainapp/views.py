@@ -7,37 +7,27 @@ import os
 from datetime import date, datetime, timedelta
 import pandas as pd
 import shutil
-import re
+
+# Date/time imports
+from datetime import date, datetime
+
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
+from django.contrib import messages
+from django.contrib import messages
+from django.forms import formset_factory
+from django.http import HttpResponse, Http404
+
+from .models import Flight_Log, Flight_Paths
+from .forms import FlightForm
 from django.utils.timezone import now
 from django.utils import timezone
 from .models import Fields, Flight_Log, SensorReading, Sensor, Stats, STAT_OPTIONS
 from .sd_card import detect_sd_cards
-
-logger = logging.getLogger(__name__)
-
-# Base output root; ensure this is accessible on your system
-BASE_OUTPUT = os.path.expanduser('~/PheNo')
-
-# Regex to extract the Flight Path Name portion of an SD-card folder
-FOLDER_RE = re.compile(r'''
-    ^(?:DJI_[0-9]{12}_[0-9]{3}_)?   # optional DJI_YYYYMMDDhhmm_###_
-    (?P<flight_path>
-        \d+                        # flight‐path ID, e.g. '25'
-        -[\w-]+                    # site name, e.g. 'RobOat' (allows letters, digits, underscores, hyphens)
-        -\d+m                      # altitude, e.g. '20m'
-        -[\w-]+                    # flight angle, e.g. 'Oblique'
-        -\d+                       # start tilt, e.g. '80'
-        -\d+                       # end tilt, e.g. '85'
-    )
-    (?:\..*)?$                     # optional extension or trailer
-''', re.VERBOSE)
-
 
 def home_view(request):
     print(">>> ENTER home_view")
@@ -118,118 +108,151 @@ def weekly_overview(request):
 
     return render(request, "mainapp/weekly_overview.html", context)
 
+logger = logging.getLogger("mainapp")
+
+# regex to pull out your flight_path key from folder names
+FOLDER_RE = re.compile(r'''
+    ^(?:DJI_[0-9]{12}_[0-9]{3}_)?
+    (?P<flight_path>\d+-[\w-]+-\d+m-[\w-]+(?:-\d+){0,2})
+''', re.VERBOSE)
+
+FlightFormSet = formset_factory(FlightForm, extra=0)
+
+def discover_flights(dcim_root):
+    for name in os.listdir(dcim_root):
+        p = Path(dcim_root) / name
+        if p.is_dir():
+            m = FOLDER_RE.match(name)
+            if m:
+                yield p, m
 
 def sd_card_view(request):
-    print(">>> ENTER sd_card_view, method:", request.method)
-    logger.debug("⇒ Enter sd_card_view; method=%s", request.method)
-
     sd_cards = detect_sd_cards()
-    print(">>> detect_sd_cards returned:", sd_cards)
-    logger.debug("Detected SD cards: %r", sd_cards)
+    if not sd_cards:
+        messages.error(request, "No SD cards detected.")
+        return render(request, "mainapp/sd_card.html", {
+            "sd_cards": [], "formset": None
+        })
 
-    # Hard-code drone models here, because the CSV is wrong
-    # Pull the machine-readable values from your Flight_Log model
-    drone_models = [choice[0] for choice in Flight_Log.DRONE_MODEL_CHOICES]
-    print(">>> available drone_models:", drone_models)
-    logger.debug("Available drone models: %r", drone_models)
+    # figure out which card
+    selected = request.POST.get("sd_card", sd_cards[0])
+    logger.debug("Using SD card: %r", selected)
 
-    if request.method == 'POST':
-        print(">>> sd_card_view handling POST, data:", dict(request.POST))
-        logger.debug("Handling POST; POST data=%r", request.POST)
+    # build the initial data once, for GET only
+    initial = []
+    for path, m in discover_flights(selected):
+        initial.append({
+            "flight_path_key": m.group("flight_path"),
+            "flight_dir":      str(path),
+        })
+    logger.debug("Found %d flight directories", len(initial))
 
-        sd_card_dcim   = request.POST.get('sd_card')
-        selected_drone = request.POST.get('drone_model')
-        print(">>> POST values:", sd_card_dcim, selected_drone)
-        logger.debug(" sd_card_dcim=%r, selected_drone=%r", sd_card_dcim, selected_drone)
+    if request.method == "POST":
+        # BIND only POST data & FILES — no initial= here
+        formset = FlightFormSet(request.POST, request.FILES)
+        logger.debug("POST → formset bound=%s forms=%d",
+                     formset.is_bound, len(formset.forms))
 
-        if not sd_card_dcim:
-            messages.error(request, "Please pick an SD card.")
-            return redirect('sd_card')
-        if not selected_drone:
-            messages.error(request, "Please select a drone model.")
-            return redirect('sd_card')
+        if formset.is_valid() and "upload" in request.POST:
+            processed = 0
 
-        copied = 0
-        os.makedirs(BASE_OUTPUT, exist_ok=True)
-        print(">>> ensured BASE_OUTPUT exists:", BASE_OUTPUT)
-        logger.debug("Ensured BASE_OUTPUT exists: %s", BASE_OUTPUT)
+            for form in formset:
+                cd  = form.cleaned_data
+                fpk = cd["flight_path_key"]
+                try:
+                    fp = Flight_Paths.objects.get(
+                        flight_path_name__startswith=fpk
+                    )
+                except Flight_Paths.DoesNotExist:
+                    messages.warning(request, f"No config for flight {fpk}")
+                    continue
 
-        for sub in os.listdir(sd_card_dcim):
-            print(">>> iterating folder:", sub)
-            logger.debug("Found entry in SD card: %s", sub)
+                # build destination folder name
+                today = date.today().strftime("%Y%m%d")
+                side  = str(int(fp.side_overlap)) if fp.side_overlap else ""
+                front = str(int(fp.front_overlap)) if fp.front_overlap else ""
+                parts = [
+                    today, fp.short_id, cd["drone_model"],
+                    fp.type_of_flight, side, front
+                ]
+                new_folder = " ".join(p for p in parts if p)
 
-            src = os.path.join(sd_card_dcim, sub)
-            if not os.path.isdir(src):
-                print(">>> skipping non-dir:", sub)
-                logger.debug("Skipping non-directory: %s", sub)
-                continue
+                # make dest dir
+                dest_root = Path(fp.first_flight_path)
+                dest = dest_root / new_folder
+                dest.mkdir(parents=True, exist_ok=True)
 
-            m = FOLDER_RE.match(sub)
-            if not m:
-                print(">>> regex did not match:", sub)
-                logger.warning("Skipping folder with unexpected name: %r", sub)
-                continue
+                # copy the raw flight images
+                shutil.copytree(cd["flight_dir"], dest, dirs_exist_ok=True)
 
-            flight_path_key = m.group('flight_path')
-            print(">>> flight_path_key:", flight_path_key)
-            logger.debug("Regex matched flight_path_key=%r", flight_path_key)
+                # copy reflectance if provided, else use flight_dir
+                ref = cd.get("reflectance_dir") or cd["flight_dir"]
+                shutil.copytree(ref, dest, dirs_exist_ok=True)
 
-            try:
-                fp = Flight_Paths.objects.get(
-                    flight_path_name__startswith=flight_path_key
+                # handle uploaded skyline files
+                uploads = request.FILES.getlist(f"{form.prefix}-skyline_files")
+                tmp = dest / "_tmp"
+                if uploads:
+                    tmp.mkdir(exist_ok=True)
+                    for uf in uploads:
+                        with (tmp/uf.name).open("wb+") as f:
+                            for chunk in uf.chunks():
+                                f.write(chunk)
+                        cd["skyline_names"] += f",{uf.name}"
+
+                # move skyline frames into your _SKYLINE folder
+                names = [n for n in cd["skyline_names"].split(",") if n]
+                if names:
+                    sky_root = dest.parent.parent / "_SKYLINE" / fp.short_id
+                    sky_root.mkdir(parents=True, exist_ok=True)
+                    for name in names:
+                        src = (tmp/name) if (tmp/name).exists() else (dest/name)
+                        if src.exists():
+                            shutil.move(str(src), str(sky_root/name))
+                    if tmp.exists():
+                        shutil.rmtree(tmp)
+
+                # record the flight in your DB
+                ws = ",".join(str(cd[f"wind_speed{i}"]) for i in (1,2,3))
+                Flight_Log.objects.create(
+                    foldername        = new_folder,
+                    flight_field_id   = fpk,
+                    project           = fp.project,
+                    flight_type       = fp.type_of_flight,
+                    drone_type        = cd["drone_model"],
+                    drone_pilot       = cd["pilot"],
+                    reflectance_panel = "Yes" if cd.get("reflectance_dir") else "No",
+                    flight_date       = date.today(),
+                    flight_comments   = cd["comments"],
+                    flight_wind_speed = ws,
+                    flight_height     = str(fp.flight_height or ""),
+                    flight_side_over  = str(int(fp.side_overlap)) if fp.side_overlap else "",
+                    flight_front_over = str(int(fp.front_overlap)) if fp.front_overlap else "",
+                    new_folder_name   = new_folder,
+                    root_folder       = str(fp.first_flight_path),
+                    flight_path       = fp.flight_path_name,
+                    p4d_path          = fp.pix4d_path,
                 )
-                print(">>> found Flight_Paths:", fp)
-                logger.debug("Found Flight_Paths entry: %r", fp)
-            except Flight_Paths.DoesNotExist:
-                print(">>> no Flight_Paths matching:", flight_path_key)
-                logger.warning("No DB entry matching Flight Path Name %r", flight_path_key)
-                continue
-            except Flight_Paths.MultipleObjectsReturned:
-                print(">>> multiple Flight_Paths matching:", flight_path_key)
-                logger.warning("Multiple entries match Flight Path Name %r", flight_path_key)
-                continue
 
-            today_str = date.today().strftime('%Y%m%d')
-            side      = str(int(fp.side_overlap)) if fp.side_overlap is not None else ''
-            front     = str(int(fp.front_overlap)) if fp.front_overlap is not None else ''
-            # Use spaces between all components, no semicolons
-            parts = [today_str, fp.short_id, selected_drone, fp.type_of_flight, side, front]
-            new_folder = ' '.join(p for p in parts if p)
-            print(">>> new_folder name:", new_folder)
-            logger.debug("New folder name: %s", new_folder)
+                processed += 1
 
-            dest_root = fp.first_flight_path
-            if not dest_root:
-                print(">>> fp.first_flight_path missing for:", fp)
-                logger.error("No first_flight_path defined for %r", fp.flight_path_name)
-                continue
+            messages.success(request, f"Processed {processed} flight(s).")
+            return redirect("sd_card")
 
-            dest = os.path.join(dest_root, new_folder)
-            os.makedirs(dest, exist_ok=True)
-            print(">>> ensured dest exists:", dest)
-            logger.debug("Ensured destination exists: %s", dest)
+        else:
+            logger.warning(
+                "Formset invalid or no upload flag: %r | upload in POST? %s",
+                formset.errors, "upload" in request.POST
+            )
 
-            try:
-                print(f">>> copying {src} → {dest}")
-                logger.debug("Copying %r → %r …", src, dest)
-                shutil.copytree(src, dest, dirs_exist_ok=True)
+    else:
+        # GET: pre-populate with initial data
+        formset = FlightFormSet(initial=initial)
 
-                copied += 1
-                print(">>> copied count:", copied)
-                logger.info("Copied %r → %r (total copied=%d)", src, dest, copied)
-
-            except Exception as exc:
-                print(">>> copy failed:", exc)
-                logger.error("Failed to copy %r: %s", src, exc)
-                messages.error(request, f"Failed to copy {sub}: {exc}")
-
-        messages.success(request, f"Copied {copied} folders into {BASE_OUTPUT}.")
-        return redirect('sd_card')
-
-    return render(request, 'mainapp/sd_card.html', {
-        'sd_cards': sd_cards,
-        'drone_models': drone_models,
-        'selected_drone': None,
+    return render(request, "mainapp/sd_card.html", {
+        "sd_cards":      sd_cards,
+        "selected_card": selected,
+        "formset":       formset,
     })
 
 """def data_visualisation_view(request):

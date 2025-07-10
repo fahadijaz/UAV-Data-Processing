@@ -2,8 +2,13 @@
 import os
 import sys
 import csv
+from pathlib import Path
 
-# 1) Set up Django environment
+# 1) Ensure Python can import your Django project
+PROJECT_ROOT = Path(__file__).parent.resolve()
+sys.path.insert(0, str(PROJECT_ROOT))
+
+# 2) Bootstrap Django
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'processing_platform.settings')
 import django
 django.setup()
@@ -11,64 +16,71 @@ django.setup()
 from mainapp.models import Flight_Paths
 
 def to_float(s):
-    """Convert '2,00' or '3.14' → float, returning None on failure/empty."""
-    if not s:
+    if s is None:
         return None
-    s = s.replace(',', '.')
+    s = s.strip().replace(',', '.')
     try:
         return float(s)
     except ValueError:
         return None
 
 def import_from_csv(csv_path):
-    # Use utf-8-sig to drop any BOM on the first line
-    with open(csv_path, newline='', encoding='utf-8-sig') as f:
+    csv_path = Path(csv_path)
+    if not csv_path.exists():
+        print(f"ERROR: CSV file not found: {csv_path}")
+        return
+
+    with csv_path.open(newline='', encoding='utf-8-sig') as f:
         reader = csv.DictReader(f, delimiter=';')
-        # DEBUG: uncomment to verify you see '#'
-        # print("Detected headers:", reader.fieldnames)
+        print("Detected CSV headers:", reader.fieldnames)
 
+        # pick your record-number column
+        rec_cols = ['#', 'Record Number', 'record_number']
+        for col in rec_cols:
+            if col in reader.fieldnames:
+                rec_col = col
+                break
+        else:
+            print("ERROR: could not find any of", rec_cols)
+            return
+
+        # pick your flight-path-name column
+        fpath_cols = ['Flight Path Name', 'flight_path_name', 'field_folder_name']
+        for col in fpath_cols:
+            if col in reader.fieldnames:
+                fpath_col = col
+                break
+        else:
+            print("ERROR: could not find any of", fpath_cols)
+            return
+
+        # now iterate
         for row in reader:
-            key = row.get('#')
-            if not key or not key.strip().isdigit():
-                # skip blank/garbage rows
+            rec = row.get(rec_col, '').strip()
+            if not rec.isdigit():
                 continue
+            rn = int(rec)
 
-            rn = int(key)
+            fpn = row.get(fpath_col, '').strip() or None
             data = {
-                'record_number':        rn,
-                'project':              row.get('Project') or None,
-                'short_id':             row.get('Short_ID') or None,
-                'project_folder_name':  row.get('Project Folder Name') or None,
-                'field_folder_name':    row.get('Field folder name') or None,
-                'flight_path_name':     row.get('Flight Path Name') or None,
-                'location_of_field_plot': row.get('Location of field plot') or None,
-                'type_of_flight':       row.get('Type of flight') or None,
-                'frequency':            to_float(row.get('Frequency')),
-                'drone_model':          row.get('Drone Model') or None,
-                'flight_height':        to_float(row.get('Flight Height')),
-                'flight_speed':         to_float(row.get('Flight Speed')),
-                'side_overlap':         to_float(row.get('Side Overlap')),
-                'front_overlap':        to_float(row.get('Front Overlap')),
-                'camera_angle':         to_float(row.get('Camera Angle')),
-                'flight_pattern':       row.get('Flight Pattern') or None,
-                'flight_path_angle':    to_float(row.get('Flight Path Angle')),
-                'ortho_gsd':            to_float(row.get('Ortho GSD')),
-                'oblique_gsd':          to_float(row.get('Oblique GSD')),
-                'flight_length':        to_float(row.get('Flight Length')),
-                'ortho_gsd_pix4d':      to_float(row.get('Ortho GSD')),
-                'oblique_gsd_pix4d':    to_float(row.get('Oblique GSD')),
-                'first_flight_path':    row.get('1_flight path') or None,
-                'pix4d_path':           row.get('2_1_pix4d path') or None,
+                'flight_path_name':   fpn,
+                'short_id':           row.get('Short_ID') or None,
+                'first_flight_path':  row.get('1_flight path') or None,
+                'pix4d_path':         row.get('2_1_pix4d path') or None,
+                'side_overlap':       to_float(row.get('Side Overlap')),
+                'front_overlap':      to_float(row.get('Front Overlap')),
+                'flight_height':      to_float(row.get('Flight Height')),
+                # … add more mappings here as needed …
             }
 
             obj, created = Flight_Paths.objects.update_or_create(
                 record_number=rn,
                 defaults=data
             )
-            print(f"{'Created' if created else 'Updated'} record #{rn}")
+            print(f"{'Created' if created else 'Updated'} Flight_Paths id={obj.id} (record_number={rn})")
 
 if __name__ == '__main__':
     if len(sys.argv) != 2:
-        print("Usage: python populate_flight_paths.py path/to/Flight_list.csv")
+        print("Usage: python populate_flight_paths.py path/to/your.csv")
         sys.exit(1)
     import_from_csv(sys.argv[1])
