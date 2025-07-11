@@ -80,7 +80,7 @@ DATABASES = {
         "USER": "admin",  # POSTGRES_USER
         "PASSWORD": "Drone2025PheNo",  # POSTGRES_PASSWORD
         "HOST": "0.0.0.0",
-        "PORT": "5432",
+        "PORT": "5433",
     }
 }
 
