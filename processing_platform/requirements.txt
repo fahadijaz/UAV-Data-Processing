@@ -1,0 +1,6 @@
+pandas
+numpy
+django
+psycopg2-binary
+openpyxl
+
