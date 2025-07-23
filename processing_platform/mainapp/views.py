@@ -1,6 +1,8 @@
 from django.shortcuts import render
 import logging
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
+
 import csv
 import json
 import os
@@ -23,10 +25,9 @@ from django.forms import formset_factory
 from django.http import HttpResponse, Http404
 
 from .models import Flight_Log, Flight_Paths
+
+from django.forms import formset_factory
 from .forms import FlightForm
-from django.utils.timezone import now
-from django.utils import timezone
-from .models import Fields, Flight_Log, SensorReading, Sensor, Stats, STAT_OPTIONS
 from .sd_card import detect_sd_cards
 
 def home_view(request):
@@ -127,133 +128,132 @@ def discover_flights(dcim_root):
                 yield p, m
 
 def sd_card_view(request):
-    sd_cards = detect_sd_cards()
-    if not sd_cards:
-        messages.error(request, "No SD cards detected.")
-        return render(request, "mainapp/sd_card.html", {
-            "sd_cards": [], "formset": None
+    try:
+        sd_cards = detect_sd_cards()
+    except SDCardError as e:
+        messages.error(request, str(e))
+        return render(request, 'mainapp/sd_card.html', {
+            'sd_cards': [], 'formset': None
         })
 
-    # figure out which card
-    selected = request.POST.get("sd_card", sd_cards[0])
-    logger.debug("Using SD card: %r", selected)
+    selected = request.POST.get('sd_card', sd_cards[0] if sd_cards else None)
 
-    # build the initial data once, for GET only
-    initial = []
-    for path, m in discover_flights(selected):
-        initial.append({
-            "flight_path_key": m.group("flight_path"),
-            "flight_dir":      str(path),
-        })
-    logger.debug("Found %d flight directories", len(initial))
+    if request.method == 'POST':
+        logger.debug("POST keys: %s", list(request.POST.keys()))
+        logger.debug("FILES keys: %s", list(request.FILES.keys()))
 
-    if request.method == "POST":
-        # BIND only POST data & FILES — no initial= here
+        # 1) Bind the formset
         formset = FlightFormSet(request.POST, request.FILES)
-        logger.debug("POST → formset bound=%s forms=%d",
-                     formset.is_bound, len(formset.forms))
 
-        if formset.is_valid() and "upload" in request.POST:
-            processed = 0
+        # 2) Suppress empty-file errors on forms without uploads
+        for form in formset.forms:
+            key = f"{form.prefix}-skyline_files"
+            if not request.FILES.getlist(key):
+                form.errors.pop('skyline_files', None)
 
-            for form in formset:
-                cd  = form.cleaned_data
-                fpk = cd["flight_path_key"]
-                try:
-                    fp = Flight_Paths.objects.get(
-                        flight_path_name__startswith=fpk
-                    )
-                except Flight_Paths.DoesNotExist:
-                    messages.warning(request, f"No config for flight {fpk}")
-                    continue
-
-                # build destination folder name
-                today = date.today().strftime("%Y%m%d")
-                side  = str(int(fp.side_overlap)) if fp.side_overlap else ""
-                front = str(int(fp.front_overlap)) if fp.front_overlap else ""
-                parts = [
-                    today, fp.short_id, cd["drone_model"],
-                    fp.type_of_flight, side, front
-                ]
-                new_folder = " ".join(p for p in parts if p)
-
-                # make dest dir
-                dest_root = Path(fp.first_flight_path)
-                dest = dest_root / new_folder
-                dest.mkdir(parents=True, exist_ok=True)
-
-                # copy the raw flight images
-                shutil.copytree(cd["flight_dir"], dest, dirs_exist_ok=True)
-
-                # copy reflectance if provided, else use flight_dir
-                ref = cd.get("reflectance_dir") or cd["flight_dir"]
-                shutil.copytree(ref, dest, dirs_exist_ok=True)
-
-                # handle uploaded skyline files
-                uploads = request.FILES.getlist(f"{form.prefix}-skyline_files")
-                tmp = dest / "_tmp"
-                if uploads:
-                    tmp.mkdir(exist_ok=True)
-                    for uf in uploads:
-                        with (tmp/uf.name).open("wb+") as f:
-                            for chunk in uf.chunks():
-                                f.write(chunk)
-                        cd["skyline_names"] += f",{uf.name}"
-
-                # move skyline frames into your _SKYLINE folder
-                names = [n for n in cd["skyline_names"].split(",") if n]
-                if names:
-                    sky_root = dest.parent.parent / "_SKYLINE" / fp.short_id
-                    sky_root.mkdir(parents=True, exist_ok=True)
-                    for name in names:
-                        src = (tmp/name) if (tmp/name).exists() else (dest/name)
-                        if src.exists():
-                            shutil.move(str(src), str(sky_root/name))
-                    if tmp.exists():
-                        shutil.rmtree(tmp)
-
-                # record the flight in your DB
-                ws = ",".join(str(cd[f"wind_speed{i}"]) for i in (1,2,3))
-                Flight_Log.objects.create(
-                    foldername        = new_folder,
-                    flight_field_id   = fpk,
-                    project           = fp.project,
-                    flight_type       = fp.type_of_flight,
-                    drone_type        = cd["drone_model"],
-                    drone_pilot       = cd["pilot"],
-                    reflectance_panel = "Yes" if cd.get("reflectance_dir") else "No",
-                    flight_date       = date.today(),
-                    flight_comments   = cd["comments"],
-                    flight_wind_speed = ws,
-                    flight_height     = str(fp.flight_height or ""),
-                    flight_side_over  = str(int(fp.side_overlap)) if fp.side_overlap else "",
-                    flight_front_over = str(int(fp.front_overlap)) if fp.front_overlap else "",
-                    new_folder_name   = new_folder,
-                    root_folder       = str(fp.first_flight_path),
-                    flight_path       = fp.flight_path_name,
-                    p4d_path          = fp.pix4d_path,
-                )
-
-                processed += 1
-
-            messages.success(request, f"Processed {processed} flight(s).")
-            return redirect("sd_card")
-
-        else:
-            logger.warning(
-                "Formset invalid or no upload flag: %r | upload in POST? %s",
-                formset.errors, "upload" in request.POST
+        # 3) Validate and process ALL forms
+        if formset.is_valid() and 'upload' in request.POST:
+            total = process_flights_post(formset, selected, request)
+            # 4) Rebuild a fresh formset so the page reflects current state
+            new_initial = build_initial_flights(selected)
+            formset = FlightFormSet(initial=new_initial)
+            messages.success(
+                request,
+                f"✅ Done! Processed {total} flight{'s' if total != 1 else ''}."
             )
+        else:
+            messages.warning(request, f"There were errors: {formset.errors}")
 
     else:
-        # GET: pre-populate with initial data
+        # GET: just show all detected flights
+        initial = build_initial_flights(selected)
         formset = FlightFormSet(initial=initial)
 
-    return render(request, "mainapp/sd_card.html", {
-        "sd_cards":      sd_cards,
-        "selected_card": selected,
-        "formset":       formset,
+    return render(request, 'mainapp/sd_card.html', {
+        'sd_cards': sd_cards,
+        'selected_card': selected,
+        'formset': formset,
     })
+
+  
+
+"""def data_visualisation_view(request):
+    return render(request, 'mainapp/data_visualisation.html')"""
+
+STAT_OPTIONS = [
+    ("cv", "Coefficient of Variation"),
+    ("iqr", "Interquartile Range"),
+    ("kurtosis", "Kurtosis"),
+    ("majority", "Majority"),
+    ("max", "Maximum"),
+    ("mean", "Mean"),
+    ("median", "Median"),
+    ("min", "Minimum"),
+    ("minority", "Minority"),
+    ("q25", "25th Percentile (Q1)"),
+    ("q75", "75th Percentile (Q3)"),
+    ("range", "Range (Max - Min)"),
+    ("skewness", "Skewness"),
+    ("std", "Standard Deviation"),
+    ("sum", "Sum"),
+    ("top_10", "Top 10 Values"),
+    ("top_10_mean", "Mean of Top 10 Values"),
+    ("top_10_median", "Median of Top 10 Values"),
+    ("top_10_std", "Standard Deviation of Top 10 Values"),
+    ("top_15", "Top 15 Values"),
+    ("top_15_mean", "Mean of Top 15 Values"),
+    ("top_15_median", "Median of Top 15 Values"),
+    ("top_15_std", "Standard Deviation of Top 15 Values"),
+    ("top_20", "Top 20 Values"),
+    ("top_25", "Top 25 Values"),
+    ("top_25_mean", "Mean of Top 25 Values"),
+    ("top_25_median", "Median of Top 25 Values"),
+    ("top_25_std", "Standard Deviation of Top 25 Values"),
+    ("top_35", "Top 35 Values"),
+    ("top_35_mean", "Mean of Top 35 Values"),
+    ("top_35_median", "Median of Top 35 Values"),
+    ("top_35_std", "Standard Deviation of Top 35 Values"),
+    ("top_50", "Top 50 Values"),
+    ("top_50_mean", "Mean of Top 50 Values"),
+    ("top_50_median", "Median of Top 50 Values"),
+    ("top_50_std", "Standard Deviation of Top 50 Values"),
+    ("top_5_mean", "Mean of Top 5 Values"),
+    ("top_5_median", "Median of Top 5 Values"),
+    ("top_5_std", "Standard Deviation of Top 5 Values"),
+    ("variance", "Variance"),
+    ("variety", "Variety (Number of Unique Values)"),
+]
+
+def data_visualisation(request):
+    selected_stats = request.GET.getlist("stats")
+    selected_dates = request.GET.getlist("date")
+    
+    all_dates = []
+    downloads_path = os.path.expanduser("~/Downloads")
+    csv_file_path = os.path.join(downloads_path, "24BPROBARG20_Vollebekk_2024.csv")
+
+    if os.path.exists(csv_file_path):
+        df = pd.read_csv(csv_file_path)
+        if "date" in df.columns:
+            all_dates = (
+                pd.to_datetime(df["date"], errors="coerce")
+                .dt.strftime("%Y-%m-%d")
+                .drop_duplicates()
+                .sort_values()
+                .tolist()
+            )
+
+    plots = []
+    return render(request, "mainapp/data_visualisation.html", {
+        "plots": plots,
+        "stat_options": STAT_OPTIONS,
+        "selected_stats": selected_stats,
+        "selected_dates": selected_dates,
+        "all_dates": all_dates,
+    })
+
+df = pd.read_csv("~/Downloads/Drone_Flying_Schedule_2025.csv")
+print(df.columns)  # See what columns actually exist
 
 """def data_visualisation_view(request):
     return render(request, 'mainapp/data_visualisation.html')"""
