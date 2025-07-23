@@ -19,6 +19,7 @@ urlpatterns = [
     path("add-routes/", views.add_routes_view, name="add_routes"),
     path("weekly_overview/", views.weekly_overview, name="weekly_overview"),
     path("upload/", views.easy_growth, name="easy_growth"),
+    path('visualise/', views.data_visualisation, name='data_visualisation'),
 ]
 
 logger.debug("Registered URL patterns: %s", [p.name for p in urlpatterns])

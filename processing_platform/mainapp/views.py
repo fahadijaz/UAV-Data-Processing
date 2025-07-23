@@ -1,3 +1,4 @@
+from django.shortcuts import render
 import logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
 
@@ -235,6 +236,63 @@ def sd_card_view(request):
         'selected_drone': None,
     })
 
+<<<<<<< HEAD
+=======
+"""def data_visualisation_view(request):
+    return render(request, 'mainapp/data_visualisation.html')"""
+
+STAT_OPTIONS = [
+
+    ("cv", "Coefficient of Variation"),
+    ("iqr", "Interquartile Range"),
+    ("kurtosis", "Kurtosis"),
+    ("majority", "Majority"),
+    ("max", "Maximum"),
+    ("mean", "Mean"),
+    ("median", "Median"),
+    ("min", "Minimum"),
+    ("minority", "Minority"),
+    ("q25", "25th Percentile (Q1)"),
+    ("q75", "75th Percentile (Q3)"),
+    ("range", "Range (Max - Min)"),
+    ("std", "Standard Deviation"),
+    ("sum", "Sum"),
+    ("top_10", "Top 10 Values"),
+    ("top_10_mean", "Mean of Top 10 Values"),
+    ("skewness", "Skewness"),
+]
+
+def data_visualisation(request):
+    selected_stats = request.GET.getlist("stats")
+    selected_dates = request.GET.getlist("date")
+    
+    all_dates = []
+    downloads_path = os.path.expanduser("~/Downloads")
+    csv_file_path = os.path.join(downloads_path, "24BPROBARG20_Vollebekk_2024.csv")
+
+    if os.path.exists(csv_file_path):
+        df = pd.read_csv(csv_file_path)
+        if "date" in df.columns:
+            all_dates = (
+                pd.to_datetime(df["date"], errors="coerce")
+                .dt.strftime("%Y-%m-%d")
+                .drop_duplicates()
+                .sort_values()
+                .tolist()
+            )
+
+    plots = []
+    return render(request, "mainapp/data_visualisation.html", {
+        "plots": plots,
+        "stat_options": STAT_OPTIONS,
+        "selected_stats": selected_stats,
+        "selected_dates": selected_dates,
+        "all_dates": all_dates,
+    })
+
+df = pd.read_csv("~/Downloads/Drone_Flying_Schedule_2025.csv")
+print(df.columns)  # See what columns actually exist
+>>>>>>> feat/plotting
 
 def read_local_csv(request):
     print(">>> ENTER read_local_csv")

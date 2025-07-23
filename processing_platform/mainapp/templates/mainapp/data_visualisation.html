@@ -1,0 +1,41 @@
+{% extends "mainapp/base.html" %}
+
+{% block title %}Data Visualisation{% endblock %}
+
+{% block content %}
+  <h2 class="text-2xl font-semibold mb-4">Data visualisation</h2>
+  <p class="mb-4">Select a date and one or more statistical values to plot</p>
+
+  <form method="get" class="mb-22">
+    <!-- Date input-->
+    {% for date in all_dates %}
+      <label class="block">
+        <input type="checkbox" name="date" value="{{ date }}"
+              {% if date in selected_dates %}checked{% endif %}>
+        {{ date }}
+      </label>
+    {% endfor %} 
+       
+    <!-- Stats selector-->
+     <label class="block mb-2 font-medium">Select statistical values:</label>
+      {% for key, label in stat_options %}
+        <label class="block">
+          <input type="checkbox" name="stats" value="{{ key }}"
+                {% if key in selected_stats %}checked{% endif %}>
+          {{ label }}
+        </label>
+      {% endfor %}
+    <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
+      Plot
+    </button>
+  </form>
+
+  {% for plot in plots %}
+    <div class="mb-8 border p-4 bg-white shadow rounded">
+      <img src="data:image/png;base64,{{plot}}" alt="Plot" class="w-full h-auto">
+    </div>
+  {% endfor %}
+{% endblock %}
+
+
+
