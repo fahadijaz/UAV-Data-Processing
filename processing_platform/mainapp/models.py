@@ -22,6 +22,7 @@ class Flight_Log(models.Model):
         ("Kristoffer", "Kristoffer"),
         ("Ludvik", "Ludvik"),
         ("Jorgen", "Jorgen"),
+        ("Mia", "Mia"),
         ("Fahad", "Fahad"),
         ("Other", "Other"),
     ]
@@ -170,3 +171,29 @@ class Flight_Paths(models.Model):
     class Meta:
         db_table = 'flight_paths'
 
+class Sensor(models.Model):
+    sensor_id = models.CharField(max_length=100, unique=True)
+
+    def __str__(self):
+        return self.sensor_id
+
+
+class SensorReading(models.Model):
+    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE)
+    timestamp = models.DateTimeField()
+
+    soil_temperature = models.FloatField(null=True, blank=True)
+    soil_moisture = models.FloatField(null=True, blank=True)
+    air_temperature = models.FloatField(null=True, blank=True)
+    air_humidity = models.FloatField(null=True, blank=True)
+    battery = models.FloatField(null=True, blank=True)
+    rainfall = models.FloatField(null=True, blank=True)
+
+    crop_type = models.CharField(max_length=100, blank=True)
+    soil_type = models.CharField(max_length=100, blank=True)
+
+    class Meta:
+        unique_together = ("sensor", "timestamp")
+
+    def __str__(self):
+        return f"{self.sensor.sensor_id} @ {self.timestamp}"

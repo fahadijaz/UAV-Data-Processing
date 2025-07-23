@@ -1,17 +1,13 @@
 from django.shortcuts import render
 import logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
-
+logger = logging.getLogger(__name__)
 import csv
+import json
 import os
 from datetime import date, datetime, timedelta
-
 import pandas as pd
 import shutil
-
-# Date/time imports
-from datetime import date, datetime
-
+import re
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
@@ -19,8 +15,8 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
 from django.utils.timezone import now
-
-from .models import Fields, Flight, Flight_Log, Sensor, SensorReading
+from django.utils import timezone
+from .models import Fields, Flight_Log, SensorReading, Sensor
 from .sd_card import detect_sd_cards
 
 logger = logging.getLogger(__name__)
@@ -508,7 +504,7 @@ def weekly_view(request):
     all_flights = []
 
     # Get current week range
-    today = datetime.date.today()
+    today = date.today()
     start_of_week = today - datetime.timedelta(days=today.weekday())
     end_of_week = start_of_week + datetime.timedelta(days=6)
     week_num = today.isocalendar()[1]
@@ -555,86 +551,141 @@ def weekly_view(request):
 
     return render(request, "mainapp/weekly.html", context)
 
-
-def parse_csv_datetime(datetime_string):
-    """Trying to extract the date"""
-    try:
-        return datetime.strptime(datetime_string.strip(), "%d.%m.%Y %H:%M")
-    except ValueError:
-        return datetime.strptime(datetime_string.strip(), "%d.%m.%Y")
-
-
-def process_csv_data(file_content, sensor_id):
-    """reads csv files and puts the data into db, ignoring duplicates"""
+def process_json_data(json_data, sensor_id):
+    """Lagrer rader fra en JSON-fil i databasen."""
     sensor, _ = Sensor.objects.get_or_create(sensor_id=sensor_id)
+    total = 0
+    added = 0
 
-    decoded = file_content.decode("utf-8").splitlines()
-    reader = csv.reader(decoded)
-
-    try:
-        header = next(reader)
-    except StopIteration:
-        return
-
-    for row in reader:
-        if not row or not row[0].strip():
-            continue
-
+    for entry in json_data:
         try:
-            timestamp = parse_csv_datetime(row[0])
+            timestamp_str = entry["TS"]
+            timestamp = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
             reading_data = {
-                "soil_temperature": float(row[1]) if row[1] else None,
-                "soil_moisture": float(row[2]) if row[2] else None,
-                "air_temperature": float(row[3]) if row[3] else None,
-                "air_humidity": float(row[4]) if row[4] else None,
-                "battery": float(row[5]) if row[5] else None,
-                "rainfall": float(row[6]) if row[6] else None,
-                "crop_type": row[7].strip() if len(row) > 7 else "",
-                "soil_type": row[8].strip() if len(row) > 8 else "",
+                "soil_temperature": float(entry["JT"]) if entry.get("JT") else None,
+                "soil_moisture": float(entry["JF"]) if entry.get("JF") else None,
+                "air_temperature": float(entry["LT"]) if entry.get("LT") else None,
+                "air_humidity": float(entry["LF"]) if entry.get("LF") else None,
+                "battery": float(entry["BT"]) if entry.get("BT") else None,
+                "rainfall": float(entry["R"]) if entry.get("R") else None,
+                "crop_type": entry.get("crop", "").strip(),
+                "soil_type": entry.get("soilType", "").strip(),
             }
 
-            SensorReading.objects.get_or_create(
-                sensor=sensor, timestamp=timestamp, defaults=reading_data
+            obj, created = SensorReading.objects.get_or_create(
+                sensor=sensor,
+                timestamp=timestamp,
+                defaults=reading_data,
             )
+            if created:
+                added += 1
+            total += 1
 
         except Exception as e:
-            print(f"Feil i rad {row}: {e}")
+            logger.error(f"Error json row {entry}: {e}")
             continue
+
+
+
+
+def process_json_data(json_data, sensor_id):
+    """Lagrer rader fra en JSON-fil i databasen."""
+    sensor, _ = Sensor.objects.get_or_create(sensor_id=sensor_id)
+    added = 0
+
+    for entry in json_data:
+        try:
+            timestamp_str = entry["TS"]
+            timestamp = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+            reading_data = {
+                "soil_temperature": float(entry["JT"]) if entry.get("JT") else None,
+                "soil_moisture": float(entry["JF"]) if entry.get("JF") else None,
+                "air_temperature": float(entry["LT"]) if entry.get("LT") else None,
+                "air_humidity": float(entry["LF"]) if entry.get("LF") else None,
+                "battery": float(entry["BT"]) if entry.get("BT") else None,
+                "rainfall": float(entry["R"]) if entry.get("R") else None,
+                "crop_type": entry.get("crop", "").strip(),
+                "soil_type": entry.get("soilType", "").strip(),
+            }
+
+            _, created = SensorReading.objects.get_or_create(
+                sensor=sensor,
+                timestamp=timestamp,
+                defaults=reading_data,
+            )
+            if created:
+                added += 1
+
+        except Exception as e:
+            logger.error(f"Feil i JSON-rad {entry}: {e}")
+            continue
+
+    logger.info(f"Sensor {sensor_id}: {added}/{len(json_data)} rader lagt til.")
+
 
 
 def upload_easy_growth_data(request):
-    """Hovedvisningen for å laste opp sensorfiler fra brukerens maskin."""
+    sensors = Sensor.objects.all()
+    chart_data = []
+    latest_reading = None
+    default_end = timezone.now().date()
+    default_start = default_end - timedelta(days=14)
+
+    selected_sensor_id = request.GET.get("sensor")
+    start_str = request.GET.get("start_date")
+    end_str = request.GET.get("end_date")
+    try:
+        if start_str:
+            default_start = datetime.strptime(start_str, "%Y-%m-%d").date()
+        if end_str:
+            default_end = datetime.strptime(end_str, "%Y-%m-%d").date()
+    except ValueError:
+        messages.error(request, "Ugyldig datoformat.")
+        return redirect(request.path)
+
+    if selected_sensor_id:
+        readings = SensorReading.objects.filter(
+            sensor__sensor_id=selected_sensor_id,
+            timestamp__date__range=(default_start, default_end)
+        ).order_by("timestamp")
+
+        chart_data = [
+            {
+                "timestamp": r.timestamp.strftime("%Y-%m-%d %H:%M"),
+                "air_temperature": r.air_temperature,
+                "soil_temperature": r.soil_temperature,
+                "air_humidity": r.air_humidity,
+                "soil_moisture": r.soil_moisture,
+            }
+            for r in readings
+        ]
+        latest_reading = readings.last()
+
     if request.method == "POST":
-        source = request.POST.get("source")
-
-        if source == "files":
-            files = request.FILES.getlist("files")
-        elif source == "folder":
-            files = request.FILES.getlist("folder_files")
-        else:
-            files = []
-
-        if not files:
-            messages.error(request, "Ingen filer valgt.")
-            return redirect(request.path)
-
+        files = request.FILES.getlist("files")
         total = 0
         for file in files:
-            filename_parts = (
-                file.name.split("/") if "/" in file.name else file.name.split("\\")
-            )
-            short_name = filename_parts[-1]
-
+            short_name = file.name.split("/")[-1].split("\\")[-1]
             sensor_id = short_name.split()[0].strip()
 
             try:
-                process_csv_data(file.read(), sensor_id)
+                data = json.loads(file.read().decode("utf-8"))
+                process_json_data(data, sensor_id)
                 total += 1
             except Exception as e:
-                print(f"Feil i fil: {file.name} – {e}")
+                logger.error(f"Error handling file {file.name}: {e}")
+                messages.error(request, f"Feil i fil: {file.name}")
 
-        messages.success(request, f"{total} filer behandlet.")
+        if total:
+            messages.success(request, f"{total} fil(er) lastet opp.")
         return redirect(request.path)
 
-    return render(request, "mainapp/flight_details.html")
+    return render(request, "mainapp/easy_growth.html", {
+        "sensors": sensors,
+        "chart_data": chart_data,
+        "latest_readings": latest_reading,
+        "default_start": default_start.isoformat(),
+        "default_end": default_end.isoformat(),
+    })
