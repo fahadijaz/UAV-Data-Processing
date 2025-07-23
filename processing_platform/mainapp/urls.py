@@ -9,5 +9,5 @@ urlpatterns = [
     path('weekly/', views.weekly_view, name='weekly'),
     path('details/', views.details_view, name='details'),
     path('add-routes/', views.add_routes_view, name='add_routes'),
-    path('visualise/', views.data_visualisation_view, name='data_visualisation'),
+    path('visualise/', views.data_visualisation, name='data_visualisation'),
 ]
