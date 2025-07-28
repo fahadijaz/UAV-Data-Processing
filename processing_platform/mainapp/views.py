@@ -16,7 +16,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
 from django.utils.timezone import now
 from django.utils import timezone
-from .models import Fields, Flight_Log, SensorReading, Sensor
+from .models import Fields, Flight_Log, SensorReading, Sensor, Stats, STAT_OPTIONS
 from .sd_card import detect_sd_cards
 
 logger = logging.getLogger(__name__)
@@ -232,13 +232,10 @@ def sd_card_view(request):
         'selected_drone': None,
     })
 
-<<<<<<< HEAD
-=======
 """def data_visualisation_view(request):
     return render(request, 'mainapp/data_visualisation.html')"""
 
 STAT_OPTIONS = [
-
     ("cv", "Coefficient of Variation"),
     ("iqr", "Interquartile Range"),
     ("kurtosis", "Kurtosis"),
@@ -251,11 +248,35 @@ STAT_OPTIONS = [
     ("q25", "25th Percentile (Q1)"),
     ("q75", "75th Percentile (Q3)"),
     ("range", "Range (Max - Min)"),
+    ("skewness", "Skewness"),
     ("std", "Standard Deviation"),
     ("sum", "Sum"),
     ("top_10", "Top 10 Values"),
     ("top_10_mean", "Mean of Top 10 Values"),
-    ("skewness", "Skewness"),
+    ("top_10_median", "Median of Top 10 Values"),
+    ("top_10_std", "Standard Deviation of Top 10 Values"),
+    ("top_15", "Top 15 Values"),
+    ("top_15_mean", "Mean of Top 15 Values"),
+    ("top_15_median", "Median of Top 15 Values"),
+    ("top_15_std", "Standard Deviation of Top 15 Values"),
+    ("top_20", "Top 20 Values"),
+    ("top_25", "Top 25 Values"),
+    ("top_25_mean", "Mean of Top 25 Values"),
+    ("top_25_median", "Median of Top 25 Values"),
+    ("top_25_std", "Standard Deviation of Top 25 Values"),
+    ("top_35", "Top 35 Values"),
+    ("top_35_mean", "Mean of Top 35 Values"),
+    ("top_35_median", "Median of Top 35 Values"),
+    ("top_35_std", "Standard Deviation of Top 35 Values"),
+    ("top_50", "Top 50 Values"),
+    ("top_50_mean", "Mean of Top 50 Values"),
+    ("top_50_median", "Median of Top 50 Values"),
+    ("top_50_std", "Standard Deviation of Top 50 Values"),
+    ("top_5_mean", "Mean of Top 5 Values"),
+    ("top_5_median", "Median of Top 5 Values"),
+    ("top_5_std", "Standard Deviation of Top 5 Values"),
+    ("variance", "Variance"),
+    ("variety", "Variety (Number of Unique Values)"),
 ]
 
 def data_visualisation(request):
@@ -288,7 +309,6 @@ def data_visualisation(request):
 
 df = pd.read_csv("~/Downloads/Drone_Flying_Schedule_2025.csv")
 print(df.columns)  # See what columns actually exist
->>>>>>> feat/plotting
 
 def read_local_csv(request):
     print(">>> ENTER read_local_csv")

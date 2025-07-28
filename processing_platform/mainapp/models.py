@@ -197,3 +197,17 @@ class SensorReading(models.Model):
 
     def __str__(self):
         return f"{self.sensor.sensor_id} @ {self.timestamp}"
+
+STAT_FIELDS = [
+    "cv", "iqr", "kurtosis", "majority", "max", "mean", "median", "min", "minority",
+    "q25", "q75", "range", "skewness", "std", "sum", "top_10", "top_10_mean", "top_10_median", "top_10_std",
+    "top_15", "top_15_mean", "top_15_median", "top_15_std",
+    "top_20", "top_25", "top_25_mean", "top_25_median", "top_25_std",
+    "top_35", "top_35_mean", "top_35_median", "top_35_std",
+    "top_50", "top_50_mean", "top_50_median", "top_50_std",
+    "top_5_mean", "top_5_median", "top_5_std", "variance", "variety",
+]
+
+class Stats(models.Model):
+    date = models.DateField()
+    spectrum = models.CharField()
