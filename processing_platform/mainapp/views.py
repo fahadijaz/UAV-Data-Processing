@@ -232,8 +232,6 @@ def sd_card_view(request):
         'selected_drone': None,
     })
 
-<<<<<<< HEAD
-=======
 """def data_visualisation_view(request):
     return render(request, 'mainapp/data_visualisation.html')"""
 
@@ -288,7 +286,6 @@ def data_visualisation(request):
 
 df = pd.read_csv("~/Downloads/Drone_Flying_Schedule_2025.csv")
 print(df.columns)  # See what columns actually exist
->>>>>>> feat/plotting
 
 def read_local_csv(request):
     print(">>> ENTER read_local_csv")
