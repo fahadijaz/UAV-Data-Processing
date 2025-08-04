@@ -198,6 +198,7 @@ class SensorReading(models.Model):
     def __str__(self):
         return f"{self.sensor.sensor_id} @ {self.timestamp}"
 
+"""
 STAT_FIELDS = [
     "cv", "iqr", "kurtosis", "majority", "max", "mean", "median", "min", "minority",
     "q25", "q75", "range", "skewness", "std", "sum", "top_10", "top_10_mean", "top_10_median", "top_10_std",
@@ -207,7 +208,73 @@ STAT_FIELDS = [
     "top_50", "top_50_mean", "top_50_median", "top_50_std",
     "top_5_mean", "top_5_median", "top_5_std", "variance", "variety",
 ]
+"""
 
-class Stats(models.Model):
+class ZonalStat(models.Model):
+    id = models.IntegerField()
+    location = models.CharField(max_length=100)
+    camera = models.CharField(max_length=100)
+    flight_height = models.CharField(max_length=20)
+    project = models.CharField(max_length=100)
+    flight = models.CharField(max_length=200)
     date = models.DateField()
-    spectrum = models.CharField()
+    spectrum = models.CharField(max_length=50)
+
+    count = models.IntegerField()
+    cv = models.FloatField()
+    iqr = models.FloatField()
+    kurtosis = models.FloatField()
+    majority = models.FloatField()
+    max = models.FloatField()
+    mean = models.FloatField()
+    median = models.FloatField()
+    min = models.FloatField()
+    minority = models.FloatField()
+    q25 = models.FloatField()
+    q75 = models.FloatField()
+    range = models.FloatField()
+    skewness = models.FloatField()
+    std = models.FloatField()
+    sum = models.FloatField()
+
+    top_10 = models.FloatField()
+    top_10_mean = models.FloatField()
+    top_10_median = models.FloatField()
+    top_10_std = models.FloatField()
+
+    top_15 = models.FloatField()
+    top_15_mean = models.FloatField()
+    top_15_median = models.FloatField()
+    top_15_std = models.FloatField()
+
+    top_20 = models.FloatField()
+
+    top_25 = models.FloatField()
+    top_25_mean = models.FloatField()
+    top_25_median = models.FloatField()
+    top_25_std = models.FloatField()
+
+    top_35 = models.FloatField()
+    top_35_mean = models.FloatField()
+    top_35_median = models.FloatField()
+    top_35_std = models.FloatField()
+
+    top_50 = models.FloatField()
+    top_50_mean = models.FloatField()
+    top_50_median = models.FloatField()
+    top_50_std = models.FloatField()
+
+    top_5_mean = models.FloatField()
+    top_5_median = models.FloatField()
+    top_5_std = models.FloatField()
+
+    variance = models.FloatField()
+    variety = models.IntegerField()
+
+    class Meta:
+        ordering = ["date"]
+
+    def __str__(self):
+        return f"{self.date} | {self.spectrum} | {self.mean:.3f}"
+    
+
