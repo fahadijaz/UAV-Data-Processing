@@ -20,4 +20,3 @@ services:
       - ~/Downloads:/downloads
     depends_on:
       - db
-

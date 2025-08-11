@@ -2,6 +2,7 @@ import os
 import platform
 import string
 import ctypes
+import shutil
 
 def is_removable_drive_windows(drive_letter):
     DRIVE_REMOVABLE = 2
@@ -11,30 +12,41 @@ def is_removable_drive_windows(drive_letter):
 def find_sd_cards_windows(dcim_folder="DCIM"):
     sd_cards = []
     for drive_letter in string.ascii_uppercase:
-        drive_path = f"{drive_letter}:/"
-        target_path = os.path.join(drive_path, dcim_folder)
-        try:
-            if is_removable_drive_windows(drive_letter) and os.path.exists(target_path):
-                sd_cards.append(target_path)
-        except Exception:
-            pass
+        drive = f"{drive_letter}:/"
+        candidate = os.path.join(drive, dcim_folder)
+        if is_removable_drive_windows(drive_letter) and os.path.isdir(candidate):
+            sd_cards.append(candidate)
     return sd_cards
 
 def find_sd_cards_unix(dcim_folder="DCIM"):
-    base_dirs = ["/media", "/Volumes", "/mnt"]
     sd_cards = []
-    for base_path in base_dirs:
-        if os.path.exists(base_path):
-            for device in os.listdir(base_path):
-                device_path = os.path.join(base_path, device)
-                target_path = os.path.join(device_path, dcim_folder)
-                if os.path.isdir(target_path):
-                    sd_cards.append(target_path)
+    for base in ("/media", "/Volumes", "/mnt"):
+        if not os.path.isdir(base):
+            continue
+        for dev in os.listdir(base):
+            candidate = os.path.join(base, dev, dcim_folder)
+            if os.path.isdir(candidate):
+                sd_cards.append(candidate)
     return sd_cards
 
 def detect_sd_cards(dcim_folder="DCIM"):
-    system = platform.system()
-    if system == "Windows":
+    if platform.system() == "Windows":
         return find_sd_cards_windows(dcim_folder)
-    else:
-        return find_sd_cards_unix(dcim_folder)
+    return find_sd_cards_unix(dcim_folder)
+
+
+if __name__ == "__main__":
+    BASE_OUTPUT = r"E:\PheNo"
+    os.makedirs(BASE_OUTPUT, exist_ok=True)
+
+    for dcim_path in detect_sd_cards():
+        print(f"Found DCIM folder at:\n  {dcim_path}\n")
+        # Move each subfolder (e.g. "100MEDIA", "101MEDIA", "DJI_…") out of DCIM:
+        for sub in os.listdir(dcim_path):
+            src_folder = os.path.join(dcim_path, sub)
+            if not os.path.isdir(src_folder):
+                continue
+
+            dest = os.path.join(BASE_OUTPUT, sub)
+            print(f"Moving:\n  {src_folder}\n→ {dest}\n")
+            shutil.move(src_folder, dest)

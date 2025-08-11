@@ -1,9 +1,13 @@
+from django.shortcuts import render
+import logging
+logger = logging.getLogger(__name__)
 import csv
-import datetime
+import json
 import os
 from datetime import date, datetime, timedelta
-
 import pandas as pd
+import shutil
+import re
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
@@ -11,12 +15,33 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
 from django.utils.timezone import now
-
-from .models import Fields, Flight, Flight_Log, Sensor, SensorReading
+from django.utils import timezone
+from .models import Fields, Flight_Log, SensorReading, Sensor, Stats, STAT_OPTIONS
 from .sd_card import detect_sd_cards
+
+logger = logging.getLogger(__name__)
+
+# Base output root; ensure this is accessible on your system
+BASE_OUTPUT = os.path.expanduser('~/PheNo')
+
+# Regex to extract the Flight Path Name portion of an SD-card folder
+FOLDER_RE = re.compile(r'''
+    ^(?:DJI_[0-9]{12}_[0-9]{3}_)?   # optional DJI_YYYYMMDDhhmm_###_
+    (?P<flight_path>
+        \d+                        # flight‐path ID, e.g. '25'
+        -[\w-]+                    # site name, e.g. 'RobOat' (allows letters, digits, underscores, hyphens)
+        -\d+m                      # altitude, e.g. '20m'
+        -[\w-]+                    # flight angle, e.g. 'Oblique'
+        -\d+                       # start tilt, e.g. '80'
+        -\d+                       # end tilt, e.g. '85'
+    )
+    (?:\..*)?$                     # optional extension or trailer
+''', re.VERBOSE)
 
 
 def home_view(request):
+    print(">>> ENTER home_view")
+    logger.debug("ENTER home_view")
     return render(request, "mainapp/home.html")
 
 
@@ -95,12 +120,215 @@ def weekly_overview(request):
 
 
 def sd_card_view(request):
-    sd_cards = detect_sd_cards()
-    return render(request, "mainapp/sd_card.html", {"sd_cards": sd_cards})
+    print(">>> ENTER sd_card_view, method:", request.method)
+    logger.debug("⇒ Enter sd_card_view; method=%s", request.method)
 
+    sd_cards = detect_sd_cards()
+    print(">>> detect_sd_cards returned:", sd_cards)
+    logger.debug("Detected SD cards: %r", sd_cards)
+
+    # Hard-code drone models here, because the CSV is wrong
+    # Pull the machine-readable values from your Flight_Log model
+    drone_models = [choice[0] for choice in Flight_Log.DRONE_MODEL_CHOICES]
+    print(">>> available drone_models:", drone_models)
+    logger.debug("Available drone models: %r", drone_models)
+
+    if request.method == 'POST':
+        print(">>> sd_card_view handling POST, data:", dict(request.POST))
+        logger.debug("Handling POST; POST data=%r", request.POST)
+
+        sd_card_dcim   = request.POST.get('sd_card')
+        selected_drone = request.POST.get('drone_model')
+        print(">>> POST values:", sd_card_dcim, selected_drone)
+        logger.debug(" sd_card_dcim=%r, selected_drone=%r", sd_card_dcim, selected_drone)
+
+        if not sd_card_dcim:
+            messages.error(request, "Please pick an SD card.")
+            return redirect('sd_card')
+        if not selected_drone:
+            messages.error(request, "Please select a drone model.")
+            return redirect('sd_card')
+
+        copied = 0
+        os.makedirs(BASE_OUTPUT, exist_ok=True)
+        print(">>> ensured BASE_OUTPUT exists:", BASE_OUTPUT)
+        logger.debug("Ensured BASE_OUTPUT exists: %s", BASE_OUTPUT)
+
+        for sub in os.listdir(sd_card_dcim):
+            print(">>> iterating folder:", sub)
+            logger.debug("Found entry in SD card: %s", sub)
+
+            src = os.path.join(sd_card_dcim, sub)
+            if not os.path.isdir(src):
+                print(">>> skipping non-dir:", sub)
+                logger.debug("Skipping non-directory: %s", sub)
+                continue
+
+            m = FOLDER_RE.match(sub)
+            if not m:
+                print(">>> regex did not match:", sub)
+                logger.warning("Skipping folder with unexpected name: %r", sub)
+                continue
+
+            flight_path_key = m.group('flight_path')
+            print(">>> flight_path_key:", flight_path_key)
+            logger.debug("Regex matched flight_path_key=%r", flight_path_key)
+
+            try:
+                fp = Flight_Paths.objects.get(
+                    flight_path_name__startswith=flight_path_key
+                )
+                print(">>> found Flight_Paths:", fp)
+                logger.debug("Found Flight_Paths entry: %r", fp)
+            except Flight_Paths.DoesNotExist:
+                print(">>> no Flight_Paths matching:", flight_path_key)
+                logger.warning("No DB entry matching Flight Path Name %r", flight_path_key)
+                continue
+            except Flight_Paths.MultipleObjectsReturned:
+                print(">>> multiple Flight_Paths matching:", flight_path_key)
+                logger.warning("Multiple entries match Flight Path Name %r", flight_path_key)
+                continue
+
+            today_str = date.today().strftime('%Y%m%d')
+            side      = str(int(fp.side_overlap)) if fp.side_overlap is not None else ''
+            front     = str(int(fp.front_overlap)) if fp.front_overlap is not None else ''
+            # Use spaces between all components, no semicolons
+            parts = [today_str, fp.short_id, selected_drone, fp.type_of_flight, side, front]
+            new_folder = ' '.join(p for p in parts if p)
+            print(">>> new_folder name:", new_folder)
+            logger.debug("New folder name: %s", new_folder)
+
+            dest_root = fp.first_flight_path
+            if not dest_root:
+                print(">>> fp.first_flight_path missing for:", fp)
+                logger.error("No first_flight_path defined for %r", fp.flight_path_name)
+                continue
+
+            dest = os.path.join(dest_root, new_folder)
+            os.makedirs(dest, exist_ok=True)
+            print(">>> ensured dest exists:", dest)
+            logger.debug("Ensured destination exists: %s", dest)
+
+            try:
+                print(f">>> copying {src} → {dest}")
+                logger.debug("Copying %r → %r …", src, dest)
+                shutil.copytree(src, dest, dirs_exist_ok=True)
+
+                copied += 1
+                print(">>> copied count:", copied)
+                logger.info("Copied %r → %r (total copied=%d)", src, dest, copied)
+
+            except Exception as exc:
+                print(">>> copy failed:", exc)
+                logger.error("Failed to copy %r: %s", src, exc)
+                messages.error(request, f"Failed to copy {sub}: {exc}")
+
+        messages.success(request, f"Copied {copied} folders into {BASE_OUTPUT}.")
+        return redirect('sd_card')
+
+    return render(request, 'mainapp/sd_card.html', {
+        'sd_cards': sd_cards,
+        'drone_models': drone_models,
+        'selected_drone': None,
+    })
+
+"""def data_visualisation_view(request):
+    return render(request, 'mainapp/data_visualisation.html')"""
+
+STAT_OPTIONS = [
+    ("cv", "Coefficient of Variation"),
+    ("iqr", "Interquartile Range"),
+    ("kurtosis", "Kurtosis"),
+    ("majority", "Majority"),
+    ("max", "Maximum"),
+    ("mean", "Mean"),
+    ("median", "Median"),
+    ("min", "Minimum"),
+    ("minority", "Minority"),
+    ("q25", "25th Percentile (Q1)"),
+    ("q75", "75th Percentile (Q3)"),
+    ("range", "Range (Max - Min)"),
+    ("skewness", "Skewness"),
+    ("std", "Standard Deviation"),
+    ("sum", "Sum"),
+    ("top_10", "Top 10 Values"),
+    ("top_10_mean", "Mean of Top 10 Values"),
+    ("top_10_median", "Median of Top 10 Values"),
+    ("top_10_std", "Standard Deviation of Top 10 Values"),
+    ("top_15", "Top 15 Values"),
+    ("top_15_mean", "Mean of Top 15 Values"),
+    ("top_15_median", "Median of Top 15 Values"),
+    ("top_15_std", "Standard Deviation of Top 15 Values"),
+    ("top_20", "Top 20 Values"),
+    ("top_25", "Top 25 Values"),
+    ("top_25_mean", "Mean of Top 25 Values"),
+    ("top_25_median", "Median of Top 25 Values"),
+    ("top_25_std", "Standard Deviation of Top 25 Values"),
+    ("top_35", "Top 35 Values"),
+    ("top_35_mean", "Mean of Top 35 Values"),
+    ("top_35_median", "Median of Top 35 Values"),
+    ("top_35_std", "Standard Deviation of Top 35 Values"),
+    ("top_50", "Top 50 Values"),
+    ("top_50_mean", "Mean of Top 50 Values"),
+    ("top_50_median", "Median of Top 50 Values"),
+    ("top_50_std", "Standard Deviation of Top 50 Values"),
+    ("top_5_mean", "Mean of Top 5 Values"),
+    ("top_5_median", "Median of Top 5 Values"),
+    ("top_5_std", "Standard Deviation of Top 5 Values"),
+    ("variance", "Variance"),
+    ("variety", "Variety (Number of Unique Values)"),
+]
+
+def data_visualisation(request):
+    selected_stats = request.GET.getlist("stats")
+    selected_dates = request.GET.getlist("date")
+    
+    all_dates = []
+    downloads_path = os.path.expanduser("~/Downloads")
+    csv_file_path = os.path.join(downloads_path, "24BPROBARG20_Vollebekk_2024.csv")
+
+    if os.path.exists(csv_file_path):
+        df = pd.read_csv(csv_file_path)
+        if "date" in df.columns:
+            all_dates = (
+                pd.to_datetime(df["date"], errors="coerce")
+                .dt.strftime("%Y-%m-%d")
+                .drop_duplicates()
+                .sort_values()
+                .tolist()
+            )
+
+    plots = []
+    return render(request, "mainapp/data_visualisation.html", {
+        "plots": plots,
+        "stat_options": STAT_OPTIONS,
+        "selected_stats": selected_stats,
+        "selected_dates": selected_dates,
+        "all_dates": all_dates,
+    })
+
+df = pd.read_csv("~/Downloads/Drone_Flying_Schedule_2025.csv")
+print(df.columns)  # See what columns actually exist
 
 def read_local_csv(request):
-    # Replace <YourUsername> with your actual username or use os.path.expanduser
+    print(">>> ENTER read_local_csv")
+    logger.debug("ENTER read_local_csv")
+    downloads_path = os.path.expanduser("~/Downloads")
+    csv_file_path = os.path.join(downloads_path, "Drone_Flying_Schedule_2025.csv")
+
+    if not os.path.exists(csv_file_path):
+        return JsonResponse(
+            {"error": f"CSV file not found at {csv_file_path}"}, status=404
+        )
+
+    try:
+        df = pd.read_csv(csv_file_path)
+        data = df.to_dict(orient="records")
+        return JsonResponse(data, safe=False)
+    except Exception as e:
+        return JsonResponse({"error": str(e)}, status=500)
+
+def read_local_csv(request):
     downloads_path = os.path.expanduser("~/Downloads")
     csv_file_path = os.path.join(downloads_path, "Drone_Flying_Schedule_2025.csv")
 
@@ -296,7 +524,7 @@ def weekly_view(request):
     all_flights = []
 
     # Get current week range
-    today = datetime.date.today()
+    today = date.today()
     start_of_week = today - datetime.timedelta(days=today.weekday())
     end_of_week = start_of_week + datetime.timedelta(days=6)
     week_num = today.isocalendar()[1]
@@ -343,86 +571,141 @@ def weekly_view(request):
 
     return render(request, "mainapp/weekly.html", context)
 
-
-def parse_csv_datetime(datetime_string):
-    """Trying to extract the date"""
-    try:
-        return datetime.strptime(datetime_string.strip(), "%d.%m.%Y %H:%M")
-    except ValueError:
-        return datetime.strptime(datetime_string.strip(), "%d.%m.%Y")
-
-
-def process_csv_data(file_content, sensor_id):
-    """reads csv files and puts the data into db, ignoring duplicates"""
+def process_json_data(json_data, sensor_id):
+    """Lagrer rader fra en JSON-fil i databasen."""
     sensor, _ = Sensor.objects.get_or_create(sensor_id=sensor_id)
+    total = 0
+    added = 0
 
-    decoded = file_content.decode("utf-8").splitlines()
-    reader = csv.reader(decoded)
-
-    try:
-        header = next(reader)
-    except StopIteration:
-        return
-
-    for row in reader:
-        if not row or not row[0].strip():
-            continue
-
+    for entry in json_data:
         try:
-            timestamp = parse_csv_datetime(row[0])
+            timestamp_str = entry["TS"]
+            timestamp = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
 
             reading_data = {
-                "soil_temperature": float(row[1]) if row[1] else None,
-                "soil_moisture": float(row[2]) if row[2] else None,
-                "air_temperature": float(row[3]) if row[3] else None,
-                "air_humidity": float(row[4]) if row[4] else None,
-                "battery": float(row[5]) if row[5] else None,
-                "rainfall": float(row[6]) if row[6] else None,
-                "crop_type": row[7].strip() if len(row) > 7 else "",
-                "soil_type": row[8].strip() if len(row) > 8 else "",
+                "soil_temperature": float(entry["JT"]) if entry.get("JT") else None,
+                "soil_moisture": float(entry["JF"]) if entry.get("JF") else None,
+                "air_temperature": float(entry["LT"]) if entry.get("LT") else None,
+                "air_humidity": float(entry["LF"]) if entry.get("LF") else None,
+                "battery": float(entry["BT"]) if entry.get("BT") else None,
+                "rainfall": float(entry["R"]) if entry.get("R") else None,
+                "crop_type": entry.get("crop", "").strip(),
+                "soil_type": entry.get("soilType", "").strip(),
             }
 
-            SensorReading.objects.get_or_create(
-                sensor=sensor, timestamp=timestamp, defaults=reading_data
+            obj, created = SensorReading.objects.get_or_create(
+                sensor=sensor,
+                timestamp=timestamp,
+                defaults=reading_data,
             )
+            if created:
+                added += 1
+            total += 1
 
         except Exception as e:
-            print(f"Feil i rad {row}: {e}")
+            logger.error(f"Error json row {entry}: {e}")
             continue
+
+
+
+
+def process_json_data(json_data, sensor_id):
+    """Lagrer rader fra en JSON-fil i databasen."""
+    sensor, _ = Sensor.objects.get_or_create(sensor_id=sensor_id)
+    added = 0
+
+    for entry in json_data:
+        try:
+            timestamp_str = entry["TS"]
+            timestamp = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
+
+            reading_data = {
+                "soil_temperature": float(entry["JT"]) if entry.get("JT") else None,
+                "soil_moisture": float(entry["JF"]) if entry.get("JF") else None,
+                "air_temperature": float(entry["LT"]) if entry.get("LT") else None,
+                "air_humidity": float(entry["LF"]) if entry.get("LF") else None,
+                "battery": float(entry["BT"]) if entry.get("BT") else None,
+                "rainfall": float(entry["R"]) if entry.get("R") else None,
+                "crop_type": entry.get("crop", "").strip(),
+                "soil_type": entry.get("soilType", "").strip(),
+            }
+
+            _, created = SensorReading.objects.get_or_create(
+                sensor=sensor,
+                timestamp=timestamp,
+                defaults=reading_data,
+            )
+            if created:
+                added += 1
+
+        except Exception as e:
+            logger.error(f"Feil i JSON-rad {entry}: {e}")
+            continue
+
+    logger.info(f"Sensor {sensor_id}: {added}/{len(json_data)} rader lagt til.")
+
 
 
 def upload_easy_growth_data(request):
-    """Hovedvisningen for å laste opp sensorfiler fra brukerens maskin."""
+    sensors = Sensor.objects.all()
+    chart_data = []
+    latest_reading = None
+    default_end = timezone.now().date()
+    default_start = default_end - timedelta(days=14)
+
+    selected_sensor_id = request.GET.get("sensor")
+    start_str = request.GET.get("start_date")
+    end_str = request.GET.get("end_date")
+    try:
+        if start_str:
+            default_start = datetime.strptime(start_str, "%Y-%m-%d").date()
+        if end_str:
+            default_end = datetime.strptime(end_str, "%Y-%m-%d").date()
+    except ValueError:
+        messages.error(request, "Ugyldig datoformat.")
+        return redirect(request.path)
+
+    if selected_sensor_id:
+        readings = SensorReading.objects.filter(
+            sensor__sensor_id=selected_sensor_id,
+            timestamp__date__range=(default_start, default_end)
+        ).order_by("timestamp")
+
+        chart_data = [
+            {
+                "timestamp": r.timestamp.strftime("%Y-%m-%d %H:%M"),
+                "air_temperature": r.air_temperature,
+                "soil_temperature": r.soil_temperature,
+                "air_humidity": r.air_humidity,
+                "soil_moisture": r.soil_moisture,
+            }
+            for r in readings
+        ]
+        latest_reading = readings.last()
+
     if request.method == "POST":
-        source = request.POST.get("source")
-
-        if source == "files":
-            files = request.FILES.getlist("files")
-        elif source == "folder":
-            files = request.FILES.getlist("folder_files")
-        else:
-            files = []
-
-        if not files:
-            messages.error(request, "Ingen filer valgt.")
-            return redirect(request.path)
-
+        files = request.FILES.getlist("files")
         total = 0
         for file in files:
-            filename_parts = (
-                file.name.split("/") if "/" in file.name else file.name.split("\\")
-            )
-            short_name = filename_parts[-1]
-
+            short_name = file.name.split("/")[-1].split("\\")[-1]
             sensor_id = short_name.split()[0].strip()
 
             try:
-                process_csv_data(file.read(), sensor_id)
+                data = json.loads(file.read().decode("utf-8"))
+                process_json_data(data, sensor_id)
                 total += 1
             except Exception as e:
-                print(f"Feil i fil: {file.name} – {e}")
+                logger.error(f"Error handling file {file.name}: {e}")
+                messages.error(request, f"Feil i fil: {file.name}")
 
-        messages.success(request, f"{total} filer behandlet.")
+        if total:
+            messages.success(request, f"{total} fil(er) lastet opp.")
         return redirect(request.path)
 
-    return render(request, "mainapp/flight_details.html")
+    return render(request, "mainapp/easy_growth.html", {
+        "sensors": sensors,
+        "chart_data": chart_data,
+        "latest_readings": latest_reading,
+        "default_start": default_start.isoformat(),
+        "default_end": default_end.isoformat(),
+    })
