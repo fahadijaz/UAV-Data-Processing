@@ -1,34 +1,27 @@
 from django.shortcuts import render
 import logging
-logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
-logger = logging.getLogger(__name__)
-
 import csv
 import json
 import os
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 import pandas as pd
 import shutil
-
-# Date/time imports
-from datetime import date, datetime
-
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.dateparse import parse_date
-from django.contrib import messages
-from django.contrib import messages
 from django.forms import formset_factory
 from django.http import HttpResponse, Http404
-
-from .models import Flight_Log, Flight_Paths
-
+from .models import Flight_Log, Flight_Paths, Sensor, SensorReading,ZonalStat, Meta, Fields
 from django.forms import formset_factory
 from .forms import FlightForm
 from .sd_card import detect_sd_cards
+import re
+
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
+logger = logging.getLogger(__name__)
 
 def home_view(request):
     print(">>> ENTER home_view")
@@ -180,49 +173,6 @@ def sd_card_view(request):
 """def data_visualisation_view(request):
     return render(request, 'mainapp/data_visualisation.html')"""
 
-STAT_OPTIONS = [
-    ("cv", "Coefficient of Variation"),
-    ("iqr", "Interquartile Range"),
-    ("kurtosis", "Kurtosis"),
-    ("majority", "Majority"),
-    ("max", "Maximum"),
-    ("mean", "Mean"),
-    ("median", "Median"),
-    ("min", "Minimum"),
-    ("minority", "Minority"),
-    ("q25", "25th Percentile (Q1)"),
-    ("q75", "75th Percentile (Q3)"),
-    ("range", "Range (Max - Min)"),
-    ("skewness", "Skewness"),
-    ("std", "Standard Deviation"),
-    ("sum", "Sum"),
-    ("top_10", "Top 10 Values"),
-    ("top_10_mean", "Mean of Top 10 Values"),
-    ("top_10_median", "Median of Top 10 Values"),
-    ("top_10_std", "Standard Deviation of Top 10 Values"),
-    ("top_15", "Top 15 Values"),
-    ("top_15_mean", "Mean of Top 15 Values"),
-    ("top_15_median", "Median of Top 15 Values"),
-    ("top_15_std", "Standard Deviation of Top 15 Values"),
-    ("top_20", "Top 20 Values"),
-    ("top_25", "Top 25 Values"),
-    ("top_25_mean", "Mean of Top 25 Values"),
-    ("top_25_median", "Median of Top 25 Values"),
-    ("top_25_std", "Standard Deviation of Top 25 Values"),
-    ("top_35", "Top 35 Values"),
-    ("top_35_mean", "Mean of Top 35 Values"),
-    ("top_35_median", "Median of Top 35 Values"),
-    ("top_35_std", "Standard Deviation of Top 35 Values"),
-    ("top_50", "Top 50 Values"),
-    ("top_50_mean", "Mean of Top 50 Values"),
-    ("top_50_median", "Median of Top 50 Values"),
-    ("top_50_std", "Standard Deviation of Top 50 Values"),
-    ("top_5_mean", "Mean of Top 5 Values"),
-    ("top_5_median", "Median of Top 5 Values"),
-    ("top_5_std", "Standard Deviation of Top 5 Values"),
-    ("variance", "Variance"),
-    ("variety", "Variety (Number of Unique Values)"),
-]
 
 def data_visualisation(request):
     selected_stats = request.GET.getlist("stats")
@@ -523,6 +473,11 @@ def flight_events(request):
     return JsonResponse(events, safe=False)
 
 
+####################################################################
+#weekly overview
+####################################################################
+
+
 def folder_exists_for_week(base_path, start_date, end_date):
     if not os.path.exists(base_path):
         return False
@@ -594,42 +549,10 @@ def weekly_view(request):
 
     return render(request, "mainapp/weekly.html", context)
 
-def process_json_data(json_data, sensor_id):
-    """Lagrer rader fra en JSON-fil i databasen."""
-    sensor, _ = Sensor.objects.get_or_create(sensor_id=sensor_id)
-    total = 0
-    added = 0
 
-    for entry in json_data:
-        try:
-            timestamp_str = entry["TS"]
-            timestamp = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S.%fZ")
-
-            reading_data = {
-                "soil_temperature": float(entry["JT"]) if entry.get("JT") else None,
-                "soil_moisture": float(entry["JF"]) if entry.get("JF") else None,
-                "air_temperature": float(entry["LT"]) if entry.get("LT") else None,
-                "air_humidity": float(entry["LF"]) if entry.get("LF") else None,
-                "battery": float(entry["BT"]) if entry.get("BT") else None,
-                "rainfall": float(entry["R"]) if entry.get("R") else None,
-                "crop_type": entry.get("crop", "").strip(),
-                "soil_type": entry.get("soilType", "").strip(),
-            }
-
-            obj, created = SensorReading.objects.get_or_create(
-                sensor=sensor,
-                timestamp=timestamp,
-                defaults=reading_data,
-            )
-            if created:
-                added += 1
-            total += 1
-
-        except Exception as e:
-            logger.error(f"Error json row {entry}: {e}")
-            continue
-
-
+####################################################################
+#easygrowth
+####################################################################
 
 
 def process_json_data(json_data, sensor_id):
