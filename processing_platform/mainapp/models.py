@@ -211,7 +211,7 @@ STAT_FIELDS = [
 """
 
 class ZonalStat(models.Model):
-    id = models.IntegerField()
+    idx = models.IntegerField()
     location = models.CharField(max_length=100)
     camera = models.CharField(max_length=100)
     flight_height = models.CharField(max_length=20)
@@ -225,17 +225,17 @@ class ZonalStat(models.Model):
     iqr = models.FloatField()
     kurtosis = models.FloatField()
     majority = models.FloatField()
-    max = models.FloatField()
+    maximum = models.FloatField()
     mean = models.FloatField()
     median = models.FloatField()
-    min = models.FloatField()
+    minimum = models.FloatField()
     minority = models.FloatField()
     q25 = models.FloatField()
     q75 = models.FloatField()
-    range = models.FloatField()
+    range_stat = models.FloatField()
     skewness = models.FloatField()
     std = models.FloatField()
-    sum = models.FloatField()
+    sum_stat = models.FloatField()
 
     top_10 = models.FloatField()
     top_10_mean = models.FloatField()
@@ -271,8 +271,8 @@ class ZonalStat(models.Model):
     variance = models.FloatField()
     variety = models.IntegerField()
 
-    class Meta:
-        ordering = ["date"]
+class Meta:
+    ordering = ["date"]
 
     def __str__(self):
         return f"{self.date} | {self.spectrum} | {self.mean:.3f}"

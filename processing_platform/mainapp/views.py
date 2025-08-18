@@ -20,7 +20,7 @@ from django.forms import formset_factory
 from .forms import FlightForm
 from .sd_card import detect_sd_cards
 import re
-from sd_card import SDCardError,build_initial_flights, process_flights_post
+from mainapp.sd_card import build_initial_flights, process_flights_post
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -52,7 +52,7 @@ FIELD_FLIGHT_MODES = {
 
 def get_current_week_dates():
     today = date.today()
-    monday = today - timedelta(days=today.weekday())  # Monday
+    monday = today - timedelta(days=today.weekday())
     sunday = monday + timedelta(days=6)
     return monday, sunday
 
@@ -90,7 +90,6 @@ def weekly_overview(request):
                 }
             )
 
-    # ✅ Add this line:
     is_current_week = week_offset == 0
 
     context = {
@@ -99,7 +98,7 @@ def weekly_overview(request):
         "end_date": end_date,
         "fields_status": fields_status,
         "week_offset": week_offset,
-        "is_current_week": is_current_week,  # 🔥 This enables your template check!
+        "is_current_week": is_current_week,  
     }
 
     return render(request, "mainapp/weekly_overview.html", context)
@@ -123,44 +122,27 @@ def discover_flights(dcim_root):
                 yield p, m
 
 def sd_card_view(request):
-    try:
-        sd_cards = detect_sd_cards()
-    except SDCardError as e:
-        messages.error(request, str(e))
-        return render(request, 'mainapp/sd_card.html', {
-            'sd_cards': [], 'formset': None
-        })
-
+    sd_cards = detect_sd_cards()
     selected = request.POST.get('sd_card', sd_cards[0] if sd_cards else None)
 
     if request.method == 'POST':
         logger.debug("POST keys: %s", list(request.POST.keys()))
         logger.debug("FILES keys: %s", list(request.FILES.keys()))
-
-        # 1) Bind the formset
         formset = FlightFormSet(request.POST, request.FILES)
 
-        # 2) Suppress empty-file errors on forms without uploads
         for form in formset.forms:
             key = f"{form.prefix}-skyline_files"
             if not request.FILES.getlist(key):
                 form.errors.pop('skyline_files', None)
 
-        # 3) Validate and process ALL forms
         if formset.is_valid() and 'upload' in request.POST:
             total = process_flights_post(formset, selected, request)
-            # 4) Rebuild a fresh formset so the page reflects current state
             new_initial = build_initial_flights(selected)
             formset = FlightFormSet(initial=new_initial)
-            messages.success(
-                request,
-                f"✅ Done! Processed {total} flight{'s' if total != 1 else ''}."
-            )
+            messages.success(request, f"Done! Processed {total} flight{'s' if total != 1 else ''}.")
         else:
             messages.warning(request, f"There were errors: {formset.errors}")
-
     else:
-        # GET: just show all detected flights
         initial = build_initial_flights(selected)
         formset = FlightFormSet(initial=initial)
 
@@ -169,6 +151,7 @@ def sd_card_view(request):
         'selected_card': selected,
         'formset': formset,
     })
+
 
   
 
@@ -204,7 +187,7 @@ def data_visualisation(request):
         "all_dates": all_dates,
     })
 
-df = pd.read_csv("~/Downloads/Drone_Flying_Schedule_2025.csv")
+df = pd.read_csv("~/Downloads/Drone Flying Schedule 2025.csv")
 print(df.columns)  # See what columns actually exist
 
 """def data_visualisation_view(request):
@@ -282,14 +265,14 @@ def data_visualisation(request):
         "all_dates": all_dates,
     })
 
-df = pd.read_csv("~/Downloads/Drone_Flying_Schedule_2025.csv")
+df = pd.read_csv("~/Downloads/Drone Flying Schedule 2025.csv")
 print(df.columns)  # See what columns actually exist
 
 def read_local_csv(request):
     print(">>> ENTER read_local_csv")
     logger.debug("ENTER read_local_csv")
     downloads_path = os.path.expanduser("~/Downloads")
-    csv_file_path = os.path.join(downloads_path, "Drone_Flying_Schedule_2025.csv")
+    csv_file_path = os.path.join(downloads_path, "Drone Flying Schedule 2025.csv")
 
     if not os.path.exists(csv_file_path):
         return JsonResponse(
@@ -305,7 +288,7 @@ def read_local_csv(request):
 
 def read_local_csv(request):
     downloads_path = os.path.expanduser("~/Downloads")
-    csv_file_path = os.path.join(downloads_path, "Drone_Flying_Schedule_2025.csv")
+    csv_file_path = os.path.join(downloads_path, "Drone Flying Schedule 2025.csv")
 
     if not os.path.exists(csv_file_path):
         return JsonResponse(

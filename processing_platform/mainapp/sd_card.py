@@ -27,9 +27,8 @@ FOLDER_RE = re.compile(r'''
 
 FlightFormSet = formset_factory(FlightForm, extra=0)
 
-class SDCardError(Exception):
-    """Raised when no SD cards are detected."""
-    pass
+"""class SDCardError(Exception):
+    pass"""
 
 def is_removable_drive_windows(drive_letter):
     DRIVE_REMOVABLE = 2
