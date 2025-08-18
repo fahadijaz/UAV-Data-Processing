@@ -6,6 +6,7 @@ import os
 from datetime import date, datetime, timedelta, timezone
 import pandas as pd
 import shutil
+from pathlib import Path
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import Q
@@ -19,6 +20,7 @@ from django.forms import formset_factory
 from .forms import FlightForm
 from .sd_card import detect_sd_cards
 import re
+from sd_card import SDCardError,build_initial_flights, process_flights_post
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
