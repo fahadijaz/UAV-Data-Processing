@@ -164,7 +164,7 @@ def data_visualisation(request):
     selected_dates = request.GET.getlist("date")
     
     all_dates = []
-    downloads_path = os.path.expanduser("~/Downloads")
+    downloads_path = os.path.expanduser("/user/Downloads")
     csv_file_path = os.path.join(downloads_path, "24BPROBARG20_Vollebekk_2024.csv")
 
     if os.path.exists(csv_file_path):
@@ -187,7 +187,7 @@ def data_visualisation(request):
         "all_dates": all_dates,
     })
 
-df = pd.read_csv("~/Downloads/Drone Flying Schedule 2025.csv")
+df = pd.read_csv("/Users/fredericstrand/Downloads/Drone Flying Schedule 2025.csv")
 print(df.columns)  # See what columns actually exist
 
 """def data_visualisation_view(request):
@@ -265,7 +265,7 @@ def data_visualisation(request):
         "all_dates": all_dates,
     })
 
-df = pd.read_csv("~/Downloads/Drone Flying Schedule 2025.csv")
+df = pd.read_csv("/Users/fredericstrand/Downloads/Drone Flying Schedule 2025.csv")
 print(df.columns)  # See what columns actually exist
 
 def read_local_csv(request):
