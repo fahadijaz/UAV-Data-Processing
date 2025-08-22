@@ -3,7 +3,8 @@ import logging
 import csv
 import json
 import os
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timedelta
+from django.utils import timezone
 import pandas as pd
 import shutil
 from pathlib import Path
@@ -24,6 +25,8 @@ from mainapp.sd_card import build_initial_flights, process_flights_post
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
+
+flight_log_csv_path = os.path.join(settings.BASE_DIR, "Drone_Flying_Schedule_2025.csv")
 
 def home_view(request):
     print(">>> ENTER home_view")
@@ -153,12 +156,6 @@ def sd_card_view(request):
     })
 
 
-  
-
-"""def data_visualisation_view(request):
-    return render(request, 'mainapp/data_visualisation.html')"""
-
-
 def data_visualisation(request):
     selected_stats = request.GET.getlist("stats")
     selected_dates = request.GET.getlist("date")
@@ -186,9 +183,6 @@ def data_visualisation(request):
         "selected_dates": selected_dates,
         "all_dates": all_dates,
     })
-
-df = pd.read_csv("/Users/fredericstrand/Downloads/Drone Flying Schedule 2025.csv")
-print(df.columns)  # See what columns actually exist
 
 """def data_visualisation_view(request):
     return render(request, 'mainapp/data_visualisation.html')"""
@@ -265,42 +259,24 @@ def data_visualisation(request):
         "all_dates": all_dates,
     })
 
-df = pd.read_csv("/Users/fredericstrand/Downloads/Drone Flying Schedule 2025.csv")
-print(df.columns)  # See what columns actually exist
-
+"""
+df = pd.read_csv(flight_log_csv_path)
 def read_local_csv(request):
     print(">>> ENTER read_local_csv")
     logger.debug("ENTER read_local_csv")
     downloads_path = os.path.expanduser("~/Downloads")
-    csv_file_path = os.path.join(downloads_path, "Drone Flying Schedule 2025.csv")
 
-    if not os.path.exists(csv_file_path):
+    if not os.path.exists(flight_log_csv_path):
         return JsonResponse(
-            {"error": f"CSV file not found at {csv_file_path}"}, status=404
+            {"error": f"CSV file not found at {flight_log_csv_path}"}, status=404
         )
 
     try:
-        df = pd.read_csv(csv_file_path)
+        df = pd.read_csv(flight_log_csv_path)
         data = df.to_dict(orient="records")
         return JsonResponse(data, safe=False)
     except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
-
-def read_local_csv(request):
-    downloads_path = os.path.expanduser("~/Downloads")
-    csv_file_path = os.path.join(downloads_path, "Drone Flying Schedule 2025.csv")
-
-    if not os.path.exists(csv_file_path):
-        return JsonResponse(
-            {"error": f"CSV file not found at {csv_file_path}"}, status=404
-        )
-
-    try:
-        df = pd.read_csv(csv_file_path)
-        data = df.to_dict(orient="records")
-        return JsonResponse(data, safe=False)
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)
+        return JsonResponse({"error": str(e)}, status=500)"""
 
 
 def review_drone_flights(request):
@@ -463,7 +439,7 @@ def flight_events(request):
 ####################################################################
 
 
-def folder_exists_for_week(base_path, start_date, end_date):
+"""def folder_exists_for_week(base_path, start_date, end_date):
     if not os.path.exists(base_path):
         return False
 
@@ -479,10 +455,10 @@ def folder_exists_for_week(base_path, start_date, end_date):
     except PermissionError:
         return False
 
-    return False
+    return False"""
 
 
-def weekly_view(request):
+"""def weekly_view(request):
     csv_path = os.path.join(settings.BASE_DIR, "mainapp", "data", "flight_list.csv")
     all_flights = []
 
@@ -532,7 +508,7 @@ def weekly_view(request):
         "end_date": end_of_week,
     }
 
-    return render(request, "mainapp/weekly.html", context)
+    return render(request, "mainapp/weekly.html", context)"""
 
 
 ####################################################################

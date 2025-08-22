@@ -7,15 +7,12 @@ import shutil
 import logging
 from pathlib import Path
 from datetime import datetime, date
-
 from django import forms
 from django.forms import formset_factory
 from django.contrib import messages
-
 from .forms import FlightForm
 from .models import Flight_Paths, Flight_Log
 
-# Set up logger
 logger = logging.getLogger("mainapp")
 
 FOLDER_RE = re.compile(r'''
@@ -27,14 +24,13 @@ FOLDER_RE = re.compile(r'''
 
 FlightFormSet = formset_factory(FlightForm, extra=0)
 
-"""class SDCardError(Exception):
-    pass"""
+class SDCardError(Exception):
+    pass
 
 def is_removable_drive_windows(drive_letter):
     DRIVE_REMOVABLE = 2
     drive_type = ctypes.windll.kernel32.GetDriveTypeW(f"{drive_letter}:/")
     return drive_type == DRIVE_REMOVABLE
-
 
 def find_sd_cards_windows(dcim_folder="DCIM"):
     sd_cards = []
@@ -44,7 +40,6 @@ def find_sd_cards_windows(dcim_folder="DCIM"):
         if is_removable_drive_windows(drive_letter) and os.path.isdir(candidate):
             sd_cards.append(candidate)
     return sd_cards
-
 
 def find_sd_cards_unix(dcim_folder="DCIM"):
     sd_cards = []
@@ -57,9 +52,7 @@ def find_sd_cards_unix(dcim_folder="DCIM"):
                 sd_cards.append(candidate)
     return sd_cards
 
-
 def detect_sd_cards(dcim_folder="DCIM"):
-    """Return a list of DCIM folder paths on removable drives."""
     if platform.system() == "Windows":
         cards = find_sd_cards_windows(dcim_folder)
     else:
@@ -67,7 +60,6 @@ def detect_sd_cards(dcim_folder="DCIM"):
     if not cards:
         raise SDCardError("No SD cards detected.")
     return cards
-
 
 def discover_flights(dcim_path):
     for name in os.listdir(dcim_path):
@@ -77,7 +69,6 @@ def discover_flights(dcim_path):
         m = FOLDER_RE.match(name)
         if m:
             yield p, m.group("flight_path")
-
 
 def build_initial_flights(dcim_path):
     initial = []
@@ -98,9 +89,7 @@ def process_flights_post(formset, selected_dcim, request):
             formset.errors, "upload" in request.POST
         )
         return None
-
     processed = 0
-
     for form in formset:
         cd = form.cleaned_data
         key = cd.get("flight_path_key")
@@ -111,7 +100,6 @@ def process_flights_post(formset, selected_dcim, request):
         except Flight_Paths.DoesNotExist:
             messages.warning(request, f"No config for flight {key}")
             continue
-
         folder_name = Path(cd["flight_dir"]).name
         m = FOLDER_RE.match(folder_name)
         if m and m.group("timestamp"):
@@ -123,12 +111,10 @@ def process_flights_post(formset, selected_dcim, request):
                 date_str = date.today().strftime("%Y%m%d")
         else:
             date_str = date.today().strftime("%Y%m%d")
-
         height = f"{int(fp.flight_height)}m" if fp.flight_height else ""
         overlap = ""
         if fp.side_overlap is not None and fp.front_overlap is not None:
             overlap = f"{int(fp.side_overlap)} {int(fp.front_overlap)}"
-
         parts = [
             date_str,
             fp.short_id,
@@ -138,13 +124,10 @@ def process_flights_post(formset, selected_dcim, request):
             overlap,
         ]
         new_folder = " ".join(p for p in parts if p)
-
         base = Path(fp.first_flight_path)
         dest = base / new_folder
         dest.mkdir(parents=True, exist_ok=True)
-
-        shutil.copytree(cd["flight_dir"], dest, dirs_exist_ok=True)
-
+        shutil.move(cd["flight_dir"], dest, dirs_exist_ok=True)
         ref_dir = cd.get("reflectance_dir")
         if ref_dir:
             ref_src = Path(ref_dir)
@@ -154,8 +137,7 @@ def process_flights_post(formset, selected_dcim, request):
                     str(dest / ref_src.name),
                     dirs_exist_ok=True
                 )
-
-        uploads = request.FILES.getlist(f"{form.prefix}-skyline_files")
+        uploads = request.FILES.getlist(f"{form.prefix}-skyline_files") if hasattr(request.FILES, "getlist") else ([request.FILES[f"{form.prefix}-skyline_files"]] if f"{form.prefix}-skyline_files" in request.FILES else [])
         tmp = dest / "_tmp"
         skyline = (
             cd.get("skyline_names", "").split(",")
@@ -169,7 +151,6 @@ def process_flights_post(formset, selected_dcim, request):
                     for chunk in uf.chunks():
                         f.write(chunk)
                 skyline.append(uf.name)
-
         if skyline:
             sky_root = base.parent[2] / "_SKYLINE" / new_folder
             sky_root.mkdir(parents=True, exist_ok=True)
@@ -179,7 +160,6 @@ def process_flights_post(formset, selected_dcim, request):
                     shutil.move(str(src), str(sky_root / name))
             if tmp.exists():
                 shutil.rmtree(tmp)
-
         ws = ",".join(str(cd.get(f"wind_speed{i}")) for i in (1, 2, 3))
         Flight_Log.objects.create(
             foldername        = new_folder,
@@ -200,7 +180,5 @@ def process_flights_post(formset, selected_dcim, request):
             flight_path       = fp.flight_path_name,
             p4d_path          = fp.pix4d_path,
         )
-
         processed += 1
-
     return processed
