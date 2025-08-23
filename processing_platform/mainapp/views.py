@@ -552,6 +552,38 @@ def process_json_data(json_data, sensor_id):
     logger.info(f"Sensor {sensor_id}: {added}/{len(json_data)} rader lagt til.")
 
 
+FILENAME_RE = re.compile(
+    r"""
+    ^\s*
+    (?P<group>[^\s#]+)      
+    (?:\s+.*?)?             
+    \s*\#(?P<num>\d+)        
+    (?:\s+JSON)?            
+    \.txt\s*$
+    """,
+    re.IGNORECASE | re.VERBOSE,
+)
+
+def parse_sensor_id_from_filename(filename: str) -> str:
+    """
+    Lager sensor_id i formatet 'GRUPPE #NUMMER' fra filnavn.
+    Fallback: første ord i filnavnet (gammel oppførsel).
+    Inneholder også en enkel normalisering fra '25BPROBARG20' -> '25PROBAR20'.
+    """
+    short = os.path.basename(filename)
+    m = FILENAME_RE.match(short)
+    if not m:
+        base = os.path.splitext(short)[0]
+        return (base.split()[0] if base.split() else base).strip()
+
+    group = m.group("group").strip()
+    num = int(m.group("num"))
+
+    group = group.replace("BPROBARG", "PROBAR")
+
+    return f"{group} #{num}"
+
+
 
 def upload_easy_growth_data(request):
     sensors = Sensor.objects.all()
@@ -595,7 +627,7 @@ def upload_easy_growth_data(request):
         total = 0
         for file in files:
             short_name = file.name.split("/")[-1].split("\\")[-1]
-            sensor_id = short_name.split()[0].strip()
+            sensor_id = parse_sensor_id_from_filename(short_name)
 
             try:
                 data = json.loads(file.read().decode("utf-8"))
