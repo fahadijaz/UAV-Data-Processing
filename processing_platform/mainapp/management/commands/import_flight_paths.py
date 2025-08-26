@@ -15,19 +15,22 @@ class Command(BaseCommand):
         skipped_count = 0
         
         with open(options['csv_file'], 'r', encoding='utf-8') as file:
+            # Skip the header row with column names
             reader = csv.reader(file, delimiter=';')
             headers = next(reader)
             
             for row in reader:
+                # Skip empty rows
                 if not row or not row[0] or not row[5]:
                     skipped_count += 1
                     continue
                 
                 try:
+                    # Parse the flight path name to match folder naming convention
                     flight_path_original = row[5].strip()
                     
                     flight_path_clean = flight_path_original.replace('.kmz', '')
-                    
+                
                     
                     flight_height_str = row[10].replace('m', '') if row[10] else ''
                     flight_height = float(flight_height_str) if flight_height_str and flight_height_str.replace('.', '').isdigit() else None
@@ -35,6 +38,7 @@ class Command(BaseCommand):
                     side_overlap = float(row[12]) if row[12] and row[12].replace('.', '').isdigit() else None
                     front_overlap = float(row[13]) if row[13] and row[13].replace('.', '').isdigit() else None
                     
+                    # Clean numeric fields
                     def clean_float(value):
                         if not value or value in ['#I/T', '#VERDI!', '']:
                             return None
@@ -86,6 +90,7 @@ class Command(BaseCommand):
             )
         )
         
+"""        # Show what was imported
         self.stdout.write("\nImported flight paths:")
         for fp in Flight_Paths.objects.all()[:10]:
-            self.stdout.write(f"- {fp.flight_path_name}")
+            self.stdout.write(f"- {fp.flight_path_name}")"""
