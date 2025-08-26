@@ -125,35 +125,38 @@ def discover_flights(dcim_root):
                 yield p, m
 
 def sd_card_view(request):
-    sd_cards = detect_sd_cards()
-    selected = request.POST.get('sd_card', sd_cards[0] if sd_cards else None)
-
-    if request.method == 'POST':
-        logger.debug("POST keys: %s", list(request.POST.keys()))
-        logger.debug("FILES keys: %s", list(request.FILES.keys()))
+    from .sd_card import detect_sd_cards, build_initial_flights, process_flights_post, FlightFormSet, SDCardError
+    
+    if request.method == "POST":
+        selected_dcim = request.POST.get("selected_dcim")
+        if not selected_dcim:
+            messages.error(request, "Please select a valid DCIM path")
+            return redirect("sd_card")
+            
         formset = FlightFormSet(request.POST, request.FILES)
-
-        for form in formset.forms:
-            key = f"{form.prefix}-skyline_files"
-            if not request.FILES.getlist(key):
-                form.errors.pop('skyline_files', None)
-
-        if formset.is_valid() and 'upload' in request.POST:
-            total = process_flights_post(formset, selected, request)
-            new_initial = build_initial_flights(selected)
-            formset = FlightFormSet(initial=new_initial)
-            messages.success(request, f"Done! Processed {total} flight{'s' if total != 1 else ''}.")
-        else:
-            messages.warning(request, f"There were errors: {formset.errors}")
-    else:
-        initial = build_initial_flights(selected)
-        formset = FlightFormSet(initial=initial)
-
-    return render(request, 'mainapp/sd_card.html', {
-        'sd_cards': sd_cards,
-        'selected_card': selected,
-        'formset': formset,
-    })
+        processed = process_flights_post(formset, selected_dcim, request)
+        if processed is not None:
+            messages.success(request, f"Successfully processed {processed} flights")
+            return redirect("review_drone_flights")
+    
+    try:
+        sd_cards = detect_sd_cards()
+        context = {"sd_cards": sd_cards}
+    except SDCardError as e:
+        messages.warning(request, str(e))
+        context = {"sd_cards": []}
+    
+    selected_dcim = request.GET.get("selected_dcim")
+    if selected_dcim and selected_dcim != "":
+        try:
+            initial_data = build_initial_flights(selected_dcim)
+            formset = FlightFormSet(initial=initial_data)
+            context["formset"] = formset
+            context["selected_dcim"] = selected_dcim
+        except (ValueError, OSError) as e:
+            messages.error(request, f"Error reading DCIM path: {e}")
+    
+    return render(request, "mainapp/sd_card.html", context)
 
 
 def data_visualisation(request):

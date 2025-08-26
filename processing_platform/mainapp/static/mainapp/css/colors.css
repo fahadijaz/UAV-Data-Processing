@@ -1,0 +1,36 @@
+:root {
+    --dark-green: #283c34;
+    --normal-green: #408424;
+    --beige: #f8f4dc;
+    --light-turquoise: #e8ece4;
+}
+
+/* Background colors */
+.bg-dark-green { background-color: var(--dark-green); }
+.bg-normal-green { background-color: var(--normal-green); }
+.bg-beige { background-color: var(--beige); }
+.bg-light-turquoise { background-color: var(--light-turquoise); }
+
+/* Text colors */
+.text-dark-green { color: var(--dark-green); }
+.text-normal-green { color: var(--normal-green); }
+.text-beige { color: var(--beige); }
+.text-light-turquoise { color: var(--light-turquoise); }
+
+/* Border colors */
+.border-dark-green { border-color: var(--dark-green); }
+.border-normal-green { border-color: var(--normal-green); }
+.border-beige { border-color: var(--beige); }
+.border-light-turquoise { border-color: var(--light-turquoise); }
+
+/* Hover effects */
+.hover-dark-green:hover { background-color: var(--dark-green); }
+.hover-normal-green:hover { background-color: var(--normal-green); }
+.hover-beige:hover { background-color: var(--beige); }
+.hover-light-turquoise:hover { background-color: var(--light-turquoise); }
+
+/* Custom navigation hover */
+.nav-hover:hover {
+    color: var(--normal-green);
+    transition: color 0.2s ease;
+}

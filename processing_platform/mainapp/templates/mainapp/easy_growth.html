@@ -3,7 +3,7 @@
 {% block title %}Last opp sensor-data{% endblock %}
 
 {% block content %}
-  <div class="max-w-5xl mx-auto p-6 bg-white shadow-md rounded-lg space-y-6">
+  <div class="max-w-5xl mx-auto p-6 shadow-md rounded-lg space-y-6" style="background-color: #e8ece4;">
     <h2 class="text-2xl font-semibold text-gray-800">Last opp sensor-data (JSON)</h2>
 
     {% if messages %}
@@ -18,7 +18,7 @@
       {% csrf_token %}
       <label for="files" class="block text-sm font-medium text-gray-700">Velg JSON-filer:</label>
       <input type="file" name="files" id="files" multiple class="block w-full">
-      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Last opp</button>
+      <button type="submit" class="text-white px-4 py-2 rounded transition" style="background-color: #408424;">Last opp</button>
     </form>
 
     <form method="get" class="space-y-4">
@@ -46,7 +46,7 @@
         </div>
       </div>
 
-      <button type="submit" class="w-full bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition">
+      <button type="submit" class="w-full text-white py-2 px-4 rounded transition" style="background-color: #408424;">
         Vis data
       </button>
     </form>
