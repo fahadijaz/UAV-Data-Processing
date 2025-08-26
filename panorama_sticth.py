@@ -3,7 +3,7 @@ import cv2
 import time
 from tqdm import tqdm
 
-cp = cv2.VideoCapture('GX010268_column1.mp4')
+cp = cv2.VideoCapture('plot_104.mp4')
 n_frames = int(cp.get(cv2.CAP_PROP_FRAME_COUNT))
 print("N_frames:", n_frames)
 
@@ -11,19 +11,24 @@ width = int(cp.get(cv2.CAP_PROP_FRAME_WIDTH))
 height = int(cp.get(cv2.CAP_PROP_FRAME_HEIGHT))
 fps = cp.get(cv2.CAP_PROP_FPS)
 
-out = cv2.VideoWriter('video_out.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps/2, (2 * width, height))
+# After rotation 270°: width and height swap
+rot_width, rot_height = height, width
+
+out = cv2.VideoWriter('video_out.mp4', cv2.VideoWriter_fourcc(*'mp4v'), fps/2, (2 * rot_width, rot_height))
 
 ret, prev = cp.read()
 if not ret:
     raise RuntimeError("Could not read first frame")
 
+# Rotate the first frame
+prev = cv2.rotate(prev, cv2.ROTATE_90_CLOCKWISE)
 prev_gray = cv2.cvtColor(prev, cv2.COLOR_BGR2GRAY)
+
 index = 0
 stitched = None
 start_time = time.time()
 processed_frames = 0
 
-# Create progress bar for total frames
 with tqdm(total=n_frames-2, desc="Processing frames", unit="frame") as pbar:
     for i in range(n_frames - 2):
         sift = cv2.SIFT_create()
@@ -77,7 +82,6 @@ with tqdm(total=n_frames-2, desc="Processing frames", unit="frame") as pbar:
             remaining_frames = (n_frames - i) / 20
             eta = remaining_frames * avg_time
             
-            # Update progress bar with additional info
             pbar.set_postfix({
                 'Processed': processed_frames,
                 'ETA': f'{eta:.1f}s'
@@ -86,7 +90,6 @@ with tqdm(total=n_frames-2, desc="Processing frames", unit="frame") as pbar:
         index += 1
         pbar.update(1)
 
-# Clean up
 cp.release()
 out.release()
 
@@ -98,3 +101,4 @@ if stitched is not None:
     cv2.destroyAllWindows()
 else:
     print("No panorama could be created.")
+
