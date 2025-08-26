@@ -4,23 +4,27 @@
   <meta charset="UTF-8">
   <title>{% block title %}My App{% endblock %}</title>
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    .bg-beige { background-color: #e8ece4; }
+  </style>
 </head>
 
 {% load static %}
-
 <body class="bg-gray-100 min-h-screen flex">
 
-  <nav class="w-64 bg-white shadow-lg h-screen p-6 space-y-4">
+  <nav class="w-64 bg-beige shadow-lg h-screen p-6 space-y-4">
+
     <img src="{% static 'mainapp/images/pheno-logo-green.svg' %}" alt="UAV Data Processing" class="h-12 mb-8">
 
     <ul class="space-y-3 text-gray-700 font-medium">
       <li><a href="{% url 'review_drone_flights' %}" class="block hover:text-blue-600">Review Drone Flights</a></li>
       <!-- Add more links here -->
       <li><a href="{% url 'sd_card' %}" class="block hover:text-blue-600">Upload SD-card</a></li>
-      <li><a href="{% url 'add_routes' %}" class="block hover:text-blue-600">Add routes</a></li>
       <li><a href="{% url 'data_visualisation' %}" class="block hover:text-blue-600">Data visualisation</a></li>
       <li><a href="{% url 'weekly_overview' %}" class="block hover:text-blue-600">Weekly Overview</a></li>
       <li><a href="{% url 'easy_growth' %}" class="block hover:text-blue-600">Easy Growth</a></li>
+      <li><a href="{% url 'add_routes' %}" class="block hover:text-blue-600">Add routes</a></li>
     </ul>
   </nav>
 

@@ -11,14 +11,14 @@
   <div class="mb-6 flex gap-3">
     <a
       href="?week_offset={{ week_offset|add:"-1" }}"
-      class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm transition-colors duration-200 flex items-center gap-2"
+      class="text-white px-4 py-2 rounded-md shadow-sm transition-colors duration-200 flex items-center gap-2" style="background-color: #408424;"
     >
       ← Previous Week
     </a>
     {% if not is_current_week %}
     <a 
       href="?week_offset={{ week_offset|add:"1" }}" 
-      class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md shadow-sm transition-colors duration-200 flex items-center gap-2"
+      class="text-white px-4 py-2 rounded-md shadow-sm transition-colors duration-200 flex items-center gap-2" style="background-color: #408424;"
     >
       Next Week →
     </a>
@@ -28,7 +28,7 @@
   <div class="bg-white rounded-lg shadow-lg overflow-hidden">
     <table class="w-full">
       <thead>
-        <tr class="bg-gray-600 text-white">
+        <tr class="text-white" style="background-color: #408424;">
           <th class="px-6 py-4 text-left font-semibold border-r border-gray-500">Field</th>
           <th class="px-6 py-4 text-left font-semibold border-r border-gray-500">Flight Type</th>
           <th class="px-6 py-4 text-center font-semibold border-r border-gray-500">Flown?</th>
