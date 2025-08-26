@@ -25,20 +25,20 @@ SECRET_KEY = "django-insecure-0-fv%*7#6nt^b*tb6q#f70%fi9c(@rir%_c8fhai#pb^8d-1f$
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.100.37', '192.168.100.35', 'localhost', '127.0.0.1', '*']
+ALLOWED_HOSTS = ["192.168.100.37", "192.168.100.35", "localhost", "127.0.0.1", "*"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'mainapp',
-    'django_extensions',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "mainapp",
+    "django_extensions",
 ]
 
 MIDDLEWARE = [
@@ -80,8 +80,8 @@ DATABASES = {
         "NAME": "UAV",  # POSTGRES_DB
         "USER": "admin",  # POSTGRES_USER
         "PASSWORD": "Drone2025PheNo",  # POSTGRES_PASSWORD
-        "HOST": "localhost",  # POSTGRES_HOST
-        "PORT": "5433",
+        "HOST": "db",  # POSTGRES_HOST
+        "PORT": "5432",
     }
 }
 
@@ -127,24 +127,23 @@ STATIC_URL = "/static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
         },
     },
-    'root': {
-        'handlers': ['console'],
-        'level': 'DEBUG',            # catch everything
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG",  # catch everything
     },
-    'loggers': {
+    "loggers": {
         # Django internals (optional)
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False,
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
         },
     },
 }
-

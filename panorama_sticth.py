@@ -37,10 +37,7 @@ with tqdm(total=n_frames-2, desc="Processing frames", unit="frame") as pbar:
         succ, curr = cp.read()
         if not succ:
             break
-        
-        # Rotate the current frame
-        curr = cv2.rotate(curr, cv2.ROTATE_90_CLOCKWISE)
-        
+            
         if index % 20 == 0:
             frame_start = time.time()
             curr_gray = cv2.cvtColor(curr, cv2.COLOR_BGR2GRAY)
@@ -104,3 +101,4 @@ if stitched is not None:
     cv2.destroyAllWindows()
 else:
     print("No panorama could be created.")
+

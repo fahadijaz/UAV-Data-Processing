@@ -68,7 +68,7 @@
   {% if chart_data %}
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-      const chartData = JSON.parse('{{ chart_data|escapejs }}');
+      const chartData = {{ chart_data|safe }};
       const timestamps = chartData.map(d => d.timestamp);
       const airTemp = chartData.map(d => d.air_temperature);
       const soilTemp = chartData.map(d => d.soil_temperature);
