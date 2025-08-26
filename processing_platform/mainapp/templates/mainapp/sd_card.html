@@ -14,6 +14,15 @@
      class="space-y-8"
    >
      {% csrf_token %}
+ {# ── Main form ── #}
+ <div class="flex-1">
+   <form
+     id="flight-upload-form"
+     method="post"
+     enctype="multipart/form-data"
+     class="space-y-8"
+   >
+     {% csrf_token %}
 
      {# SD Card selector #}
      <div>
@@ -32,7 +41,45 @@
          {% endfor %}
        </select>
      </div>
+     {# SD Card selector #}
+     <div>
+       <label for="sd_card" class="block text-sm font-semibold text-dark-green">
+         Select SD Card
+       </label>
+       <select
+         name="sd_card"
+         id="sd_card"
+         class="mt-1 block w-full border-2 border-normal-green rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
+<<<<<<< HEAD
+         onchange="loadFlights()"
+       >
+         <option value="">-- Select SD Card --</option>
+         {% for card in sd_cards %}
+           <option value="{{ card }}" {% if card == selected_dcim %}selected{% endif %}>
+=======
+         onchange="loadFlights()"
+       >
+         <option value="">-- Select SD Card --</option>
+         {% for card in sd_cards %}
+           <option value="{{ card }}" {% if card == selected_dcim %}selected{% endif %}>
+>>>>>>> feat/styling
+             {{ card|cut:'/Volumes/' }}
+           </option>
+         {% endfor %}
+       </select>
+     </div>
 
+     {{ formset.non_form_errors }}
+     {% if formset.management_form.errors %}
+       <ul class="text-red-600 list-disc pl-5">
+         {% for field, errors in formset.management_form.errors.items %}
+           {% for error in errors %}
+             <li>{{ field }}: {{ error }}</li>
+           {% endfor %}
+         {% endfor %}
+       </ul>
+     {% endif %}
+     {{ formset.management_form }}
      {{ formset.non_form_errors }}
      {% if formset.management_form.errors %}
        <ul class="text-red-600 list-disc pl-5">
@@ -48,6 +95,9 @@
      {% for form in formset %}
        {{ form.folder_name }}
        {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+     {% for form in formset %}
+       {{ form.folder_name }}
+       {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
 
        <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
          <div class="bg-normal-green px-6 py-4 flex justify-between items-center">
@@ -58,7 +108,41 @@
              Flight {{ forloop.counter }}
            </span>
          </div>
+       <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+         <div class="bg-normal-green px-6 py-4 flex justify-between items-center">
+           <h2 class="text-xl font-bold text-white">
+             {{ form.folder_name.value }}
+           </h2>
+           <span class="bg-white text-dark-green text-sm font-medium px-3 py-1 rounded-full">
+             Flight {{ forloop.counter }}
+           </span>
+         </div>
 
+         <div class="px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+           <div>
+             {{ form.pilot.label_tag }}
+             {{ form.pilot }}
+             {{ form.pilot.errors }}
+           </div>
+           <div>
+             {{ form.drone_model.label_tag }}
+             {{ form.drone_model }}
+             {{ form.drone_model.errors }}
+           </div>
+           <div class="lg:col-span-2">
+             <label class="block text-sm font-semibold text-dark-green">
+               Wind speed (m/s)
+             </label>
+             <div class="flex space-x-4 mt-1">
+               {{ form.wind_speed1 }}{{ form.wind_speed2 }}{{ form.wind_speed3 }}
+             </div>
+             {{ form.wind_speed1.errors }}{{ form.wind_speed2.errors }}{{ form.wind_speed3.errors }}
+           </div>
+           <div class="lg:col-span-2">
+             {{ form.comments.label_tag }}
+             {{ form.comments }}
+             {{ form.comments.errors }}
+           </div>
          <div class="px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
            <div>
              {{ form.pilot.label_tag }}
@@ -118,7 +202,75 @@
                  </div>
                  {{ form.skyline_files.errors }}
                </div>
+           {# ── Unified file-picker row ── #}
+           <div class="lg:col-span-2">
+             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+               {# Skyline #}
+               <div>
+                 <label class="block text-sm font-semibold text-dark-green mb-1">
+                   Skyline files
+                 </label>
+                 <div class="flex border border-gray-300 rounded-lg overflow-hidden">
+                   <label
+                     for="{{ form.skyline_files.id_for_label }}"
+                     class="px-4 py-2 bg-normal-green text-white cursor-pointer hover:bg-dark-green transition-colors"
+                   >
+                     Browse…
+                     <input
+                       id="{{ form.skyline_files.id_for_label }}"
+                       name="{{ form.skyline_files.html_name }}"
+                       type="file"
+                       multiple
+                       webkitdirectory
+                       accept="image/jpeg"
+                       class="hidden"
+                     >
+                   </label>
+                   <div
+                     class="flex-1 px-4 py-2 bg-white flex items-center text-gray-700 file-count"
+                     data-input-name="{{ form.skyline_files.html_name }}"
+                   >
+                     None selected
+                   </div>
+                   <input type="hidden" name="{{ form.prefix }}-skyline_names" id="skyline_names_{{ form.prefix }}" value="{{ form.skyline_names.value|default:'' }}">
+                 </div>
 
+                 <div>
+                   <label class="block text-sm font-semibold text-dark-green mb-1">
+                     Reflectance panel folder
+                   </label>
+                   <div class="flex border border-gray-300 rounded-lg overflow-hidden">
+                     <label
+                       for="reflectance_{{ form.prefix }}"
+                       class="px-4 py-2 bg-normal-green text-black cursor-pointer hover:bg-dark-green transition-colors"
+                     >
+                       Browse…
+                       <input
+                         id="reflectance_{{ form.prefix }}"
+                         name="{{ form.prefix }}-reflectance_files"
+                         type="file"
+                         webkitdirectory
+                         class="hidden"
+                         onchange="updateReflectanceFolder(this, '{{ form.prefix }}')"
+                       >
+                     </label>
+                     <div
+                       id="reflectance_display_{{ form.prefix }}"
+                       class="flex-1 px-4 py-2 bg-white flex items-center text-gray-700"
+                     >
+                       None selected
+                     </div>
+                   </div>
+                 </div>
+                 {{ form.reflectance_dir.errors }}
+               </div>
+             </div>
+           </div>
+         </div>
+       </div>
+     {% empty %}
+       <p class="text-center text-gray-500">No flights detected on that card.</p>
+     {% endfor %}
                {# Reflectance #}
                <div>
                  <label class="block text-sm font-semibold text-dark-green mb-1">
@@ -155,6 +307,39 @@
        <p class="text-center text-gray-500">No flights detected on that card.</p>
      {% endfor %}
 
+       <div class="flex justify-end">
+         <button
+           id="upload-btn"
+           name="upload"
+           type="submit"
+           class="relative inline-flex items-center px-8 py-3 bg-green-700 text-black font-semibold rounded-xl hover:bg-green-500 transition-colors"
+           onclick="showLoadingOverlay()"
+         >
+           <svg
+             id="upload-spinner"
+             class="absolute left-4 top-1/2 -mt-2 h-5 w-5 text-white hidden animate-spin"
+             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+           >
+             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+           </svg>
+           <span id="btn-text">Upload All</span>
+         </button>
+       </div>
+     {% else %}
+       {% if selected_dcim %}
+         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+           <h3 class="text-lg font-semibold text-blue-800 mb-2">No flights detected on that card.</h3>
+           <p class="text-blue-700">Make sure the SD card contains flight folders with the expected naming pattern.</p>
+         </div>
+       {% else %}
+         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+           <h3 class="text-lg font-semibold text-gray-800 mb-2">Select an SD card to view available flights.</h3>
+         </div>
+       {% endif %}
+     {% endif %}
+   </form>
+ </div>
      <div class="flex justify-end">
        <button
          id="upload-btn"
@@ -187,13 +372,49 @@
      <li>Click "Upload All" to copy and organize files.</li>
    </ul>
  </aside>
+ {# ── Info sidebar ── #}
+ <aside class="hidden lg:block w-1/4 bg-light-turquoise rounded-2xl shadow-inner p-6 sticky top-24">
+   <h3 class="text-lg font-bold mb-4 text-dark-green">Upload info</h3>
+   <ul class="list-disc pl-5 space-y-2 text-sm text-gray-700">
+     <li>Select the SD card containing your DJI folders.</li>
+     <li>Add pilot name and drone model if needed.</li>
+     <li>Choose skyline images folder (opens DJI folder by default).</li>
+     <li>Choose reflectance panel folder (opens DCIM root).</li>
+     <li>Click "Upload All" to copy and organize files.</li>
+   </ul>
+ </aside>
 </div>
 
-{# ── Full-screen overlay ── #}
 <div
  id="loading-overlay"
  class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50"
+ id="loading-overlay"
+ class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50"
 >
+ <div class="bg-white p-8 rounded-2xl flex items-center space-x-4 shadow-lg">
+   <svg
+     id="upload-spinner-overlay"
+     class="h-8 w-8 text-normal-green animate-spin"
+     xmlns="http://www.w3.org/2000/svg"
+     fill="none"
+     viewBox="0 0 24 24"
+   >
+     <circle
+       class="opacity-25"
+       cx="12"
+       cy="12"
+       r="10"
+       stroke="currentColor"
+       stroke-width="4"
+     />
+     <path
+       class="opacity-75"
+       fill="currentColor"
+       d="M4 12a8 8 0 018-8v8z"
+     />
+   </svg>
+   <span class="text-lg font-medium text-dark-green">Uploading…</span>
+ </div>
  <div class="bg-white p-8 rounded-2xl flex items-center space-x-4 shadow-lg">
    <svg
      id="upload-spinner-overlay"
