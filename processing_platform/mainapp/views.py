@@ -19,7 +19,7 @@ from django.http import HttpResponse, Http404
 from .models import Flight_Log, Flight_Paths, Sensor, SensorReading,ZonalStat, Meta, Fields
 from django.forms import formset_factory
 from .forms import FlightForm
-from .sd_card import detect_sd_cards
+from .sd_card import detect_sd_cards, SDCardError
 import re
 from mainapp.sd_card import build_initial_flights, process_flights_post
 
@@ -125,7 +125,12 @@ def discover_flights(dcim_root):
                 yield p, m
 
 def sd_card_view(request):
-    sd_cards = detect_sd_cards()
+    sd_cards = []
+    try:
+        sd_cards = detect_sd_cards() or []
+    except SDCardError:
+        logger.warning("Failed to detect SD cards")
+
     selected = request.POST.get('sd_card', sd_cards[0] if sd_cards else None)
 
     if request.method == 'POST':
@@ -142,7 +147,9 @@ def sd_card_view(request):
             total = process_flights_post(formset, selected, request)
             new_initial = build_initial_flights(selected)
             formset = FlightFormSet(initial=new_initial)
-            messages.success(request, f"Done! Processed {total} flight{'s' if total != 1 else ''}.")
+            messages.success(
+                request, f"Done! Processed {total} flight{'s' if total != 1 else ''}."
+            )
         else:
             messages.warning(request, f"There were errors: {formset.errors}")
     else:
@@ -154,6 +161,7 @@ def sd_card_view(request):
         'selected_card': selected,
         'formset': formset,
     })
+
 
 
 def data_visualisation(request):
