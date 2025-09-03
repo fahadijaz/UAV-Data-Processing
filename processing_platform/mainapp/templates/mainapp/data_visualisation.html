@@ -3,39 +3,88 @@
 {% block title %}Data Visualisation{% endblock %}
 
 {% block content %}
-  <h2 class="text-2xl font-semibold mb-4">Data visualisation</h2>
-  <p class="mb-4">Select a date and one or more statistical values to plot</p>
+<div>
 
-  <form method="get" class="mb-22">
-    <!-- Date input-->
-    {% for date in all_dates %}
-      <label class="block">
-        <input type="checkbox" name="date" value="{{ date }}"
-              {% if date in selected_dates %}checked{% endif %}>
-        {{ date }}
-      </label>
-    {% endfor %} 
-       
-    <!-- Stats selector-->
-     <label class="block mb-2 font-medium">Select statistical values:</label>
-      {% for key, label in stat_options %}
-        <label class="block">
-          <input type="checkbox" name="stats" value="{{ key }}"
-                {% if key in selected_stats %}checked{% endif %}>
-          {{ label }}
-        </label>
-      {% endfor %}
-    <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
-      Plot
-    </button>
-  </form>
 
-  {% for plot in plots %}
-    <div class="mb-8 border p-4 bg-white shadow rounded">
-      <img src="data:image/png;base64,{{plot}}" alt="Plot" class="w-full h-auto">
+
+<div id="selector" class="rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm ring-1 ring-gray-100 backdrop-blur">
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <label for="start_date" class="block text-sm font-medium text-gray-700">Startdato</label>
+      <input
+        type="date"
+        name="start_date"
+        id="start_date"
+        value="{{ request.GET.start_date|default:default_start }}"
+        class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
+      >
     </div>
-  {% endfor %}
+    <div>
+      <label for="end_date" class="block text-sm font-medium text-gray-700">Sluttdato</label>
+      <input
+        type="date"
+        name="end_date"
+        id="end_date"
+        value="{{ request.GET.end_date|default:default_end }}"
+        class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
+      >
+    </div>
+  </div>
+
+  <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+    <div>
+      <label for="field" class="block text-sm font-medium text-gray-700">Felt</label>
+      <select
+        name="field"
+        id="field"
+        class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
+      >
+        <option value="">Velg felt…</option>
+        {% for field in fields %}
+          <option value="{{ field }}" {% if request.GET.field|default:default_field == field %}selected{% endif %}>
+            {{ field }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="specters" class="block text-sm font-medium text-gray-700">Spekter (flervalg)</label>
+      <select
+        name="specters"
+        id="specters"
+        multiple
+        size="6"
+        class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
+      >
+        {% for specter in specters %}
+          <option value="{{ specter }}" {% if selected_specters and specter in selected_specters %}selected{% endif %}>
+            {{ specter }}
+          </option>
+        {% endfor %}
+      </select>
+      <p class="mt-1 text-xs text-gray-500">Hold Ctrl/Cmd for å velge flere.</p>
+    </div>
+    <div>
+      <label for="variables" class="block text-sm font-medium text-gray-700">Variabler (flervalg)</label>
+      <select
+        name="variables"
+        id="variables"
+        multiple
+        size="6"
+        class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
+      >
+        {% for variable in variables %}
+          <option value="{{ variable }}" {% if selected_variables and variable in selected_variables %}selected{% endif %}>
+            {{ variable }}
+          </option>
+        {% endfor %}
+      </select>
+      <p class="mt-1 text-xs text-gray-500">Hold Ctrl/Cmd for å velge flere.</p>
+    </div>
+  </div>
+</div>
+</div>
+
+
+
 {% endblock %}
-
-
-
