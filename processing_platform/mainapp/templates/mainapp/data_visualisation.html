@@ -1,90 +1,154 @@
 {% extends "mainapp/base.html" %}
-
 {% block title %}Data Visualisation{% endblock %}
 
 {% block content %}
-<div>
 
+<!-- Meldinger for suksess og feil -->
+{% if messages %}
+  <div class="mb-4 space-y-2">
+    {% for message in messages %}
+      <div class="rounded-lg px-4 py-2 {% if message.tags == 'success' %}bg-green-50 text-green-700{% elif message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-gray-50 text-gray-700{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
 
-
-<div id="selector" class="rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm ring-1 ring-gray-100 backdrop-blur">
-  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+<!-- Excel-opplastingsskjema (POST) -->
+<form method="post" action="{% url 'data_visualisation' %}" enctype="multipart/form-data" class="mb-6">
+  {% csrf_token %}
+  <div class="flex flex-col gap-3 md:flex-row md:items-end">
     <div>
-      <label for="start_date" class="block text-sm font-medium text-gray-700">Startdato</label>
-      <input
-        type="date"
-        name="start_date"
-        id="start_date"
-        value="{{ request.GET.start_date|default:default_start }}"
-        class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
-      >
+      <label class="block text-sm font-medium text-gray-700">Excel (.xlsx)</label>
+      <input type="file" name="file" accept=".xlsx" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
     </div>
-    <div>
-      <label for="end_date" class="block text-sm font-medium text-gray-700">Sluttdato</label>
-      <input
-        type="date"
-        name="end_date"
-        id="end_date"
-        value="{{ request.GET.end_date|default:default_end }}"
-        class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
-      >
+    <button type="submit" class="rounded-lg bg-teal-600 px-4 py-2 text-white hover:bg-teal-700">Last opp</button>
+  </div>
+</form>
+
+<!-- Filter-skjema for visualisering (GET) -->
+<form method="get" action="{% url 'data_visualisation' %}">
+  <div id="selector" class="rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm ring-1 ring-gray-100 backdrop-blur">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div>
+        <label for="start_date" class="block text-sm font-medium text-gray-700">Startdato</label>
+        <input
+          type="date"
+          name="start_date"
+          id="start_date"
+          value="{{ request.GET.start_date }}"
+          class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
+        >
+      </div>
+      <div>
+        <label for="end_date" class="block text-sm font-medium text-gray-700">Sluttdato</label>
+        <input
+          type="date"
+          name="end_date"
+          id="end_date"
+          value="{{ request.GET.end_date }}"
+          class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
+        >
+      </div>
+    </div>
+
+    <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <!-- Felt -->
+      <div>
+        <label for="field" class="block text-sm font-medium text-gray-700">Felt</label>
+        <select name="field" id="field" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
+          <option value="">Velg felt…</option>
+          {% for field in fields %}
+            <option value="{{ field }}" {% if request.GET.field == field %}selected{% endif %}>{{ field }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Spekter (flervalg) -->
+      <div>
+        <label for="specters" class="block text-sm font-medium text-gray-700">Spekter (flervalg)</label>
+        <select name="specters" id="specters" multiple size="6" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
+          {% for specter in specters %}
+            <option value="{{ specter }}" {% if specter in selected_specters %}selected{% endif %}>{{ specter }}</option>
+          {% endfor %}
+        </select>
+        <p class="mt-1 text-xs text-gray-500">Hold Ctrl/Cmd for å velge flere.</p>
+      </div>
+
+      <!-- Variabler (flervalg) -->
+      <div>
+        <label for="variables" class="block text-sm font-medium text-gray-700">Variabler (flervalg)</label>
+        <select name="variables" id="variables" multiple size="6" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
+          {% for variable in variables %}
+            <option value="{{ variable }}" {% if variable in selected_variables %}selected{% endif %}>{{ variable }}</option>
+          {% endfor %}
+        </select>
+        <p class="mt-1 text-xs text-gray-500">Hold Ctrl/Cmd for å velge flere.</p>
+      </div>
+    </div>
+
+    <div class="mt-4 flex gap-2">
+      <button type="submit" class="rounded-lg bg-teal-600 px-4 py-2 text-white hover:bg-teal-700">Oppdater</button>
+      <button type="button" id="select-all-specters" class="rounded-lg border px-3 py-2">Velg alle spekter</button>
+      <button type="button" id="select-all-variables" class="rounded-lg border px-3 py-2">Velg alle variabler</button>
     </div>
   </div>
+</form>
 
-  <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-    <div>
-      <label for="field" class="block text-sm font-medium text-gray-700">Felt</label>
-      <select
-        name="field"
-        id="field"
-        class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
-      >
-        <option value="">Velg felt…</option>
-        {% for field in fields %}
-          <option value="{{ field }}" {% if request.GET.field|default:default_field == field %}selected{% endif %}>
-            {{ field }}
-          </option>
-        {% endfor %}
-      </select>
-    </div>
-    <div>
-      <label for="specters" class="block text-sm font-medium text-gray-700">Spekter (flervalg)</label>
-      <select
-        name="specters"
-        id="specters"
-        multiple
-        size="6"
-        class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
-      >
-        {% for specter in specters %}
-          <option value="{{ specter }}" {% if selected_specters and specter in selected_specters %}selected{% endif %}>
-            {{ specter }}
-          </option>
-        {% endfor %}
-      </select>
-      <p class="mt-1 text-xs text-gray-500">Hold Ctrl/Cmd for å velge flere.</p>
-    </div>
-    <div>
-      <label for="variables" class="block text-sm font-medium text-gray-700">Variabler (flervalg)</label>
-      <select
-        name="variables"
-        id="variables"
-        multiple
-        size="6"
-        class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
-      >
-        {% for variable in variables %}
-          <option value="{{ variable }}" {% if selected_variables and variable in selected_variables %}selected{% endif %}>
-            {{ variable }}
-          </option>
-        {% endfor %}
-      </select>
-      <p class="mt-1 text-xs text-gray-500">Hold Ctrl/Cmd for å velge flere.</p>
-    </div>
-  </div>
-</div>
+<!-- Graf -->
+<div class="mt-8 rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm ring-1 ring-gray-100 backdrop-blur">
+  <canvas id="chart" height="120"></canvas>
 </div>
 
+<!-- Chart data fra backend -->
+{{ chart_data|json_script:"chart-data" }}
 
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  const startDateInput = document.getElementById("start_date");
+  const endDateInput = document.getElementById("end_date");
 
+  if (!startDateInput.value) {
+    const today = new Date();
+    const lastMonth = new Date(today);
+    lastMonth.setDate(today.getDate() - 30);
+    startDateInput.value = lastMonth.toISOString().split("T")[0];
+  }
+
+  if (!endDateInput.value) {
+    const today = new Date();
+    endDateInput.value = today.toISOString().split("T")[0];
+  }
+
+  const chartData = JSON.parse(document.getElementById("chart-data").textContent);
+  const ctx = document.getElementById("chart").getContext("2d");
+  if (window.myChart) window.myChart.destroy();
+  window.myChart = new Chart(ctx, {
+    type: "line",
+    data: {
+      labels: chartData.labels,
+      datasets: chartData.datasets.map((ds) => ({
+        label: ds.label,
+        data: ds.data,
+        tension: 0.2,
+        fill: false
+      }))
+    },
+    options: {
+      parsing: false,
+      responsive: true,
+      interaction: { mode: "index", intersect: false },
+      plugins: { legend: { position: "bottom" } },
+      scales: { x: { ticks: { autoSkip: true } } }
+    }
+  });
+
+  function selectAll(id) {
+    const sel = document.getElementById(id);
+    Array.from(sel.options).forEach(o => o.selected = true);
+  }
+  document.getElementById("select-all-specters").addEventListener("click", () => selectAll("specters"));
+  document.getElementById("select-all-variables").addEventListener("click", () => selectAll("variables"));
+</script>
 {% endblock %}

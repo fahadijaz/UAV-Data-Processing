@@ -1,27 +1,41 @@
-from django.shortcuts import render
-import logging
 import csv
 import json
+import logging
 import os
-from datetime import date, datetime, timedelta
-from django.utils import timezone
-import pandas as pd
+import re
 import shutil
+from collections import defaultdict
+from datetime import date, datetime, timedelta
 from pathlib import Path
+import pandas as pd
+
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Q
-from django.http import JsonResponse
+from django.db import transaction
+from django.db.models import Avg, Q
+from django.forms import formset_factory
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.utils.dateparse import parse_date
-from django.forms import formset_factory
-from django.http import HttpResponse, Http404
-from .models import Flight_Log, Flight_Paths, Sensor, SensorReading,ZonalStat, Meta, Fields
-from django.forms import formset_factory
-from .forms import FlightForm
-from .sd_card import detect_sd_cards, SDCardError
-import re
+
 from mainapp.sd_card import build_initial_flights, process_flights_post
+from .forms import FlightForm
+from .models import (
+    Field_visualisation,
+    Fields,
+    Flight_Log,
+    Flight_Paths,
+    Sensor,
+    SensorReading,
+)
+from .sd_card import SDCardError, detect_sd_cards
+from collections import defaultdict
+from datetime import date, timedelta
+from django.db.models import Avg, Q
+
+from .models import Field_visualisation, ZonalStat
+from .data_visualisation import import_excel_to_db, build_chart_data, VARIABLES
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -164,127 +178,55 @@ def sd_card_view(request):
 
 
 
-def data_visualisation(request):
-    selected_stats = request.GET.getlist("stats")
-    selected_dates = request.GET.getlist("date")
-    
-    all_dates = []
-    downloads_path = os.path.expanduser("/user/Downloads")
-    csv_file_path = os.path.join(downloads_path, "24BPROBARG20_Vollebekk_2024.csv")
 
-    if os.path.exists(csv_file_path):
-        df = pd.read_csv(csv_file_path)
-        if "date" in df.columns:
-            all_dates = (
-                pd.to_datetime(df["date"], errors="coerce")
-                .dt.strftime("%Y-%m-%d")
-                .drop_duplicates()
-                .sort_values()
-                .tolist()
-            )
-
-    plots = []
-    return render(request, "mainapp/data_visualisation.html", {
-        "plots": plots,
-        "stat_options": STAT_OPTIONS,
-        "selected_stats": selected_stats,
-        "selected_dates": selected_dates,
-        "all_dates": all_dates,
-    })
-
-"""def data_visualisation_view(request):
-    return render(request, 'mainapp/data_visualisation.html')"""
-
-STAT_OPTIONS = [
-    ("cv", "Coefficient of Variation"),
-    ("iqr", "Interquartile Range"),
-    ("kurtosis", "Kurtosis"),
-    ("majority", "Majority"),
-    ("max", "Maximum"),
-    ("mean", "Mean"),
-    ("median", "Median"),
-    ("min", "Minimum"),
-    ("minority", "Minority"),
-    ("q25", "25th Percentile (Q1)"),
-    ("q75", "75th Percentile (Q3)"),
-    ("range", "Range (Max - Min)"),
-    ("skewness", "Skewness"),
-    ("std", "Standard Deviation"),
-    ("sum", "Sum"),
-    ("top_10", "Top 10 Values"),
-    ("top_10_mean", "Mean of Top 10 Values"),
-    ("top_10_median", "Median of Top 10 Values"),
-    ("top_10_std", "Standard Deviation of Top 10 Values"),
-    ("top_15", "Top 15 Values"),
-    ("top_15_mean", "Mean of Top 15 Values"),
-    ("top_15_median", "Median of Top 15 Values"),
-    ("top_15_std", "Standard Deviation of Top 15 Values"),
-    ("top_20", "Top 20 Values"),
-    ("top_25", "Top 25 Values"),
-    ("top_25_mean", "Mean of Top 25 Values"),
-    ("top_25_median", "Median of Top 25 Values"),
-    ("top_25_std", "Standard Deviation of Top 25 Values"),
-    ("top_35", "Top 35 Values"),
-    ("top_35_mean", "Mean of Top 35 Values"),
-    ("top_35_median", "Median of Top 35 Values"),
-    ("top_35_std", "Standard Deviation of Top 35 Values"),
-    ("top_50", "Top 50 Values"),
-    ("top_50_mean", "Mean of Top 50 Values"),
-    ("top_50_median", "Median of Top 50 Values"),
-    ("top_50_std", "Standard Deviation of Top 50 Values"),
-    ("top_5_mean", "Mean of Top 5 Values"),
-    ("top_5_median", "Median of Top 5 Values"),
-    ("top_5_std", "Standard Deviation of Top 5 Values"),
-    ("variance", "Variance"),
-    ("variety", "Variety (Number of Unique Values)"),
-]
+####################################################################
+#data visualisation
+####################################################################
 
 def data_visualisation(request):
-    selected_stats = request.GET.getlist("stats")
-    selected_dates = request.GET.getlist("date")
-    
-    all_dates = []
-    downloads_path = os.path.expanduser("~/Downloads")
-    csv_file_path = os.path.join(downloads_path, "24BPROBARG20_Vollebekk_2024.csv")
+    if request.method == "POST":
+        file = request.FILES.get("file")
+        if not file:
+            messages.error(request, "Last opp en Excel-fil (.xlsx).")
+            return redirect("data_visualisation")
+        try:
+            created, changed = import_excel_to_db(file)
+            messages.success(request, f"Importert: {created} nye, {changed} oppdatert/duplikater.")
+        except Exception as e:
+            messages.error(request, f"Import feilet: {e}")
+        return redirect("data_visualisation")
 
-    if os.path.exists(csv_file_path):
-        df = pd.read_csv(csv_file_path)
-        if "date" in df.columns:
-            all_dates = (
-                pd.to_datetime(df["date"], errors="coerce")
-                .dt.strftime("%Y-%m-%d")
-                .drop_duplicates()
-                .sort_values()
-                .tolist()
-            )
+    today = date.today()
+    start_raw = request.GET.get("start_date")
+    end_raw = request.GET.get("end_date")
+    start_date = parse_date(start_raw) if isinstance(start_raw, str) and start_raw else (today - timedelta(days=30))
+    end_date = parse_date(end_raw) if isinstance(end_raw, str) and end_raw else today
 
-    plots = []
+    field_name = request.GET.get("field") or ""
+    specters_req = request.GET.getlist("specters")
+    variables_req = request.GET.getlist("variables") or ["mean"]
+
+    chart_data, selected_specters, selected_variables = build_chart_data(
+        start_date, end_date, field_name, specters_req, variables_req
+    )
+
+    fields = list(Field_visualisation.objects.values_list("name", flat=True).order_by("name"))
+    specters = list(ZonalStat.objects.values_list("spectrum", flat=True).distinct().order_by("spectrum"))
+
     return render(request, "mainapp/data_visualisation.html", {
-        "plots": plots,
-        "stat_options": STAT_OPTIONS,
-        "selected_stats": selected_stats,
-        "selected_dates": selected_dates,
-        "all_dates": all_dates,
+        "fields": fields,
+        "specters": specters,
+        "variables": VARIABLES,
+        "selected_specters": selected_specters,
+        "selected_variables": selected_variables,
+        "chart_data": chart_data,
     })
 
-"""
-df = pd.read_csv(flight_log_csv_path)
-def read_local_csv(request):
-    print(">>> ENTER read_local_csv")
-    logger.debug("ENTER read_local_csv")
-    downloads_path = os.path.expanduser("~/Downloads")
 
-    if not os.path.exists(flight_log_csv_path):
-        return JsonResponse(
-            {"error": f"CSV file not found at {flight_log_csv_path}"}, status=404
-        )
 
-    try:
-        df = pd.read_csv(flight_log_csv_path)
-        data = df.to_dict(orient="records")
-        return JsonResponse(data, safe=False)
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)"""
+####################################################################
+#review drone flights
+####################################################################
 
 
 def review_drone_flights(request):
