@@ -69,10 +69,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
       const chartData = {{ chart_data|safe }};
-      const timestamps = chartData.map(d => d.timestamp);
-      const airTemp = chartData.map(d => d.air_temperature);
-      const soilTemp = chartData.map(d => d.soil_temperature);
-      const airHumidity = chartData.map(d => d.air_humidity);
+      const timestamps   = chartData.map(d => d.timestamp);
+      const airTemp      = chartData.map(d => d.air_temperature);
+      const soilTemp     = chartData.map(d => d.soil_temperature);
+      const airHumidity  = chartData.map(d => d.air_humidity);
       const soilMoisture = chartData.map(d => d.soil_moisture);
 
       const commonOptions = {
@@ -87,53 +87,60 @@
             }
           }
         },
-        plugins: {
-          legend: { position: 'bottom' }
-        }
+        plugins: { legend: { position: 'bottom' } }
       };
 
+      // Temperatur (uendret)
       new Chart(document.getElementById('tempChart'), {
         type: 'line',
         data: {
           labels: timestamps,
           datasets: [
-            {
-              label: 'Lufttemperatur (°C)',
-              data: airTemp,
-              borderWidth: 2,
-              fill: false
-            },
-            {
-              label: 'Jordtemperatur (°C)',
-              data: soilTemp,
-              borderWidth: 2,
-              fill: false
-            }
+            { label: 'Lufttemperatur (°C)', data: airTemp,  borderWidth: 2, fill: false },
+            { label: 'Jordtemperatur (°C)', data: soilTemp, borderWidth: 2, fill: false }
           ]
         },
         options: commonOptions
       });
 
+      // Fuktighet – to y-akser (jord venstre, luft høyre)
       new Chart(document.getElementById('humidityChart'), {
         type: 'line',
         data: {
           labels: timestamps,
           datasets: [
-            {
-              label: 'Luftfuktighet (%)',
-              data: airHumidity,
-              borderWidth: 2,
-              fill: false
-            },
-            {
-              label: 'Jordfuktighet (%)',
-              data: soilMoisture,
-              borderWidth: 2,
-              fill: false
-            }
+            { label: 'Luftfuktighet (%)', data: airHumidity,  yAxisID: 'y1', borderWidth: 2, fill: false },
+            { label: 'Jordfuktighet (%)', data: soilMoisture, yAxisID: 'y',  borderWidth: 2, fill: false }
           ]
         },
-        options: commonOptions
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          stacked: false,
+          scales: {
+            y:  {
+              type: 'linear',
+              display: true,
+              position: 'left',
+              ticks: { callback: (v) => v + '%' }
+            },
+            y1: {
+              type: 'linear',
+              display: true,
+              position: 'right',
+              grid: { drawOnChartArea: false },
+              ticks: { callback: (v) => v + '%' }
+            },
+            x: {
+              ticks: { maxTicksLimit: 15, maxRotation: 45, minRotation: 45 }
+            }
+          },
+          plugins: {
+            legend: { position: 'bottom' },
+            tooltip: { mode: 'index', intersect: false }
+          }
+        }
       });
     </script>
   {% endif %}
