@@ -1,3 +1,4 @@
+# Standard library
 import csv
 import json
 import logging
@@ -7,11 +8,10 @@ import shutil
 from collections import defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
-import pandas as pd
 
+# Django
 from django.conf import settings
 from django.contrib import messages
-from django.db import transaction
 from django.db.models import Avg, Q
 from django.forms import formset_factory
 from django.http import Http404, HttpResponse, JsonResponse
@@ -19,23 +19,29 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.dateparse import parse_date
 
-from mainapp.sd_card import build_initial_flights, process_flights_post
+# Lokalt (app)
 from .forms import FlightForm
 from .models import (
-    Field_visualisation,
+    FieldVisualisation,
     Fields,
     Flight_Log,
     Flight_Paths,
     Sensor,
     SensorReading,
+    Spectrum,
+    ZonalStat,
 )
-from .sd_card import SDCardError, detect_sd_cards
-from collections import defaultdict
-from datetime import date, timedelta
-from django.db.models import Avg, Q
-
-from .models import Field_visualisation, ZonalStat
-from .data_visualisation import import_excel_to_db, build_chart_data, VARIABLES
+from .sd_card import (
+    SDCardError,
+    detect_sd_cards,
+    build_initial_flights,
+    process_flights_post,
+)
+from .data_visualisation import (
+    import_excel_to_db,
+    VARIABLES,
+    build_chart_data,
+)
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -196,22 +202,26 @@ def data_visualisation(request):
             messages.error(request, f"Import feilet: {e}")
         return redirect("data_visualisation")
 
+    # datoer
     today = date.today()
     start_raw = request.GET.get("start_date")
     end_raw = request.GET.get("end_date")
-    start_date = parse_date(start_raw) if isinstance(start_raw, str) and start_raw else (today - timedelta(days=30))
-    end_date = parse_date(end_raw) if isinstance(end_raw, str) and end_raw else today
+    start_date = parse_date(start_raw) if start_raw else (today - timedelta(days=30))
+    end_date = parse_date(end_raw) if end_raw else today
 
+    # filtre
     field_name = request.GET.get("field") or ""
-    specters_req = request.GET.getlist("specters")
+    specters_req = [s.strip().lower() for s in request.GET.getlist("specters")]
     variables_req = request.GET.getlist("variables") or ["mean"]
 
+    # bygg data
     chart_data, selected_specters, selected_variables = build_chart_data(
         start_date, end_date, field_name, specters_req, variables_req
     )
 
-    fields = list(Field_visualisation.objects.values_list("name", flat=True).order_by("name"))
-    specters = list(ZonalStat.objects.values_list("spectrum", flat=True).distinct().order_by("spectrum"))
+    # valg for dropdowns
+    fields = list(FieldVisualisation.objects.values_list("name", flat=True).order_by("name"))
+    specters = list(Spectrum.objects.values_list("name", flat=True).distinct().order_by("name"))
 
     return render(request, "mainapp/data_visualisation.html", {
         "fields": fields,
@@ -219,7 +229,8 @@ def data_visualisation(request):
         "variables": VARIABLES,
         "selected_specters": selected_specters,
         "selected_variables": selected_variables,
-        "chart_data": chart_data,
+        # 👇 viktige: send ekte JSON
+        "chart_data_json": json.dumps(chart_data),
     })
 
 

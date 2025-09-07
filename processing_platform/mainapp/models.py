@@ -210,16 +210,35 @@ STAT_FIELDS = [
 ]
 """
 
-class Field_visualisation(models.Model):
+class FieldVisualisation(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
     def __str__(self):
         return self.name
-
-class ZonalStat(models.Model):
+    
+class Spectrum(models.Model):
     field = models.ForeignKey(
-        Field_visualisation, on_delete=models.PROTECT, null=True, blank=True, db_index=True
+        FieldVisualisation,
+        on_delete=models.CASCADE,
+        related_name="spectrums",
+        db_index=True
     )
+    name = models.CharField(max_length=50)
+
+    class Meta:
+        unique_together = ("field", "name")
+
+    def __str__(self):
+        return f"{self.field.name} - {self.name}"
+    
+class ZonalStat(models.Model):
+    spectrum = models.ForeignKey(
+        Spectrum,
+        on_delete=models.CASCADE,
+        related_name="stats",
+        db_index=True
+    )
+
     idx = models.IntegerField()
     location = models.CharField(max_length=100)
     camera = models.CharField(max_length=100)
@@ -227,8 +246,8 @@ class ZonalStat(models.Model):
     project = models.CharField(max_length=100)
     flight = models.CharField(max_length=200)
     date = models.DateField()
-    spectrum = models.CharField(max_length=50)
 
+    # ---- Målinger ----
     count = models.IntegerField()
     cv = models.FloatField()
     iqr = models.FloatField()
@@ -246,36 +265,31 @@ class ZonalStat(models.Model):
     std = models.FloatField()
     sum_stat = models.FloatField()
 
+    # Top X-stats
+    top_5_mean = models.FloatField()
+    top_5_median = models.FloatField()
+    top_5_std = models.FloatField()
     top_10 = models.FloatField()
     top_10_mean = models.FloatField()
     top_10_median = models.FloatField()
     top_10_std = models.FloatField()
-
     top_15 = models.FloatField()
     top_15_mean = models.FloatField()
     top_15_median = models.FloatField()
     top_15_std = models.FloatField()
-
     top_20 = models.FloatField()
-
     top_25 = models.FloatField()
     top_25_mean = models.FloatField()
     top_25_median = models.FloatField()
     top_25_std = models.FloatField()
-
     top_35 = models.FloatField()
     top_35_mean = models.FloatField()
     top_35_median = models.FloatField()
     top_35_std = models.FloatField()
-
     top_50 = models.FloatField()
     top_50_mean = models.FloatField()
     top_50_median = models.FloatField()
     top_50_std = models.FloatField()
-
-    top_5_mean = models.FloatField()
-    top_5_median = models.FloatField()
-    top_5_std = models.FloatField()
 
     variance = models.FloatField()
     variety = models.IntegerField()
@@ -288,5 +302,3 @@ class ZonalStat(models.Model):
                 name="uniq_date_idx_spectrum",
             ),
         ]
-    
-
