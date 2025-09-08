@@ -8,8 +8,6 @@ from django.db.utils import NotSupportedError
 from django.db.models import Avg
 from .models import ZonalStat, FieldVisualisation, Spectrum
 
-
-# All variables the user can choose to plot
 VARIABLES: List[str] = [
     "mean", "median", "std", "cv", "iqr", "kurtosis", "majority", "maximum",
     "minimum", "minority", "q25", "q75", "range_stat", "skewness", "sum_stat",
@@ -22,7 +20,6 @@ VARIABLES: List[str] = [
     "top_50", "top_50_mean", "top_50_median", "top_50_std",
 ]
 
-# Map Excel column names (normalized) -> model field names
 _COLMAP: Dict[str, str] = {
     "id": "idx",
     "location": "location",
@@ -31,7 +28,7 @@ _COLMAP: Dict[str, str] = {
     "project": "project",
     "flight": "flight",
     "date": "date",
-    "spectrum": "spectrum",  # NOTE: will be converted to spectrum_id before insert
+    "spectrum": "spectrum",
     "count": "count",
     "cv": "cv",
     "iqr": "iqr",
@@ -84,6 +81,17 @@ _INTS = {"idx", "count", "variety"}
 
 
 def _clean_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Normalize a DataFrame's column names for robust mapping.
+
+    - Strips whitespace
+    - Replaces internal whitespace with underscores
+    - Replaces non-word characters with underscores
+    - Lowercases everything
+
+    Example:
+      "Flight Height (m)" -> "flight_height_m"
+    """
     df = df.copy()
     df.columns = (
         df.columns
@@ -98,13 +106,28 @@ def _clean_columns(df: pd.DataFrame) -> pd.DataFrame:
 @transaction.atomic
 def import_excel_to_db(file) -> Tuple[int, int]:
     """
-    Imports an Excel sheet into the hierarchy:
-      FieldVisualisation (project) -> Spectrum (per field) -> ZonalStat rows
+    Import an Excel sheet into the database as ZonalStat rows, creating
+    FieldVisualisation and Spectrum rows on demand.
 
-    Returns:
-      (created_count, updated_or_duplicated_count)
+    Pipeline
+    --------
+    1) Read Excel into a DataFrame and normalize headers (`_clean_columns`).
+    2) Validate required columns via `_COLMAP`; rename to model fields.
+    3) Normalize/parse:
+         - Trim text fields, lowercase spectrum, to_date(date)
+         - Convert numeric strings (supports comma decimal)
+         - Coerce Int64 fields for `idx`, `count`, `variety`
+    4) Create/lookup FieldVisualisation by project name.
+    5) Create/lookup Spectrum per (field_id, spectrum name).
+    6) Drop duplicates on (spectrum_id, date, idx).
+    7) Bulk upsert ZonalStat rows:
+         - Uses Postgres `update_conflicts=True` if available
+         - Fallback: ignore_conflicts
+
+    Returns
+    -------
+    (created_count, updated_or_duplicated_count)
     """
-    # 1) Read and normalize
     df = pd.read_excel(file)
     df = _clean_columns(df)
 
@@ -113,8 +136,6 @@ def import_excel_to_db(file) -> Tuple[int, int]:
         raise ValueError(f"Mangler kolonner i Excel: {', '.join(sorted(missing))}")
 
     df = df.rename(columns=_COLMAP)
-
-    # Normalize text fields
     for col in ["location", "camera", "project", "flight", "flight_height", "spectrum"]:
         df[col] = df[col].astype(str).str.strip()
 
@@ -122,16 +143,15 @@ def import_excel_to_db(file) -> Tuple[int, int]:
     df["project"] = df["project"].str.strip()
     df["date"] = pd.to_datetime(df["date"], errors="coerce").dt.date
 
-    # Parse numeric fields (accept commas as decimals)
+
+
+
     for col in _NUMERIC:
         df[col] = pd.to_numeric(df[col].astype(str).str.replace(",", "."), errors="coerce")
     for col in _INTS:
         df[col] = pd.to_numeric(df[col], errors="coerce").astype("Int64")
 
-    # Drop rows missing the natural key
     df = df.dropna(subset=["project", "date", "idx", "spectrum"])
-
-    # 2) Map project -> FieldVisualisation.id (create if needed)
     projects = sorted(df["project"].unique())
     existing_fields = dict(
         FieldVisualisation.objects.filter(name__in=projects).values_list("name", "id")
@@ -143,8 +163,6 @@ def import_excel_to_db(file) -> Tuple[int, int]:
             dict(FieldVisualisation.objects.filter(name__in=projects).values_list("name", "id"))
         )
     df["field_id"] = df["project"].map(existing_fields).astype("Int64")
-
-    # 3) Map (field_id, spectrum name) -> Spectrum.id (create if needed)
     pairs = sorted(
         {
             (int(fid), s)
@@ -168,32 +186,25 @@ def import_excel_to_db(file) -> Tuple[int, int]:
     ]
     if to_create_specs:
         Spectrum.objects.bulk_create(to_create_specs, ignore_conflicts=True)
-        # refresh mapping
         existing_specs.update({
             (f, n): i for f, n, i in Spectrum.objects.filter(
                 field_id__in=[p[0] for p in pairs],
                 name__in=[p[1] for p in pairs],
             ).values_list("field_id", "name", "id")
         })
-
-    # Attach spectrum_id column
     df["spectrum_id"] = [
         existing_specs[(int(fid), s)]
         for fid, s in df[["field_id", "spectrum"]].itertuples(index=False, name=None)
     ]
-
-    # 4) Deduplicate on the model's unique key (date, idx, spectrum)
     df = df.drop_duplicates(subset=["spectrum_id", "date", "idx"], keep="last")
 
-    # 5) Prepare insert records (use spectrum_id; exclude raw 'spectrum' string and field_id helper)
-    allowed = (set(_COLMAP.values()) | {"spectrum_id"}) - {"spectrum"}  # exclude string spectrum
+    allowed = (set(_COLMAP.values()) | {"spectrum_id"}) - {"spectrum"}  
     keep_cols = [c for c in df.columns if c in allowed]
 
     df = df.where(pd.notna(df), None)
     records = df[keep_cols].to_dict("records")
     objs = [ZonalStat(**rec) for rec in records]
 
-    # 6) Upsert by (date, idx, spectrum)
     try:
         created = ZonalStat.objects.bulk_create(
             objs,
@@ -214,17 +225,34 @@ def build_chart_data(
     start_date, end_date, field_name: str, specters_req: list[str], variables_req: list[str]
 ):
     """
-    Bygger et datasett for Chart.js:
-    - dates: liste av YYYY-MM-DD-strenger (sortert)
-    - series: liste av {"name": "<specter> · <variable>", "data": [tall/null ...]} i samme rekkefølge som dates
-    Aggregerer per dato per specter ved å ta gjennomsnitt (Avg) over alle rader (idx) den dagen.
+    Build box-plot friendly data from raw ZonalStat rows.
+
+    Output structure (consumed by the frontend)
+    -------------------------------------------
+    {
+      "dates": ["YYYY-MM-DD", ...],                 # unique sorted dates present in the result
+      "series": [
+        {
+          "name": "<specter> · <variable>",         # e.g. "green · mean"
+          "data": [                                  # aligns with 'dates' by index
+            [v1, v2, ...],                           # all raw values for that date (no aggregation)
+            [],
+            ...
+          ]
+        },
+        ...
+      ]
+    }
+
+    Notes
+    -----
+    - Accepts multiple variables and multiple specters; creates one series per (specter × variable).
+    - Returns raw values grouped per date to let the frontend compute box plots directly.
     """
-    # 1) Valider variabler
-    wanted_vars = [v for v in variables_req or [] if v in VARIABLES]
+    wanted_vars = [v for v in (variables_req or []) if v in VARIABLES]
     if not wanted_vars:
         wanted_vars = ["mean"]
 
-    # 2) Basiskø
     qs = (
         ZonalStat.objects
         .filter(date__gte=start_date, date__lte=end_date)
@@ -233,13 +261,11 @@ def build_chart_data(
     if field_name:
         qs = qs.filter(spectrum__field__name=field_name)
 
-    # hvilke specters finnes i utvalget?
-    available = list(
-        qs.values_list("spectrum__name", flat=True).distinct()
-    )
-    available = [s.strip().lower() for s in available if s]
-
-    # velg specters: enten brukeren sine (filtrert på det som faktisk finnes), ellers alle
+    available = [
+        (s or "").strip().lower()
+        for s in qs.values_list("spectrum__name", flat=True).distinct()
+        if s
+    ]
     if specters_req:
         specters = [s.strip().lower() for s in specters_req if s.strip().lower() in available]
     else:
@@ -249,30 +275,21 @@ def build_chart_data(
         return {"dates": [], "series": []}, [], wanted_vars
 
     qs = qs.filter(spectrum__name__in=specters)
+    fields = ["date", "spectrum__name"] + wanted_vars
+    rows = qs.values(*fields).order_by("date")
 
-    # 3) Aggreger per dato per specter (Avg for hver valgt variabel)
-    annos = {f"a_{v}": Avg(v) for v in wanted_vars}
-    rows = (
-        qs.values("date", "spectrum__name")
-          .order_by("date", "spectrum__name")
-          .annotate(**annos)
-    )
-
-    # 4) Bygg tidsakse (alle datoer som finnes i rows)
-    dates = sorted({r["date"] for r in rows})
-    date_idx = {d: i for i, d in enumerate(dates)}
+    dates_set = {r["date"] for r in rows}
+    dates = sorted(dates_set)
     labels = [d.isoformat() for d in dates]
+    date_idx = {d: i for i, d in enumerate(dates)}
 
-    # 5) Forbered serier: én per (specter × variable)
     series = []
-    series_map = {}  # (specter, var) -> index i series
+    series_map = {}  
     for sp in specters:
         for v in wanted_vars:
             name = f"{sp} · {v}"
             series_map[(sp, v)] = len(series)
-            series.append({"name": name, "data": [None] * len(labels)})
-
-    # 6) Fyll serier med aggregerte verdier
+            series.append({"name": name, "data": [[] for _ in labels]})
     for r in rows:
         d = r["date"]
         sp = (r["spectrum__name"] or "").strip().lower()
@@ -280,13 +297,13 @@ def build_chart_data(
             continue
         i = date_idx[d]
         for v in wanted_vars:
-            val = r.get(f"a_{v}")
-            if val is not None:
-                # sørg for float så JSON blir tall
-                try:
-                    val = float(val)
-                except Exception:
-                    val = None
-            series[series_map[(sp, v)]]["data"][i] = val
+            val = r.get(v, None)
+            if val is None:
+                continue
+            try:
+                val = float(val)
+            except Exception:
+                continue
+            series[series_map[(sp, v)]]["data"][i].append(val)
 
     return {"dates": labels, "series": series}, specters, wanted_vars

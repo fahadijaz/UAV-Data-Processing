@@ -98,7 +98,7 @@
 
 <!-- Graf -->
 <div class="mt-8 rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm ring-1 ring-gray-100 backdrop-blur">
-  <canvas id="chart" height="120"></canvas>
+  <div id="chart" style="height: 520px;"></div>
 </div>
 
 <!-- Debug Output -->
@@ -108,181 +108,103 @@
   <script id="chart-data" type="application/json">{{ chart_data_json|safe }}</script>
 {% endif %}
 
-<!-- Chart.js + date adapter -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
+<!-- Plotly (innebygget box plot) -->
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 
 <script>
 (function () {
-  // -- 1) Sett default datoer dersom tomme --
+  // --- 1) Les input (samme som før) ---
   const sd = document.getElementById('start_date');
   const ed = document.getElementById('end_date');
   if (sd && !sd.value) {
-    const t = new Date();
-    const lm = new Date(t);
-    lm.setDate(t.getDate() - 30);
+    const t = new Date(); const lm = new Date(t); lm.setDate(t.getDate() - 30);
     sd.value = lm.toISOString().split('T')[0];
   }
-  if (ed && !ed.value) {
-    const t = new Date();
-    ed.value = t.toISOString().split('T')[0];
-  }
+  if (ed && !ed.value) { const t = new Date(); ed.value = t.toISOString().split('T')[0]; }
 
-  // -- 2) Les JSON fra <script id="chart-data" type="application/json"> --
   const dataEl = document.getElementById('chart-data');
-  const raw0 = dataEl ? JSON.parse(dataEl.textContent) : {};
+  const payload = dataEl ? JSON.parse(dataEl.textContent) : { dates: [], series: [] };
+  const labels = payload.dates || [];
+  const series = payload.series || [];
 
-  // -- 3) Hjelpere for normalisering --
-  function isDateLike(v) {
-    return typeof v === 'string' && /^\d{4}-\d{2}-\d{2}/.test(v);
-  }
-  function objNumKeysToArray(obj) {
-    if (!obj || Array.isArray(obj) || typeof obj !== 'object') return obj;
-    const ks = Object.keys(obj);
-    if (!ks.length) return obj;
-    if (ks.every(k => /^\d+$/.test(k))) {
-      return ks.sort((a, b) => Number(a) - Number(b)).map(k => obj[k]);
-    }
-    return obj;
-  }
-  function normalizeFromObject(obj) {
-    // støtter {dates, series[]} eller {labels, datasets[]}
-    const labels = Array.isArray(obj.dates) ? obj.dates
-                 : Array.isArray(obj.labels) ? obj.labels
-                 : [];
-    const series = Array.isArray(obj.series) ? obj.series
-                 : Array.isArray(obj.datasets) ? obj.datasets.map(ds => ({ name: ds.label, data: ds.data }))
-                 : [];
-    return { labels, series };
-  }
-  function normalizeFromArray(arr) {
-    if (!Array.isArray(arr) || !arr.length || typeof arr[0] !== 'object') {
-      return { labels: [], series: [] };
-    }
-    const first = arr[0];
-    const keys = Object.keys(first);
-
-    // finn label-kolonne
-    let labelKey = keys.find(k => ['date', 'timestamp', 'day', 'label'].includes(k));
-    if (!labelKey) labelKey = keys.find(k => isDateLike(first[k]));
-
-    const labels = labelKey
-      ? arr.map(r => (r && r[labelKey] != null ? String(r[labelKey]) : ''))
-      : arr.map((_, i) => String(i));
-
-    // velg numeriske kolonner
-    const skip = new Set([labelKey, 'idx', 'count', 'variety', 'camera', 'location', 'project', 'flight', 'flight_height', 'spectrum']);
-    const valueKeys = keys.filter(k => !skip.has(k));
-    const numericKeys = valueKeys.filter(k => {
-      for (let i = 0; i < Math.min(arr.length, 50); i++) {
-        const v = arr[i]?.[k];
-        if (v === null || v === undefined || v === '') continue;
-        const n = Number(v);
-        if (Number.isFinite(n)) return true;
+  // --- 2) Minimalistiske traces (én trace per serie) ---
+  const traces = series.map(s => {
+    const x = [];
+    const y = [];
+    (s.data || []).forEach((vals, i) => {
+      if (Array.isArray(vals) && vals.length) {
+        // gjenta datoen for alle verdier den dagen
+        for (let k = 0; k < vals.length; k++) {
+          x.push(labels[i] || '');
+          y.push(vals[k]);
+        }
       }
-      return false;
     });
-
-    const series = numericKeys.map(k => ({
-      name: k,
-      data: arr.map(r => {
-        const v = r?.[k];
-        const n = Number(v);
-        return Number.isFinite(n) ? n : null;
-      })
-    }));
-
-    return { labels, series };
-  }
-
-  // -- 4) Normaliser: støtte 3 formater + fallback fra objekt->array --
-  let raw = objNumKeysToArray(raw0);
-  let normalized = { labels: [], series: [] };
-
-  if (Array.isArray(raw)) {
-    normalized = normalizeFromArray(raw);
-  } else if (raw && typeof raw === 'object') {
-    normalized = normalizeFromObject(raw);
-    // fallback: prøv Object.values hvis vi fortsatt ikke fikk labels/series
-    if ((!normalized.labels.length && !normalized.series.length) && Object.keys(raw).length) {
-      const vals = Object.values(raw);
-      if (Array.isArray(vals) && vals.length && typeof vals[0] === 'object') {
-        normalized = normalizeFromArray(vals);
-      }
-    }
-  }
-
-  const labels = normalized.labels || [];
-  const series = normalized.series || [];
-
-  // -- 5) Bygg {x,y}-punkter per serie (x=ISO-dato, y=tall) --
-  const datasets = series.map(s => {
-    const points = labels.map((d, i) => {
-      const v = s.data?.[i];
-      const y = Number(v);
-      if (!Number.isFinite(y)) return null;
-      return { x: d, y };
-    }).filter(Boolean);
-
     return {
-      label: s.name,
-      data: points,
-      showLine: true,
-      spanGaps: false,
-      tension: 0.2,
-      pointRadius: 2,
-      fill: false
+      type: 'box',
+      name: s.name,
+      x, y,
+      boxpoints: false,   // 👈 ingen punkter/outliers
+      boxmean: false,     // 👈 ingen mean-linje
+      notched: false,
+      line: { width: 1 }, // tynn linje for boks/whiskers
+      fillcolor: 'rgba(0,0,0,0)', // ingen fyll (holder det lett)
+      marker: { size: 0 } // ingen markører
     };
   });
 
-  // -- 6) Tegn graf (time-akse) eller vis “ingen data” --
-  const hasAnyPoint = datasets.some(ds => ds.data && ds.data.length);
-  const ctx = document.getElementById('chart')?.getContext('2d');
-
-  if (!ctx) {
-    console.warn('DV: mangler <canvas id="chart">');
-    return;
-  }
-
-  if (!hasAnyPoint) {
-    const container = document.getElementById('chart').parentElement;
+  const hasData = traces.some(t => t.y && t.y.length);
+  if (!hasData) {
     const note = document.createElement('p');
     note.className = 'mt-2 text-sm text-gray-600';
-    note.textContent = 'Ingen datapunkter for gjeldende utvalg. Prøv å utvide dato, eller velg flere spekter/variabler.';
-    container.appendChild(note);
-
-    console.info('DV DEBUG: ingen punkter', {
-      labelsLen: labels.length,
-      datasetsLen: datasets.length,
-      firstSeries: datasets[0]?.label,
-      firstPoints: datasets[0]?.data?.slice(0, 5)
-    });
+    note.textContent = 'Ingen datapunkter for gjeldende utvalg.';
+    document.getElementById('chart').parentElement.appendChild(note);
     return;
   }
 
-  if (window.myChart) window.myChart.destroy();
-  window.myChart = new Chart(ctx, {
-    type: 'line',
-    data: { datasets },
-    options: {
-      responsive: true,
-      interaction: { mode: 'index', intersect: false },
-      plugins: { legend: { position: 'bottom' } },
-      scales: {
-        x: { type: 'time', time: { unit: 'day', tooltipFormat: 'yyyy-MM-dd' } },
-        y: { beginAtZero: false }
-      }
-    }
-  });
+  // --- 3) Rent layout ---
+  const layout = {
+    boxmode: 'group',
+    margin: { l: 60, r: 10, t: 10, b: 60 },
+    paper_bgcolor: 'white',
+    plot_bgcolor: 'white',
+    xaxis: {
+      type: 'category',
+      categoryorder: 'array',
+      categoryarray: labels,
+      tickangle: -25,
+      showgrid: false,
+      showline: true,
+      linewidth: 1,
+      mirror: true
+    },
+    yaxis: {
+      zeroline: false,
+      showgrid: true,
+      gridcolor: 'rgba(0,0,0,0.06)',
+      gridwidth: 1,
+      showline: true,
+      linewidth: 1,
+      mirror: true
+    },
+    legend: {
+      orientation: 'h',
+      y: 1.02, yanchor: 'bottom',
+      x: 0,
+      font: { size: 11 }
+    },
+    hoverlabel: { bgcolor: 'white' }
+  };
 
-  console.info('DV DEBUG: tegner graf', {
-    labelsLen: labels.length,
-    datasetsLen: datasets.length,
-    firstSeries: datasets[0]?.label,
-    firstPoints: datasets[0]?.data?.slice(0, 5)
-  });
+  const config = {
+    responsive: true,
+    displaylogo: false,
+    modeBarButtonsToRemove: ['autoScale2d', 'lasso2d', 'select2d', 'toImage']
+  };
 
-  // -- 7) Små hjelpeknapper (hvis de finnes i templaten) --
+  Plotly.newPlot('chart', traces, layout, config);
+
+  // --- 4) Små hjelpeknapper som før ---
   function selectAll(id) {
     const sel = document.getElementById(id);
     if (!sel) return;
@@ -290,30 +212,8 @@
   }
   document.getElementById('select-all-specters')?.addEventListener('click', () => selectAll('specters'));
   document.getElementById('select-all-variables')?.addEventListener('click', () => selectAll('variables'));
-
-  // Alt/⌥ + klikk på Oppdater => vis debug uten å submitte skjemaet
-  document.getElementById('update-btn')?.addEventListener('click', (e) => {
-    if (!e.altKey) return; // vanlig klikk -> form submit
-    e.preventDefault();
-    const debugDiv = document.getElementById('debug-output');
-    if (!debugDiv) return;
-
-    const ds = datasets.find(d =>
-      d.label.toLowerCase().includes('mean') &&
-      d.label.toLowerCase().includes('green')
-    );
-
-    if (ds) {
-      let html = "<h3 class='font-semibold mb-2'>Mean Green Specter Data</h3><ul class='list-disc pl-5 space-y-1'>";
-      ds.data.forEach(p => { html += `<li><strong>${p.x}:</strong> ${p.y}</li>`; });
-      html += "</ul>";
-      debugDiv.innerHTML = html;
-    } else {
-      debugDiv.textContent = "Fant ikke dataset for 'mean green specter'.";
-    }
-    debugDiv.classList.remove('hidden');
-  });
 })();
 </script>
+
 
 {% endblock %}
