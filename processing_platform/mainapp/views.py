@@ -622,7 +622,7 @@ def upload_easy_growth_data(request):
 
     return render(request, "mainapp/easy_growth.html", {
         "sensors": sensors,
-        "chart_data": chart_data,
+        "chart_data_json": json.dumps(chart_data),
         "latest_readings": latest_reading,
         "default_start": default_start.isoformat(),
         "default_end": default_end.isoformat(),

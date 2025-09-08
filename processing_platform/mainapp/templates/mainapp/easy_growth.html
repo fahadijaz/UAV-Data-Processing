@@ -1,5 +1,4 @@
 {% extends "mainapp/base.html" %}
-
 {% block title %}Last opp sensor-data{% endblock %}
 
 {% block content %}
@@ -14,13 +13,21 @@
       </div>
     {% endif %}
 
+    <!-- Upload form (POST) -->
     <form method="post" enctype="multipart/form-data" class="space-y-4">
       {% csrf_token %}
       <label for="files" class="block text-sm font-medium text-gray-700">Velg JSON-filer:</label>
       <input type="file" name="files" id="files" multiple class="block w-full">
-      <button type="submit" class="text-white px-4 py-2 rounded transition" style="background-color: #408424;">Last opp</button>
+      <button type="submit"
+              class="text-white px-4 py-2 rounded transition"
+              style="background-color:#408424;"
+              onmouseover="this.style.backgroundColor='#36711f'"
+              onmouseout="this.style.backgroundColor:'#408424'">
+        Last opp
+      </button>
     </form>
 
+    <!-- Filter form (GET) -->
     <form method="get" class="space-y-4">
       <label for="sensor" class="block text-sm font-medium text-gray-700">Velg sensor:</label>
       <select name="sensor" id="sensor" class="w-full border border-gray-300 rounded p-2">
@@ -34,193 +41,183 @@
       <div class="flex space-x-4">
         <div class="w-1/2">
           <label for="start_date" class="block text-sm font-medium text-gray-700">Startdato:</label>
-          <input type="date" name="start_date" id="start_date"
+          <input type="date"
+                 name="start_date" id="start_date"
                  value="{{ request.GET.start_date|default:default_start }}"
                  class="w-full border border-gray-300 rounded p-2">
         </div>
         <div class="w-1/2">
           <label for="end_date" class="block text-sm font-medium text-gray-700">Sluttdato:</label>
-          <input type="date" name="end_date" id="end_date"
+          <input type="date"
+                 name="end_date" id="end_date"
                  value="{{ request.GET.end_date|default:default_end }}"
                  class="w-full border border-gray-300 rounded p-2">
         </div>
       </div>
 
-      <button type="submit" class="w-full text-white py-2 px-4 rounded transition" style="background-color: #408424;">
+      <button type="submit"
+              class="w-full text-white py-2 px-4 rounded transition"
+              style="background-color:#408424;"
+              onmouseover="this.style.backgroundColor='#36711f'"
+              onmouseout="this.style.backgroundColor='#408424'">
         Vis data
       </button>
     </form>
 
     {% if latest_readings %}
       <div>
-        <p class="text-lg font-semibold">Siste batterinivå: <span class="text-blue-700">{{ latest_readings.battery }} V</span></p>
+        <p class="text-lg font-semibold">
+          Siste batterinivå: <span class="text-blue-700">{{ latest_readings.battery }} V</span>
+        </p>
       </div>
     {% endif %}
 
-    {% if chart_data %}
-      <div class="space-y-6 mt-6">
-        <div class="w-full h-[400px]"><canvas id="tempChart"></canvas></div>
-        <div class="w-full h-[400px]"><canvas id="humidityChart"></canvas></div>
-      </div>
-    {% endif %}
+    <div id="chart-container" class="space-y-6 mt-6">
+      <div class="w-full h-[400px]"><canvas id="tempChart"></canvas></div>
+      <div class="w-full h-[400px]"><canvas id="humidityChart"></canvas></div>
+    </div>
   </div>
 
-{% if chart_data %}
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
-  <script>
-    // Rådata fra view
-    const raw = {{ chart_data|safe }};
-    const periodStart = new Date("{{ default_start }}T00:00:00");
-    const periodEnd   = new Date("{{ default_end }}T23:59:59");
+  <script id="chart-data" type="application/json">{{ chart_data_json|default:"[]"|safe }}</script>
 
-    // 1) Grupper målinger per dag (YYYY-MM-DD)
-    const byDay = new Map();
-    for (const r of raw) {
-      // r.timestamp er f.eks. "2025-09-07 13:45" -> bruk dato-delen
-      const dayKey = r.timestamp.slice(0, 10); // "YYYY-MM-DD"
-      if (!byDay.has(dayKey)) byDay.set(dayKey, []);
-      byDay.get(dayKey).push(r);
-    }
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3"></script>
 
-    // Velg hvordan du aggregerer flere målinger per dag:
-    function aggregateDay(rows) {
-      // eksempel: ta siste måling den dagen
-      const last = rows[rows.length - 1];
-      return {
-        air_temperature: last.air_temperature ?? null,
-        soil_temperature: last.soil_temperature ?? null,
-        air_humidity: last.air_humidity ?? null,
-        soil_moisture: last.soil_moisture ?? null,
-      };
-      // Alternativ: snitt
-      // const avg = (arr, k) => arr.map(x => +x[k]).filter(n=>Number.isFinite(n)).reduce((a,b)=>a+b,0) / arr.length || null;
-      // return { air_temperature: avg(rows,'air_temperature'), ... }
-    }
+<script>
+  const GAP_MS =  60 * 60 * 1000; 
 
-    // 2) Lag tett serie: én rad per dag i valgt periode; null der vi mangler data
-    function eachDay(start, end) {
-      const out = [];
-      const d = new Date(start);
-      d.setHours(0,0,0,0);
-      const last = new Date(end);
-      last.setHours(0,0,0,0);
-      while (d <= last) {
-        out.push(new Date(d));
-        d.setDate(d.getDate() + 1);
-      }
-      return out;
-    }
+  const raw = JSON.parse(document.getElementById('chart-data').textContent || '[]');
 
-    const dense = eachDay(periodStart, periodEnd).map(d => {
-      const key = d.toISOString().slice(0, 10); // YYYY-MM-DD
-      const agg = byDay.has(key) ? aggregateDay(byDay.get(key)) : null;
-      return {
-        timestamp: key, // Chart.js adapter skjønner ISO-dato
-        air_temperature: agg ? agg.air_temperature : null,
-        soil_temperature: agg ? agg.soil_temperature : null,
-        air_humidity: agg ? agg.air_humidity : null,
-        soil_moisture: agg ? agg.soil_moisture : null,
-      };
-    });
+  const parseUTC = (s) => {
+    if (!s) return null;
+    let iso = s.includes('T') ? s : s.replace(' ', 'T');
+    if (iso.length === 16) iso += ':00';  
+    if (!iso.endsWith('Z')) iso += 'Z';  
+    const d = new Date(iso);
+    return isNaN(+d) ? null : d;
+  };
+  const toNum = v => (v === null || v === undefined || v === '' ? null : Number(v));
+  const byX = (a, b) => a.x - b.x;
 
-    // Felles visningsvalg
-    const xScaleTime = {
-      type: 'time',
-      time: {
-        unit: 'day', // bytt til 'week' om du vil
-        tooltipFormat: 'dd.MM.yyyy',
-        displayFormats: { day: 'dd.MM', week: 'dd.MM' }
-      },
-      min: "{{ default_start }}", // vis alltid hele valgt periode
-      max: "{{ default_end }}"
-    };
+  const toPoints = (key) =>
+    raw.map(r => {
+      const x = parseUTC(r.timestamp);
+      const y = toNum(r[key]);
+      return (x && Number.isFinite(y)) ? { x, y } : null;
+    }).filter(Boolean).sort(byX);
 
-    const commonPlugins = {
+  const airTempPoints   = toPoints('air_temperature');
+  const soilTempPoints  = toPoints('soil_temperature');
+  const airHumPoints    = toPoints('air_humidity');
+  const soilMoistPoints = toPoints('soil_moisture');
+
+  const xScaleTime = {
+    type: 'time',
+    time: {
+      tooltipFormat: 'dd.MM.yyyy HH:mm',
+      displayFormats: { hour: 'dd.MM HH:mm', day: 'dd.MM' }
+    },
+    min: "{{ default_start }}T00:00:00Z",
+    max: "{{ default_end }}T23:59:59Z"
+  };
+
+  const commonOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'nearest', intersect: false },
+    plugins: {
       legend: { position: 'bottom' },
-      tooltip: { mode: 'index', intersect: false }
-    };
+      tooltip: { mode: 'nearest', intersect: false },
+      decimation: { enabled: false } 
+    },
+    elements: {
+      point: { radius: 2 },
+      line:  { tension: 0 }
+    },
+    scales: { x: xScaleTime }
+  };
 
-    // 3) Temperatur (hull i data via null-verdier)
-    new Chart(document.getElementById('tempChart'), {
-      type: 'line',
-      data: {
-        datasets: [
-          {
-            label: 'Lufttemperatur (°C)',
-            data: dense,
-            parsing: { xAxisKey: 'timestamp', yAxisKey: 'air_temperature' },
-            spanGaps: false, // <- bryt linjen ved null
-            borderWidth: 2,
-            fill: false
-          },
-          {
-            label: 'Jordtemperatur (°C)',
-            data: dense,
-            parsing: { xAxisKey: 'timestamp', yAxisKey: 'soil_temperature' },
-            spanGaps: false,
-            borderWidth: 2,
-            fill: false
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: { x: xScaleTime },
-        plugins: commonPlugins
-      }
-    });
+  const makeSegmentGapHider = () => ({
+    borderColor: ctx => {
+      const p0 = ctx.p0?.parsed?.x, p1 = ctx.p1?.parsed?.x;
+      if (p0 == null || p1 == null) return undefined;
+      return (p1 - p0) > GAP_MS ? 'rgba(0,0,0,0)' : undefined;
+    }
+  });
 
-    // 4) Fuktighet (to y-akser + hull i data)
-    new Chart(document.getElementById('humidityChart'), {
-      type: 'line',
-      data: {
-        datasets: [
-          {
-            label: 'Luftfuktighet (%)',
-            data: dense,
-            parsing: { xAxisKey: 'timestamp', yAxisKey: 'air_humidity' },
-            yAxisID: 'y1',
-            spanGaps: false,
-            borderWidth: 2,
-            fill: false
-          },
-          {
-            label: 'Jordfuktighet (%)',
-            data: dense,
-            parsing: { xAxisKey: 'timestamp', yAxisKey: 'soil_moisture' },
-            yAxisID: 'y',
-            spanGaps: false,
-            borderWidth: 2,
-            fill: false
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        interaction: { mode: 'index', intersect: false },
-        stacked: false,
-        scales: {
-          x: xScaleTime,
-          y:  {
-            type: 'linear',
-            display: true,
-            position: 'left',
-            ticks: { callback: (v) => v + '%' }
-          },
-          y1: {
-            type: 'linear',
-            display: true,
-            position: 'right',
-            grid: { drawOnChartArea: false },
-            ticks: { callback: (v) => v + '%' }
-          }
+  new Chart(document.getElementById('tempChart'), {
+    type: 'line',
+    data: {
+      datasets: [
+        {
+          label: 'Lufttemperatur (°C)',
+          data: airTempPoints,
+          borderWidth: 2,
+          fill: false,
+          segment: makeSegmentGapHider(),
+          normalized: true
         },
-        plugins: commonPlugins
+        {
+          label: 'Jordtemperatur (°C)',
+          data: soilTempPoints,
+          borderWidth: 2,
+          fill: false,
+          segment: makeSegmentGapHider(),
+          normalized: true
+        }
+      ]
+    },
+    options: commonOptions
+  });
+
+  new Chart(document.getElementById('humidityChart'), {
+    type: 'line',
+    data: {
+      datasets: [
+        {
+          label: 'Luftfuktighet (%)',
+          data: airHumPoints,
+          yAxisID: 'y1',
+          borderWidth: 2,
+          fill: false,
+          segment: makeSegmentGapHider(),
+          normalized: true
+        },
+        {
+          label: 'Jordfuktighet (%)',
+          data: soilMoistPoints,
+          yAxisID: 'y',
+          borderWidth: 2,
+          fill: false,
+          segment: makeSegmentGapHider(),
+          normalized: true
+        }
+      ]
+    },
+    options: {
+      ...commonOptions,
+      scales: {
+        x: xScaleTime,
+        y:  {
+          type: 'linear',
+          position: 'left',
+          ticks: { callback: v => v + '%' }
+        },
+        y1: {
+          type: 'linear',
+          position: 'right',
+          grid: { drawOnChartArea: false },
+          ticks: { callback: v => v + '%' }
+        }
       }
-    });
-  </script>
-{% endif %}
+    }
+  });
+
+  console.info('Antall punkter:', {
+    luftTemp: airTempPoints.length,
+    jordTemp: soilTempPoints.length,
+    luftFukt: airHumPoints.length,
+    jordFukt: soilMoistPoints.length
+  });
+</script>
 {% endblock %}
