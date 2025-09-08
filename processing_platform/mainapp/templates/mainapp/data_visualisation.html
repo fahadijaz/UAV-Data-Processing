@@ -3,7 +3,17 @@
 
 {% block content %}
 
-<!-- Meldinger for suksess og feil -->
+<style>
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 500;
+    color: #fff; text-decoration: none; transition: background-color .15s ease;
+  }
+  .btn-sm { padding: 0.5rem 0.75rem; }
+  .btn-forest { background-color: #408424; }
+  .btn-forest:hover { background-color: #36711f; }
+</style>
+
 {% if messages %}
   <div class="mb-4 space-y-2">
     {% for message in messages %}
@@ -22,7 +32,10 @@
       <label class="block text-sm font-medium text-gray-700">Excel (.xlsx)</label>
       <input type="file" name="file" accept=".xlsx" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
     </div>
-    <button type="submit" class="rounded-lg bg-teal-600 px-4 py-2 text-white hover:bg-teal-700">Last opp</button>
+
+    <button type="submit" class="btn btn-forest">
+      Last opp
+    </button>
   </div>
 </form>
 
@@ -53,7 +66,6 @@
     </div>
 
     <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
-      <!-- Felt -->
       <div>
         <label for="field" class="block text-sm font-medium text-gray-700">Felt</label>
         <select name="field" id="field" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
@@ -64,7 +76,6 @@
         </select>
       </div>
 
-      <!-- Spekter (flervalg) -->
       <div>
         <label for="specters" class="block text-sm font-medium text-gray-700">Spekter (flervalg)</label>
         <select name="specters" id="specters" multiple size="6" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
@@ -75,7 +86,6 @@
         <p class="mt-1 text-xs text-gray-500">Hold Ctrl/Cmd for å velge flere.</p>
       </div>
 
-      <!-- Variabler (flervalg) -->
       <div>
         <label for="variables" class="block text-sm font-medium text-gray-700">Variabler (flervalg)</label>
         <select name="variables" id="variables" multiple size="6" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
@@ -88,32 +98,37 @@
     </div>
 
     <div class="mt-4 flex gap-2">
-      <button type="submit" id="update-btn" class="rounded-lg bg-teal-600 px-4 py-2 text-white hover:bg-teal-700">Oppdater</button>
-      <button type="button" id="select-all-specters" class="rounded-lg border px-3 py-2">Velg alle spekter</button>
-      <button type="button" id="select-all-variables" class="rounded-lg border px-3 py-2">Velg alle variabler</button>
-      <span class="text-xs text-gray-500 self-center">(Hold Alt/⌥ og klikk “Oppdater” for å vise debug uten å sende skjemaet)</span>
+      <button type="submit" id="update-btn" class="btn btn-forest">
+        Oppdater
+      </button>
+
+      <button type="button" id="select-all-specters" class="btn btn-sm btn-forest">
+        Velg alle spekter
+      </button>
+
+      <button type="button" id="select-all-variables" class="btn btn-sm btn-forest">
+        Velg alle variabler
+      </button>
+
     </div>
   </div>
 </form>
 
-<!-- Graf -->
 <div class="mt-8 rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm ring-1 ring-gray-100 backdrop-blur">
   <div id="chart" style="height: 520px;"></div>
 </div>
 
-<!-- Debug Output -->
 <div id="debug-output" class="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 hidden"></div>
 
 {% if chart_data_json %}
   <script id="chart-data" type="application/json">{{ chart_data_json|safe }}</script>
 {% endif %}
 
-<!-- Plotly (innebygget box plot) -->
+
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 
 <script>
 (function () {
-  // --- 1) Les input (samme som før) ---
   const sd = document.getElementById('start_date');
   const ed = document.getElementById('end_date');
   if (sd && !sd.value) {
@@ -127,13 +142,11 @@
   const labels = payload.dates || [];
   const series = payload.series || [];
 
-  // --- 2) Minimalistiske traces (én trace per serie) ---
   const traces = series.map(s => {
     const x = [];
     const y = [];
     (s.data || []).forEach((vals, i) => {
       if (Array.isArray(vals) && vals.length) {
-        // gjenta datoen for alle verdier den dagen
         for (let k = 0; k < vals.length; k++) {
           x.push(labels[i] || '');
           y.push(vals[k]);
@@ -144,12 +157,12 @@
       type: 'box',
       name: s.name,
       x, y,
-      boxpoints: false,   // 👈 ingen punkter/outliers
-      boxmean: false,     // 👈 ingen mean-linje
+      boxpoints: false,
+      boxmean: false,  
       notched: false,
-      line: { width: 1 }, // tynn linje for boks/whiskers
-      fillcolor: 'rgba(0,0,0,0)', // ingen fyll (holder det lett)
-      marker: { size: 0 } // ingen markører
+      line: { width: 1 },
+      fillcolor: 'rgba(0,0,0,0)',
+      marker: { size: 0 } 
     };
   });
 
@@ -162,7 +175,6 @@
     return;
   }
 
-  // --- 3) Rent layout ---
   const layout = {
     boxmode: 'group',
     margin: { l: 60, r: 10, t: 10, b: 60 },
@@ -204,7 +216,6 @@
 
   Plotly.newPlot('chart', traces, layout, config);
 
-  // --- 4) Små hjelpeknapper som før ---
   function selectAll(id) {
     const sel = document.getElementById(id);
     if (!sel) return;
