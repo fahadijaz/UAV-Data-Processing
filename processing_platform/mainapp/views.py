@@ -1,27 +1,44 @@
-from django.shortcuts import render
-import logging
 import csv
 import json
+import logging
 import os
-from datetime import date, datetime, timedelta
-from django.utils import timezone
-import pandas as pd
+import re
 import shutil
+from collections import defaultdict
+from datetime import date, datetime, timedelta
 from pathlib import Path
+
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Q
-from django.http import JsonResponse
+from django.db.models import Avg, Q
+from django.forms import formset_factory
+from django.http import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 from django.utils.dateparse import parse_date
-from django.forms import formset_factory
-from django.http import HttpResponse, Http404
-from .models import Flight_Log, Flight_Paths, Sensor, SensorReading,ZonalStat, Meta, Fields
-from django.forms import formset_factory
+
 from .forms import FlightForm
-from .sd_card import detect_sd_cards, SDCardError
-import re
-from mainapp.sd_card import build_initial_flights, process_flights_post
+from .models import (
+    FieldVisualisation,
+    Fields,
+    Flight_Log,
+    Flight_Paths,
+    Sensor,
+    SensorReading,
+    Spectrum,
+    ZonalStat,
+)
+from .sd_card import (
+    SDCardError,
+    detect_sd_cards,
+    build_initial_flights,
+    process_flights_post,
+)
+from .data_visualisation import (
+    import_excel_to_db,
+    VARIABLES,
+    build_chart_data,
+)
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -164,127 +181,99 @@ def sd_card_view(request):
 
 
 
-def data_visualisation(request):
-    selected_stats = request.GET.getlist("stats")
-    selected_dates = request.GET.getlist("date")
-    
-    all_dates = []
-    downloads_path = os.path.expanduser("/user/Downloads")
-    csv_file_path = os.path.join(downloads_path, "24BPROBARG20_Vollebekk_2024.csv")
 
-    if os.path.exists(csv_file_path):
-        df = pd.read_csv(csv_file_path)
-        if "date" in df.columns:
-            all_dates = (
-                pd.to_datetime(df["date"], errors="coerce")
-                .dt.strftime("%Y-%m-%d")
-                .drop_duplicates()
-                .sort_values()
-                .tolist()
-            )
-
-    plots = []
-    return render(request, "mainapp/data_visualisation.html", {
-        "plots": plots,
-        "stat_options": STAT_OPTIONS,
-        "selected_stats": selected_stats,
-        "selected_dates": selected_dates,
-        "all_dates": all_dates,
-    })
-
-"""def data_visualisation_view(request):
-    return render(request, 'mainapp/data_visualisation.html')"""
-
-STAT_OPTIONS = [
-    ("cv", "Coefficient of Variation"),
-    ("iqr", "Interquartile Range"),
-    ("kurtosis", "Kurtosis"),
-    ("majority", "Majority"),
-    ("max", "Maximum"),
-    ("mean", "Mean"),
-    ("median", "Median"),
-    ("min", "Minimum"),
-    ("minority", "Minority"),
-    ("q25", "25th Percentile (Q1)"),
-    ("q75", "75th Percentile (Q3)"),
-    ("range", "Range (Max - Min)"),
-    ("skewness", "Skewness"),
-    ("std", "Standard Deviation"),
-    ("sum", "Sum"),
-    ("top_10", "Top 10 Values"),
-    ("top_10_mean", "Mean of Top 10 Values"),
-    ("top_10_median", "Median of Top 10 Values"),
-    ("top_10_std", "Standard Deviation of Top 10 Values"),
-    ("top_15", "Top 15 Values"),
-    ("top_15_mean", "Mean of Top 15 Values"),
-    ("top_15_median", "Median of Top 15 Values"),
-    ("top_15_std", "Standard Deviation of Top 15 Values"),
-    ("top_20", "Top 20 Values"),
-    ("top_25", "Top 25 Values"),
-    ("top_25_mean", "Mean of Top 25 Values"),
-    ("top_25_median", "Median of Top 25 Values"),
-    ("top_25_std", "Standard Deviation of Top 25 Values"),
-    ("top_35", "Top 35 Values"),
-    ("top_35_mean", "Mean of Top 35 Values"),
-    ("top_35_median", "Median of Top 35 Values"),
-    ("top_35_std", "Standard Deviation of Top 35 Values"),
-    ("top_50", "Top 50 Values"),
-    ("top_50_mean", "Mean of Top 50 Values"),
-    ("top_50_median", "Median of Top 50 Values"),
-    ("top_50_std", "Standard Deviation of Top 50 Values"),
-    ("top_5_mean", "Mean of Top 5 Values"),
-    ("top_5_median", "Median of Top 5 Values"),
-    ("top_5_std", "Standard Deviation of Top 5 Values"),
-    ("variance", "Variance"),
-    ("variety", "Variety (Number of Unique Values)"),
-]
+####################################################################
+#data visualisation
+####################################################################
 
 def data_visualisation(request):
-    selected_stats = request.GET.getlist("stats")
-    selected_dates = request.GET.getlist("date")
-    
-    all_dates = []
-    downloads_path = os.path.expanduser("~/Downloads")
-    csv_file_path = os.path.join(downloads_path, "24BPROBARG20_Vollebekk_2024.csv")
+    """
+    Handle data visualization for field spectra.
 
-    if os.path.exists(csv_file_path):
-        df = pd.read_csv(csv_file_path)
-        if "date" in df.columns:
-            all_dates = (
-                pd.to_datetime(df["date"], errors="coerce")
-                .dt.strftime("%Y-%m-%d")
-                .drop_duplicates()
-                .sort_values()
-                .tolist()
-            )
+    Behavior
+    --------
+    - POST:
+        Accepts an uploaded Excel (.xlsx) file, imports its rows into the database
+        via `import_excel_to_db(file)`, and reports back using Django messages.
+        Always redirects to the same view afterward (PRG pattern).
 
-    plots = []
+    - GET:
+        Reads filters from query params:
+          * start_date / end_date : ISO date (YYYY-MM-DD); defaults to last 30 days
+          * field                 : FieldVisualisation.name (optional)
+          * specters              : one or more spectrum names (case-insensitive)
+          * variables             : one or more metric names; defaults to ["mean"]
+        Builds `chart_data` by calling `build_chart_data(...)`, which returns
+        arrays of raw values per (date × specter × variable) suitable for a boxplot.
+        Renders the template `mainapp/data_visualisation.html` with dropdown
+        options and a JSON payload (`chart_data_json`) consumed by the frontend.
+
+    Template context
+    ----------------
+    - fields              : list[str] of FieldVisualisation names for the field selector
+    - specters            : list[str] of available spectrum names for the specter selector
+    - variables           : list[str] of supported variable names (from `VARIABLES`)
+    - selected_specters   : list[str] reflecting the active specter filter
+    - selected_variables  : list[str] reflecting the active variable filter
+    - chart_data_json     : JSON string with:
+        {
+          "dates":  ["YYYY-MM-DD", ...],
+          "series": [
+            {"name": "<specter> · <variable>", "data": [ [values on date0], [values on date1], ... ]},
+            ...
+          ]
+        }
+
+    Notes
+    -----
+    - `specters` and `variables` accept multiple values via repeated query params.
+    - Messages are shown in Norwegian to match the rest of the UI.
+    - No exceptions are raised to the user; errors are surfaced via Django messages.
+    """
+
+    if request.method == "POST":
+        file = request.FILES.get("file")
+        if not file:
+            messages.error(request, "Last opp en Excel-fil (.xlsx).")
+            return redirect("data_visualisation")
+        try:
+            created, changed = import_excel_to_db(file)
+            messages.success(request, f"Importert: {created} nye, {changed} oppdatert/duplikater.")
+        except Exception as e:
+            messages.error(request, f"Import feilet: {e}")
+        return redirect("data_visualisation")
+
+    today = date.today()
+    start_raw = request.GET.get("start_date")
+    end_raw = request.GET.get("end_date")
+    start_date = parse_date(start_raw) if start_raw else (today - timedelta(days=30))
+    end_date = parse_date(end_raw) if end_raw else today
+
+    field_name = request.GET.get("field") or ""
+    specters_req = [s.strip().lower() for s in request.GET.getlist("specters")]
+    variables_req = request.GET.getlist("variables") or ["mean"]
+
+    chart_data, selected_specters, selected_variables = build_chart_data(
+        start_date, end_date, field_name, specters_req, variables_req
+    )
+
+    fields = list(FieldVisualisation.objects.values_list("name", flat=True).order_by("name"))
+    specters = list(Spectrum.objects.values_list("name", flat=True).distinct().order_by("name"))
+
     return render(request, "mainapp/data_visualisation.html", {
-        "plots": plots,
-        "stat_options": STAT_OPTIONS,
-        "selected_stats": selected_stats,
-        "selected_dates": selected_dates,
-        "all_dates": all_dates,
+        "fields": fields,
+        "specters": specters,
+        "variables": VARIABLES,
+        "selected_specters": selected_specters,
+        "selected_variables": selected_variables,
+        "chart_data_json": json.dumps(chart_data), 
     })
 
-"""
-df = pd.read_csv(flight_log_csv_path)
-def read_local_csv(request):
-    print(">>> ENTER read_local_csv")
-    logger.debug("ENTER read_local_csv")
-    downloads_path = os.path.expanduser("~/Downloads")
 
-    if not os.path.exists(flight_log_csv_path):
-        return JsonResponse(
-            {"error": f"CSV file not found at {flight_log_csv_path}"}, status=404
-        )
 
-    try:
-        df = pd.read_csv(flight_log_csv_path)
-        data = df.to_dict(orient="records")
-        return JsonResponse(data, safe=False)
-    except Exception as e:
-        return JsonResponse({"error": str(e)}, status=500)"""
+####################################################################
+#review drone flights
+####################################################################
 
 
 def review_drone_flights(request):
@@ -442,81 +431,6 @@ def flight_events(request):
     return JsonResponse(events, safe=False)
 
 
-####################################################################
-#weekly overview
-####################################################################
-
-
-"""def folder_exists_for_week(base_path, start_date, end_date):
-    if not os.path.exists(base_path):
-        return False
-
-    try:
-        for name in os.listdir(base_path):
-            if len(name) >= 8 and name[:8].isdigit():
-                try:
-                    folder_date = datetime.datetime.strptime(name[:8], "%Y%m%d").date()
-                    if start_date <= folder_date <= end_date:
-                        return True
-                except ValueError:
-                    continue
-    except PermissionError:
-        return False
-
-    return False"""
-
-
-"""def weekly_view(request):
-    csv_path = os.path.join(settings.BASE_DIR, "mainapp", "data", "flight_list.csv")
-    all_flights = []
-
-    # Get current week range
-    today = date.today()
-    start_of_week = today - datetime.timedelta(days=today.weekday())
-    end_of_week = start_of_week + datetime.timedelta(days=6)
-    week_num = today.isocalendar()[1]
-
-    with open(csv_path, newline="") as csvfile:
-        reader = csv.DictReader(csvfile, delimiter=";")
-        for row in reader:
-            field_name = row["Field folder name"].strip()
-            flight_type = row["Type of flight"].strip()
-
-            flown_path = row["1_flight path"].strip()
-            processed_path = row["2_1_pix4d path"].strip()
-
-            flown = folder_exists_for_week(flown_path, start_of_week, end_of_week)
-            processed = folder_exists_for_week(
-                processed_path, start_of_week, end_of_week
-            )
-
-            if not flown:
-                status_level = 0  # red
-            elif not processed:
-                status_level = 1  # orange
-            else:
-                status_level = 2  # green
-
-            all_flights.append(
-                {
-                    "field": field_name,
-                    "type": flight_type,
-                    "flown": flown,
-                    "processed": processed,
-                    "status_level": status_level,
-                }
-            )
-
-    all_flights.sort(key=lambda x: x["status_level"])
-
-    context = {
-        "flights": all_flights,
-        "week_num": week_num,
-        "start_date": start_of_week,
-        "end_date": end_of_week,
-    }
-
-    return render(request, "mainapp/weekly.html", context)"""
 
 
 ####################################################################
@@ -525,7 +439,32 @@ def flight_events(request):
 
 
 def process_json_data(json_data, sensor_id):
-    """Lagrer rader fra en JSON-fil i databasen."""
+    """
+    Persist readings from a JSON payload for a single sensor.
+
+    Parameters
+    ----------
+    json_data : list[dict]
+        Iterable where each entry is one reading. Expected keys:
+          - "TS": ISO-8601 timestamp, e.g. "2024-01-02T03:04:05.678Z" (required)
+          - "JT" -> soil_temperature (optional, numeric)
+          - "JF" -> soil_moisture   (optional, numeric)
+          - "LT" -> air_temperature (optional, numeric)
+          - "LF" -> air_humidity    (optional, numeric)
+          - "BT" -> battery         (optional, numeric)
+          - "R"  -> rainfall        (optional, numeric)
+          - "crop"     -> crop_type     (optional, string)
+          - "soilType" -> soil_type     (optional, string)
+    sensor_id : str
+        Normalized sensor identifier. The Sensor row is created on demand.
+
+    Behavior
+    --------
+    - Uses (sensor, timestamp) as a natural key via get_or_create to avoid duplicates.
+    - On insert, sets the parsed fields; existing rows are left unchanged.
+    - Logs per-row parse errors and continues with the rest.
+    - Logs a final summary: <added>/<total> rows inserted.
+    """
     sensor, _ = Sensor.objects.get_or_create(sensor_id=sensor_id)
     added = 0
 
@@ -574,9 +513,9 @@ FILENAME_RE = re.compile(
 
 def parse_sensor_id_from_filename(filename: str) -> str:
     """
-    Lager sensor_id i formatet 'GRUPPE #NUMMER' fra filnavn.
-    Fallback: første ord i filnavnet (gammel oppførsel).
-    Inneholder også en enkel normalisering fra '25BPROBARG20' -> '25PROBAR20'.
+    Generates a sensor_id from the filename in the format 'GROUP #NUMBER'.
+    Fallback: uses the first word of the filename (legacy behavior).
+    Also applies a simple normalization: '25BPROBARG20' -> '25PROBAR20'.
     """
     short = os.path.basename(filename)
     m = FILENAME_RE.match(short)
@@ -594,6 +533,38 @@ def parse_sensor_id_from_filename(filename: str) -> str:
 
 
 def upload_easy_growth_data(request):
+    """
+    Upload and visualize Easy Growth sensor data.
+
+    Methods
+    -------
+    GET:
+      - Query params:
+          sensor      -> matches Sensor.sensor_id (optional)
+          start_date  -> YYYY-MM-DD (defaults to today - 14 days)
+          end_date    -> YYYY-MM-DD (defaults to today)
+      - If a sensor is selected, fetch SensorReading records within [start_date, end_date]
+        ordered by timestamp, and build `chart_data` for the frontend chart.
+
+    POST:
+      - Accepts multiple JSON files under the "files" field (multipart/form-data).
+      - For each file:
+          * Infer sensor_id from the filename via parse_sensor_id_from_filename(...)
+          * Load JSON and call process_json_data(data, sensor_id)
+      - Shows per-file errors via Django messages; successful uploads get a summary message.
+
+    Template context
+    ----------------
+      sensors           : QuerySet[Sensor] for the selector
+      chart_data        : list[dict] with timestamp and sensor metrics for plotting
+      latest_readings   : the last SensorReading in range (or None)
+      default_start/end : ISO date strings used to prefill the date inputs
+
+    Notes
+    -----
+    - Invalid dates trigger a user message and redirect (PRG pattern).
+    - Consider renaming context key `latest_readings` -> `latest_reading` for consistency.
+    """
     sensors = Sensor.objects.all()
     chart_data = []
     latest_reading = None

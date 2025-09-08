@@ -1,41 +1,219 @@
 {% extends "mainapp/base.html" %}
-
 {% block title %}Data Visualisation{% endblock %}
 
 {% block content %}
-  <h2 class="text-2xl font-semibold mb-4">Data visualisation</h2>
-  <p class="mb-4">Select a date and one or more statistical values to plot</p>
 
-  <form method="get" class="mb-22">
-    <!-- Date input-->
-    {% for date in all_dates %}
-      <label class="block">
-        <input type="checkbox" name="date" value="{{ date }}"
-              {% if date in selected_dates %}checked{% endif %}>
-        {{ date }}
-      </label>
-    {% endfor %} 
-       
-    <!-- Stats selector-->
-     <label class="block mb-2 font-medium">Select statistical values:</label>
-      {% for key, label in stat_options %}
-        <label class="block">
-          <input type="checkbox" name="stats" value="{{ key }}"
-                {% if key in selected_stats %}checked{% endif %}>
-          {{ label }}
-        </label>
-      {% endfor %}
-    <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded">
-      Plot
-    </button>
-  </form>
+<!-- Meldinger for suksess og feil -->
+{% if messages %}
+  <div class="mb-4 space-y-2">
+    {% for message in messages %}
+      <div class="rounded-lg px-4 py-2 {% if message.tags == 'success' %}bg-green-50 text-green-700{% elif message.tags == 'error' %}bg-red-50 text-red-700{% else %}bg-gray-50 text-gray-700{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
 
-  {% for plot in plots %}
-    <div class="mb-8 border p-4 bg-white shadow rounded">
-      <img src="data:image/png;base64,{{plot}}" alt="Plot" class="w-full h-auto">
+<!-- Excel-opplastingsskjema (POST) -->
+<form method="post" action="{% url 'data_visualisation' %}" enctype="multipart/form-data" class="mb-6">
+  {% csrf_token %}
+  <div class="flex flex-col gap-3 md:flex-row md:items-end">
+    <div>
+      <label class="block text-sm font-medium text-gray-700">Excel (.xlsx)</label>
+      <input type="file" name="file" accept=".xlsx" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
     </div>
-  {% endfor %}
+    <button type="submit" class="rounded-lg bg-teal-600 px-4 py-2 text-white hover:bg-teal-700">Last opp</button>
+  </div>
+</form>
+
+<!-- Filter-skjema for visualisering (GET) -->
+<form id="filter-form" method="get" action="{% url 'data_visualisation' %}">
+  <div id="selector" class="rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm ring-1 ring-gray-100 backdrop-blur">
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div>
+        <label for="start_date" class="block text-sm font-medium text-gray-700">Startdato</label>
+        <input
+          type="date"
+          name="start_date"
+          id="start_date"
+          value="{{ request.GET.start_date }}"
+          class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
+        >
+      </div>
+      <div>
+        <label for="end_date" class="block text-sm font-medium text-gray-700">Sluttdato</label>
+        <input
+          type="date"
+          name="end_date"
+          id="end_date"
+          value="{{ request.GET.end_date }}"
+          class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500"
+        >
+      </div>
+    </div>
+
+    <div class="mt-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+      <!-- Felt -->
+      <div>
+        <label for="field" class="block text-sm font-medium text-gray-700">Felt</label>
+        <select name="field" id="field" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
+          <option value="">Velg felt…</option>
+          {% for field in fields %}
+            <option value="{{ field }}" {% if request.GET.field == field %}selected{% endif %}>{{ field }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <!-- Spekter (flervalg) -->
+      <div>
+        <label for="specters" class="block text-sm font-medium text-gray-700">Spekter (flervalg)</label>
+        <select name="specters" id="specters" multiple size="6" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
+          {% for specter in specters %}
+            <option value="{{ specter }}" {% if specter in selected_specters %}selected{% endif %}>{{ specter }}</option>
+          {% endfor %}
+        </select>
+        <p class="mt-1 text-xs text-gray-500">Hold Ctrl/Cmd for å velge flere.</p>
+      </div>
+
+      <!-- Variabler (flervalg) -->
+      <div>
+        <label for="variables" class="block text-sm font-medium text-gray-700">Variabler (flervalg)</label>
+        <select name="variables" id="variables" multiple size="6" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
+          {% for variable in variables %}
+            <option value="{{ variable }}" {% if variable in selected_variables %}selected{% endif %}>{{ variable }}</option>
+          {% endfor %}
+        </select>
+        <p class="mt-1 text-xs text-gray-500">Hold Ctrl/Cmd for å velge flere.</p>
+      </div>
+    </div>
+
+    <div class="mt-4 flex gap-2">
+      <button type="submit" id="update-btn" class="rounded-lg bg-teal-600 px-4 py-2 text-white hover:bg-teal-700">Oppdater</button>
+      <button type="button" id="select-all-specters" class="rounded-lg border px-3 py-2">Velg alle spekter</button>
+      <button type="button" id="select-all-variables" class="rounded-lg border px-3 py-2">Velg alle variabler</button>
+      <span class="text-xs text-gray-500 self-center">(Hold Alt/⌥ og klikk “Oppdater” for å vise debug uten å sende skjemaet)</span>
+    </div>
+  </div>
+</form>
+
+<!-- Graf -->
+<div class="mt-8 rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm ring-1 ring-gray-100 backdrop-blur">
+  <div id="chart" style="height: 520px;"></div>
+</div>
+
+<!-- Debug Output -->
+<div id="debug-output" class="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 hidden"></div>
+
+{% if chart_data_json %}
+  <script id="chart-data" type="application/json">{{ chart_data_json|safe }}</script>
+{% endif %}
+
+<!-- Plotly (innebygget box plot) -->
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+
+<script>
+(function () {
+  // --- 1) Les input (samme som før) ---
+  const sd = document.getElementById('start_date');
+  const ed = document.getElementById('end_date');
+  if (sd && !sd.value) {
+    const t = new Date(); const lm = new Date(t); lm.setDate(t.getDate() - 30);
+    sd.value = lm.toISOString().split('T')[0];
+  }
+  if (ed && !ed.value) { const t = new Date(); ed.value = t.toISOString().split('T')[0]; }
+
+  const dataEl = document.getElementById('chart-data');
+  const payload = dataEl ? JSON.parse(dataEl.textContent) : { dates: [], series: [] };
+  const labels = payload.dates || [];
+  const series = payload.series || [];
+
+  // --- 2) Minimalistiske traces (én trace per serie) ---
+  const traces = series.map(s => {
+    const x = [];
+    const y = [];
+    (s.data || []).forEach((vals, i) => {
+      if (Array.isArray(vals) && vals.length) {
+        // gjenta datoen for alle verdier den dagen
+        for (let k = 0; k < vals.length; k++) {
+          x.push(labels[i] || '');
+          y.push(vals[k]);
+        }
+      }
+    });
+    return {
+      type: 'box',
+      name: s.name,
+      x, y,
+      boxpoints: false,   // 👈 ingen punkter/outliers
+      boxmean: false,     // 👈 ingen mean-linje
+      notched: false,
+      line: { width: 1 }, // tynn linje for boks/whiskers
+      fillcolor: 'rgba(0,0,0,0)', // ingen fyll (holder det lett)
+      marker: { size: 0 } // ingen markører
+    };
+  });
+
+  const hasData = traces.some(t => t.y && t.y.length);
+  if (!hasData) {
+    const note = document.createElement('p');
+    note.className = 'mt-2 text-sm text-gray-600';
+    note.textContent = 'Ingen datapunkter for gjeldende utvalg.';
+    document.getElementById('chart').parentElement.appendChild(note);
+    return;
+  }
+
+  // --- 3) Rent layout ---
+  const layout = {
+    boxmode: 'group',
+    margin: { l: 60, r: 10, t: 10, b: 60 },
+    paper_bgcolor: 'white',
+    plot_bgcolor: 'white',
+    xaxis: {
+      type: 'category',
+      categoryorder: 'array',
+      categoryarray: labels,
+      tickangle: -25,
+      showgrid: false,
+      showline: true,
+      linewidth: 1,
+      mirror: true
+    },
+    yaxis: {
+      zeroline: false,
+      showgrid: true,
+      gridcolor: 'rgba(0,0,0,0.06)',
+      gridwidth: 1,
+      showline: true,
+      linewidth: 1,
+      mirror: true
+    },
+    legend: {
+      orientation: 'h',
+      y: 1.02, yanchor: 'bottom',
+      x: 0,
+      font: { size: 11 }
+    },
+    hoverlabel: { bgcolor: 'white' }
+  };
+
+  const config = {
+    responsive: true,
+    displaylogo: false,
+    modeBarButtonsToRemove: ['autoScale2d', 'lasso2d', 'select2d', 'toImage']
+  };
+
+  Plotly.newPlot('chart', traces, layout, config);
+
+  // --- 4) Små hjelpeknapper som før ---
+  function selectAll(id) {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    Array.from(sel.options).forEach(o => o.selected = true);
+  }
+  document.getElementById('select-all-specters')?.addEventListener('click', () => selectAll('specters'));
+  document.getElementById('select-all-variables')?.addEventListener('click', () => selectAll('variables'));
+})();
+</script>
+
+
 {% endblock %}
-
-
-

@@ -65,76 +65,162 @@
     {% endif %}
   </div>
 
-  {% if chart_data %}
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-      const chartData = {{ chart_data|safe }};
-      const timestamps = chartData.map(d => d.timestamp);
-      const airTemp = chartData.map(d => d.air_temperature);
-      const soilTemp = chartData.map(d => d.soil_temperature);
-      const airHumidity = chartData.map(d => d.air_humidity);
-      const soilMoisture = chartData.map(d => d.soil_moisture);
+{% if chart_data %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns"></script>
+  <script>
+    // Rådata fra view
+    const raw = {{ chart_data|safe }};
+    const periodStart = new Date("{{ default_start }}T00:00:00");
+    const periodEnd   = new Date("{{ default_end }}T23:59:59");
 
-      const commonOptions = {
+    // 1) Grupper målinger per dag (YYYY-MM-DD)
+    const byDay = new Map();
+    for (const r of raw) {
+      // r.timestamp er f.eks. "2025-09-07 13:45" -> bruk dato-delen
+      const dayKey = r.timestamp.slice(0, 10); // "YYYY-MM-DD"
+      if (!byDay.has(dayKey)) byDay.set(dayKey, []);
+      byDay.get(dayKey).push(r);
+    }
+
+    // Velg hvordan du aggregerer flere målinger per dag:
+    function aggregateDay(rows) {
+      // eksempel: ta siste måling den dagen
+      const last = rows[rows.length - 1];
+      return {
+        air_temperature: last.air_temperature ?? null,
+        soil_temperature: last.soil_temperature ?? null,
+        air_humidity: last.air_humidity ?? null,
+        soil_moisture: last.soil_moisture ?? null,
+      };
+      // Alternativ: snitt
+      // const avg = (arr, k) => arr.map(x => +x[k]).filter(n=>Number.isFinite(n)).reduce((a,b)=>a+b,0) / arr.length || null;
+      // return { air_temperature: avg(rows,'air_temperature'), ... }
+    }
+
+    // 2) Lag tett serie: én rad per dag i valgt periode; null der vi mangler data
+    function eachDay(start, end) {
+      const out = [];
+      const d = new Date(start);
+      d.setHours(0,0,0,0);
+      const last = new Date(end);
+      last.setHours(0,0,0,0);
+      while (d <= last) {
+        out.push(new Date(d));
+        d.setDate(d.getDate() + 1);
+      }
+      return out;
+    }
+
+    const dense = eachDay(periodStart, periodEnd).map(d => {
+      const key = d.toISOString().slice(0, 10); // YYYY-MM-DD
+      const agg = byDay.has(key) ? aggregateDay(byDay.get(key)) : null;
+      return {
+        timestamp: key, // Chart.js adapter skjønner ISO-dato
+        air_temperature: agg ? agg.air_temperature : null,
+        soil_temperature: agg ? agg.soil_temperature : null,
+        air_humidity: agg ? agg.air_humidity : null,
+        soil_moisture: agg ? agg.soil_moisture : null,
+      };
+    });
+
+    // Felles visningsvalg
+    const xScaleTime = {
+      type: 'time',
+      time: {
+        unit: 'day', // bytt til 'week' om du vil
+        tooltipFormat: 'dd.MM.yyyy',
+        displayFormats: { day: 'dd.MM', week: 'dd.MM' }
+      },
+      min: "{{ default_start }}", // vis alltid hele valgt periode
+      max: "{{ default_end }}"
+    };
+
+    const commonPlugins = {
+      legend: { position: 'bottom' },
+      tooltip: { mode: 'index', intersect: false }
+    };
+
+    // 3) Temperatur (hull i data via null-verdier)
+    new Chart(document.getElementById('tempChart'), {
+      type: 'line',
+      data: {
+        datasets: [
+          {
+            label: 'Lufttemperatur (°C)',
+            data: dense,
+            parsing: { xAxisKey: 'timestamp', yAxisKey: 'air_temperature' },
+            spanGaps: false, // <- bryt linjen ved null
+            borderWidth: 2,
+            fill: false
+          },
+          {
+            label: 'Jordtemperatur (°C)',
+            data: dense,
+            parsing: { xAxisKey: 'timestamp', yAxisKey: 'soil_temperature' },
+            spanGaps: false,
+            borderWidth: 2,
+            fill: false
+          }
+        ]
+      },
+      options: {
         responsive: true,
         maintainAspectRatio: false,
+        scales: { x: xScaleTime },
+        plugins: commonPlugins
+      }
+    });
+
+    // 4) Fuktighet (to y-akser + hull i data)
+    new Chart(document.getElementById('humidityChart'), {
+      type: 'line',
+      data: {
+        datasets: [
+          {
+            label: 'Luftfuktighet (%)',
+            data: dense,
+            parsing: { xAxisKey: 'timestamp', yAxisKey: 'air_humidity' },
+            yAxisID: 'y1',
+            spanGaps: false,
+            borderWidth: 2,
+            fill: false
+          },
+          {
+            label: 'Jordfuktighet (%)',
+            data: dense,
+            parsing: { xAxisKey: 'timestamp', yAxisKey: 'soil_moisture' },
+            yAxisID: 'y',
+            spanGaps: false,
+            borderWidth: 2,
+            fill: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: { mode: 'index', intersect: false },
+        stacked: false,
         scales: {
-          x: {
-            ticks: {
-              maxTicksLimit: 15,
-              maxRotation: 45,
-              minRotation: 45
-            }
+          x: xScaleTime,
+          y:  {
+            type: 'linear',
+            display: true,
+            position: 'left',
+            ticks: { callback: (v) => v + '%' }
+          },
+          y1: {
+            type: 'linear',
+            display: true,
+            position: 'right',
+            grid: { drawOnChartArea: false },
+            ticks: { callback: (v) => v + '%' }
           }
         },
-        plugins: {
-          legend: { position: 'bottom' }
-        }
-      };
-
-      new Chart(document.getElementById('tempChart'), {
-        type: 'line',
-        data: {
-          labels: timestamps,
-          datasets: [
-            {
-              label: 'Lufttemperatur (°C)',
-              data: airTemp,
-              borderWidth: 2,
-              fill: false
-            },
-            {
-              label: 'Jordtemperatur (°C)',
-              data: soilTemp,
-              borderWidth: 2,
-              fill: false
-            }
-          ]
-        },
-        options: commonOptions
-      });
-
-      new Chart(document.getElementById('humidityChart'), {
-        type: 'line',
-        data: {
-          labels: timestamps,
-          datasets: [
-            {
-              label: 'Luftfuktighet (%)',
-              data: airHumidity,
-              borderWidth: 2,
-              fill: false
-            },
-            {
-              label: 'Jordfuktighet (%)',
-              data: soilMoisture,
-              borderWidth: 2,
-              fill: false
-            }
-          ]
-        },
-        options: commonOptions
-      });
-    </script>
-  {% endif %}
+        plugins: commonPlugins
+      }
+    });
+  </script>
+{% endif %}
 {% endblock %}
