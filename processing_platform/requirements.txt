@@ -1,0 +1,8 @@
+pandas
+numpy
+django
+psycopg2-binary
+openpyxl
+django_extensions>=3.2
+
+

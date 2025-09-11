@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:latest
+    ports:
+      - 5433:5432
+    volumes:
+      - ~/apps/postgres_UAV:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_PASSWORD=Drone2025PheNo
+      - POSTGRES_USER=admin
+      - POSTGRES_DB=UAV
+
+  web:
+    build: .
+    command: python3 manage.py runserver 0.0.0.0:8000 --verbosity 3
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - ~/Downloads:/downloads
+    depends_on:
+      - db

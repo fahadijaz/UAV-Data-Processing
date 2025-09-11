@@ -1,8 +1,27 @@
 {% extends "mainapp/base.html" %}
-
 {% block title %}Home{% endblock %}
 
 {% block content %}
-  <h2 class="text-2xl font-semibold mb-4">Welcome</h2>
-  <p>This is the home page of your drone file manager.</p>
+<div class="container mx-auto py-8 space-y-12">
+
+  <!-- Researchers section -->
+  <section class="bg-white p-6 rounded-xl shadow">
+    <h2 class="text-2xl font-semibold mb-4">Researchers</h2>
+    <p class="mb-4 text-gray-700">
+      For researchers, you are mostly intended to review and analyze the data collected by pilots.
+    </p>
+
+
+  </section>
+
+  <!-- Pilots section -->
+  <section class="bg-white p-6 rounded-xl shadow">
+    <h2 class="text-2xl font-semibold mb-4">Pilots</h2>
+    <p class="mb-4 text-gray-700">
+      As a pilot, you can:
+    </p>
+
+  </section>
+
+</div>
 {% endblock %}

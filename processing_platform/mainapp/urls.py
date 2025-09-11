@@ -1,11 +1,23 @@
-from django.urls import path, re_path
+import logging
+from django.urls import path
+
 from . import views
 
+logger = logging.getLogger(__name__)
+logger.debug("Loading mainapp.urls…")
+
 urlpatterns = [
-    path('', views.home_view, name='home'),
-    path('sd-card/', views.sd_card_view, name='sd_card'),
-    path('weekly/', views.weekly_view, name='weekly'),
-    re_path(r"^weekly/(?P<week_offset>-?\d+)/$", views.weekly_view, name="weekly_with_offset"),
-    path('details/', views.details_view, name='details'),
-    path('add-routes/', views.add_routes_view, name='add_routes'),
+    path("", views.home_view, name="home"),
+    path("sd-card/", views.sd_card_view, name="sd_card_view"),
+    path(
+        "review_drone_flights/", views.review_drone_flights, name="review_drone_flights"
+    ),
+    path("flight/<int:flight_id>/", views.flight_detail, name="flight_detail"),
+    path("details/", views.details_view, name="details"),
+    path("add-routes/", views.add_routes_view, name="add_routes"),
+    path("weekly_overview/", views.weekly_overview, name="weekly_overview"),
+    path("upload/", views.upload_easy_growth_data, name="easy_growth"),
+    path('visualise/', views.data_visualisation, name='data_visualisation'),
 ]
+
+logger.debug("Registered URL patterns: %s", [p.name for p in urlpatterns])

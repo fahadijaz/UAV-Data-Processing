@@ -1,0 +1,7 @@
+{% for file, data_uri in thumbs %}
+<label class="cursor-pointer mr-2 mb-2">
+  <input type="checkbox" class="skyChk" data-name="{{ file.name }}">
+  <img src="{{ data_uri }}" style="max-width:96px;max-height:96px"
+       class="inline-block border rounded">
+</label>
+{% endfor %}
