@@ -5,539 +5,259 @@
 {% block content %}
 {% if sd_cards %}
 <div class="flex max-w-6xl mx-auto px-6 space-x-8">
- <div class="flex-1">
-   <form
-     id="flight-upload-form"
-     method="post"
-     enctype="multipart/form-data"
-     class="space-y-8"
-   >
-     {% csrf_token %}
-<<<<<<< HEAD
-<<<<<<< HEAD
- {# ── Main form ── #}
-=======
->>>>>>> feat/styling
-=======
->>>>>>> e46b171a (working)
- <div class="flex-1">
-   <form
-     id="flight-upload-form"
-     method="post"
-     enctype="multipart/form-data"
-     class="space-y-8"
-   >
-     {% csrf_token %}
+  <div class="flex-1">
+    <form
+      id="flight-upload-form"
+      method="post"
+      enctype="multipart/form-data"
+      class="space-y-8"
+    >
+      {% csrf_token %}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-     {# SD Card selector #}
-=======
->>>>>>> feat/styling
-=======
->>>>>>> e46b171a (working)
-     <div>
-       <label for="sd_card" class="block text-sm font-semibold text-dark-green">
-         Select SD Card
-       </label>
-       <select
-         name="sd_card"
-         id="sd_card"
-         class="mt-1 block w-full border-2 border-normal-green rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-         onchange="loadFlights()"
->>>>>>> e46b171a (working)
-       >
-         <option value="">-- Select SD Card --</option>
-         <option value="">-- Select SD Card --</option>
-         {% for card in sd_cards %}
-<<<<<<< HEAD
-           <option value="{{ card }}" {% if card == selected_card %}selected{% endif %}>
-=======
-         onchange="loadFlights()"
-       >
-         <option value="">-- Select SD Card --</option>
-         {% for card in sd_cards %}
-           <option value="{{ card }}" {% if card == selected_dcim %}selected{% endif %}>
->>>>>>> feat/styling
-=======
-           <option value="{{ card }}" {% if card == selected_dcim %}selected{% endif %}>
->>>>>>> e46b171a (working)
-             {{ card|cut:'/Volumes/' }}
-           </option>
-         {% endfor %}
-       </select>
-     </div>
+      <!-- SD Card selector -->
+      <div>
+        <label for="sd_card" class="block text-sm font-semibold text-dark-green">
+          Select SD Card
+        </label>
+        <select
+          name="sd_card"
+          id="sd_card"
+          class="mt-1 block w-full border-2 border-normal-green rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
+          onchange="loadFlights()"
+        >
+          <option value="">-- Select SD Card --</option>
+          {% for card in sd_cards %}
+            <option value="{{ card }}" {% if card == selected_dcim %}selected{% endif %}>
+              {{ card|cut:'/Volumes/' }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-     {{ formset.non_form_errors }}
-     {% if formset.management_form.errors %}
-       <ul class="text-red-600 list-disc pl-5">
-         {% for field, errors in formset.management_form.errors.items %}
-           {% for error in errors %}
-             <li>{{ field }}: {{ error }}</li>
-=======
-     {% if formset %}
-       <input type="hidden" name="selected_dcim" value="{{ selected_dcim }}">
-       {{ formset.non_form_errors }}
-       {% if formset.management_form.errors %}
-         <ul class="text-red-600 list-disc pl-5">
-           {% for field, errors in formset.management_form.errors.items %}
-             {% for error in errors %}
-               <li>{{ field }}: {{ error }}</li>
-             {% endfor %}
->>>>>>> e46b171a (working)
-           {% endfor %}
-         </ul>
-       {% endif %}
-       {{ formset.management_form }}
+      {% if formset %}
+        <input type="hidden" name="selected_dcim" value="{{ selected_dcim }}">
+        {{ formset.non_form_errors }}
+        {% if formset.management_form.errors %}
+          <ul class="text-red-600 list-disc pl-5">
+            {% for field, errors in formset.management_form.errors.items %}
+              {% for error in errors %}
+                <li>{{ field }}: {{ error }}</li>
+              {% endfor %}
+            {% endfor %}
+          </ul>
+        {% endif %}
+        {{ formset.management_form }}
 
-       {% for form in formset %}
-         {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+        {% for form in formset %}
+          {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
 
-         <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-           <div class="px-2 py-1 bg-gray-100">
-             <small class="text-gray-600">Folder: {{ form.folder_name.value }}</small>
-           </div>
+          <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
+            <div class="px-2 py-1 bg-gray-100">
+              <small class="text-gray-600">Folder: {{ form.folder_name.value }}</small>
+            </div>
 
-           <div class="px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-             <div>
-               <label for="{{ form.pilot.id_for_label }}" class="block text-sm font-semibold text-dark-green mb-1">Pilot</label>
-               <select name="{{ form.pilot.html_name }}" id="{{ form.pilot.id_for_label }}"
-                       class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm">
-                 {% for value, label in pilot_choices %}
-                   <option value="{{ value }}" {% if form.pilot.value == value %}selected{% endif %}>{{ label }}</option>
-                 {% endfor %}
-               </select>
-               {{ form.pilot.errors }}
-             </div>
-             <div>
-               <label for="{{ form.drone_model.id_for_label }}" class="block text-sm font-semibold text-dark-green mb-1">Drone model</label>
-               <select name="{{ form.drone_model.html_name }}" id="{{ form.drone_model.id_for_label }}"
-                       class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm">
-                 {% for value, label in drone_model_choices %}
-                   <option value="{{ value }}" {% if form.drone_model.value == value %}selected{% endif %}>{{ label }}</option>
-                 {% endfor %}
-               </select>
-               {{ form.drone_model.errors }}
-             </div>
-             <div class="lg:col-span-2">
-               <label class="block text-sm font-semibold text-dark-green mb-1">
-                 Wind speed (m/s)
-               </label>
-               <div class="flex space-x-4 mt-1">
-                 <input type="number" name="{{ form.prefix }}-wind_speed1" 
-                        class="block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
-                        min="0" max="50" step="0.1" placeholder="Start" value="{{ form.wind_speed1.value|default:'' }}">
-                 <input type="number" name="{{ form.prefix }}-wind_speed2" 
-                        class="block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
-                        min="0" max="50" step="0.1" placeholder="Mid" value="{{ form.wind_speed2.value|default:'' }}">
-                 <input type="number" name="{{ form.prefix }}-wind_speed3" 
-                        class="block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
-                        min="0" max="50" step="0.1" placeholder="End" value="{{ form.wind_speed3.value|default:'' }}">
-               </div>
-             </div>
-             <div class="lg:col-span-2">
-               <label for="{{ form.comments.id_for_label }}" class="block text-sm font-semibold text-dark-green mb-1">Comments</label>
-               <textarea name="{{ form.comments.html_name }}" id="{{ form.comments.id_for_label }}" rows="2"
-                         class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
-                         placeholder="Flight comments">{{ form.comments.value|default:'' }}</textarea>
-               {{ form.comments.errors }}
-             </div>
+            <div class="px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div>
+                <label for="{{ form.pilot.id_for_label }}" class="block text-sm font-semibold text-dark-green mb-1">Pilot</label>
+                <select name="{{ form.pilot.html_name }}" id="{{ form.pilot.id_for_label }}"
+                        class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm">
+                  {% for value, label in pilot_choices %}
+                    <option value="{{ value }}" {% if form.pilot.value == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+                {{ form.pilot.errors }}
+              </div>
+              
+              <div>
+                <label for="{{ form.drone_model.id_for_label }}" class="block text-sm font-semibold text-dark-green mb-1">Drone model</label>
+                <select name="{{ form.drone_model.html_name }}" id="{{ form.drone_model.id_for_label }}"
+                        class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm">
+                  {% for value, label in drone_model_choices %}
+                    <option value="{{ value }}" {% if form.drone_model.value == value %}selected{% endif %}>{{ label }}</option>
+                  {% endfor %}
+                </select>
+                {{ form.drone_model.errors }}
+              </div>
+              
+              <div class="lg:col-span-2">
+                <label class="block text-sm font-semibold text-dark-green mb-1">
+                  Wind speed (m/s)
+                </label>
+                <div class="flex space-x-4 mt-1">
+                  <input type="number" name="{{ form.prefix }}-wind_speed1" 
+                         class="block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
+                         min="0" max="50" step="0.1" placeholder="Start" value="{{ form.wind_speed1.value|default:'' }}">
+                  <input type="number" name="{{ form.prefix }}-wind_speed2" 
+                         class="block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
+                         min="0" max="50" step="0.1" placeholder="Mid" value="{{ form.wind_speed2.value|default:'' }}">
+                  <input type="number" name="{{ form.prefix }}-wind_speed3" 
+                         class="block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
+                         min="0" max="50" step="0.1" placeholder="End" value="{{ form.wind_speed3.value|default:'' }}">
+                </div>
+              </div>
+              
+              <div class="lg:col-span-2">
+                <label for="{{ form.comments.id_for_label }}" class="block text-sm font-semibold text-dark-green mb-1">Comments</label>
+                <textarea name="{{ form.comments.html_name }}" id="{{ form.comments.id_for_label }}" rows="2"
+                          class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
+                          placeholder="Flight comments">{{ form.comments.value|default:'' }}</textarea>
+                {{ form.comments.errors }}
+              </div>
 
-             <div class="lg:col-span-2">
-               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <div>
-                   <label class="block text-sm font-semibold text-dark-green mb-1">
-                     Skyline files
-                   </label>
-                   <div class="flex border border-gray-300 rounded-lg overflow-hidden">
-                     <label
-                       for="skyline_{{ form.prefix }}"
-                       class="px-4 py-2 bg-normal-green text-black cursor-pointer hover:bg-dark-green transition-colors"
-                     >
-                       Browse…
-                       <input
-                         id="skyline_{{ form.prefix }}"
-                         name="{{ form.prefix }}-skyline_files"
-                         type="file"
-                         multiple
-                         accept="image/*,.jpg,.jpeg,.png,.tif,.tiff"
-                         class="hidden"
-                         onchange="updateSkylineFiles(this, '{{ form.prefix }}')"
-                       >
-                     </label>
-                     <div
-                       id="skyline_display_{{ form.prefix }}"
-                       class="flex-1 px-4 py-2 bg-white flex items-center text-gray-700"
-                     >
-                       None selected
-                     </div>
-                   </div>
-                   <input type="hidden" name="{{ form.prefix }}-skyline_names" id="skyline_names_{{ form.prefix }}" value="{{ form.skyline_names.value|default:'' }}">
-                 </div>
+              <!-- File upload section -->
+              <div class="lg:col-span-2">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label class="block text-sm font-semibold text-dark-green mb-1">
+                      Skyline files
+                    </label>
+                    <div class="flex border border-gray-300 rounded-lg overflow-hidden">
+                      <label
+                        for="skyline_{{ form.prefix }}"
+                        class="px-4 py-2 bg-normal-green text-black cursor-pointer hover:bg-dark-green transition-colors"
+                      >
+                        Browse…
+                        <input
+                          id="skyline_{{ form.prefix }}"
+                          name="{{ form.prefix }}-skyline_files"
+                          type="file"
+                          multiple
+                          accept="image/*,.jpg,.jpeg,.png,.tif,.tiff"
+                          class="hidden"
+                          onchange="updateSkylineFiles(this, '{{ form.prefix }}')"
+                        >
+                      </label>
+                      <div
+                        id="skyline_display_{{ form.prefix }}"
+                        class="flex-1 px-4 py-2 bg-white flex items-center text-gray-700"
+                      >
+                        None selected
+                      </div>
+                    </div>
+                    <input type="hidden" name="{{ form.prefix }}-skyline_names" id="skyline_names_{{ form.prefix }}" value="{{ form.skyline_names.value|default:'' }}">
+                  </div>
 
-                 <div>
-                   <label class="block text-sm font-semibold text-dark-green mb-1">
-                     Reflectance panel folder
-                   </label>
-                   <div class="flex border border-gray-300 rounded-lg overflow-hidden">
-                     <label
-                       for="reflectance_{{ form.prefix }}"
-                       class="px-4 py-2 bg-normal-green text-black cursor-pointer hover:bg-dark-green transition-colors"
-                     >
-                       Browse…
-                       <input
-                         id="reflectance_{{ form.prefix }}"
-                         name="{{ form.prefix }}-reflectance_files"
-                         type="file"
-                         webkitdirectory
-                         class="hidden"
-                         onchange="updateReflectanceFolder(this, '{{ form.prefix }}')"
-                       >
-                     </label>
-                     <div
-                       id="reflectance_display_{{ form.prefix }}"
-                       class="flex-1 px-4 py-2 bg-white flex items-center text-gray-700"
-                     >
-                       None selected
-                     </div>
-                   </div>
-                   <input type="hidden" name="{{ form.prefix }}-reflectance_dir" id="reflectance_dir_{{ form.prefix }}" value="{{ form.reflectance_dir.value|default:'' }}">
-                 </div>
-<<<<<<< HEAD
-                 {{ form.reflectance_dir.errors }}
-=======
-     {% if formset %}
-       <input type="hidden" name="selected_dcim" value="{{ selected_dcim }}">
-       {{ formset.non_form_errors }}
-       {% if formset.management_form.errors %}
-         <ul class="text-red-600 list-disc pl-5">
-           {% for field, errors in formset.management_form.errors.items %}
-             {% for error in errors %}
-               <li>{{ field }}: {{ error }}</li>
-             {% endfor %}
-           {% endfor %}
-         </ul>
-       {% endif %}
-       {{ formset.management_form }}
+                  <div>
+                    <label class="block text-sm font-semibold text-dark-green mb-1">
+                      Reflectance panel folder
+                    </label>
+                    <div class="flex border border-gray-300 rounded-lg overflow-hidden">
+                      <label
+                        for="reflectance_{{ form.prefix }}"
+                        class="px-4 py-2 bg-normal-green text-black cursor-pointer hover:bg-dark-green transition-colors"
+                      >
+                        Browse…
+                        <input
+                          id="reflectance_{{ form.prefix }}"
+                          name="{{ form.prefix }}-reflectance_files"
+                          type="file"
+                          webkitdirectory
+                          class="hidden"
+                          onchange="updateReflectanceFolder(this, '{{ form.prefix }}')"
+                        >
+                      </label>
+                      <div
+                        id="reflectance_display_{{ form.prefix }}"
+                        class="flex-1 px-4 py-2 bg-white flex items-center text-gray-700"
+                      >
+                        None selected
+                      </div>
+                    </div>
+                    <input type="hidden" name="{{ form.prefix }}-reflectance_dir" id="reflectance_dir_{{ form.prefix }}" value="{{ form.reflectance_dir.value|default:'' }}">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% empty %}
+          <p class="text-center text-gray-500">No flights detected on that card.</p>
+        {% endfor %}
 
-       {% for form in formset %}
-         {% for hidden in form.hidden_fields %}{{ hidden }}{% endfor %}
+        <div class="flex justify-end">
+          <button
+            id="upload-btn"
+            name="upload"
+            type="submit"
+            class="relative inline-flex items-center px-8 py-3 bg-green-700 text-black font-semibold rounded-xl hover:bg-green-500 transition-colors"
+            onclick="showLoadingOverlay()"
+          >
+            <svg
+              id="upload-spinner"
+              class="absolute left-4 top-1/2 -mt-2 h-5 w-5 text-white hidden animate-spin"
+              xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+            >
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+            </svg>
+            <span id="btn-text">Upload All</span>
+          </button>
+        </div>
+      {% else %}
+        {% if selected_dcim %}
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-blue-800 mb-2">No flights detected on that card.</h3>
+            <p class="text-blue-700">Make sure the SD card contains flight folders with the expected naming pattern.</p>
+          </div>
+        {% else %}
+          <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">Select an SD card to view available flights.</h3>
+          </div>
+        {% endif %}
+      {% endif %}
+    </form>
+  </div>
 
-         <div class="bg-white border border-gray-200 rounded-2xl shadow-sm overflow-hidden">
-           <div class="px-2 py-1 bg-gray-100">
-             <small class="text-gray-600">Folder: {{ form.folder_name.value }}</small>
-           </div>
-
-           <div class="px-6 py-6 grid grid-cols-1 lg:grid-cols-2 gap-6">
-             <div>
-               <label for="{{ form.pilot.id_for_label }}" class="block text-sm font-semibold text-dark-green mb-1">Pilot</label>
-               <select name="{{ form.pilot.html_name }}" id="{{ form.pilot.id_for_label }}"
-                       class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm">
-                 {% for value, label in pilot_choices %}
-                   <option value="{{ value }}" {% if form.pilot.value == value %}selected{% endif %}>{{ label }}</option>
-                 {% endfor %}
-               </select>
-               {{ form.pilot.errors }}
-             </div>
-             <div>
-               <label for="{{ form.drone_model.id_for_label }}" class="block text-sm font-semibold text-dark-green mb-1">Drone model</label>
-               <select name="{{ form.drone_model.html_name }}" id="{{ form.drone_model.id_for_label }}"
-                       class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm">
-                 {% for value, label in drone_model_choices %}
-                   <option value="{{ value }}" {% if form.drone_model.value == value %}selected{% endif %}>{{ label }}</option>
-                 {% endfor %}
-               </select>
-               {{ form.drone_model.errors }}
-             </div>
-             <div class="lg:col-span-2">
-               <label class="block text-sm font-semibold text-dark-green mb-1">
-                 Wind speed (m/s)
-               </label>
-               <div class="flex space-x-4 mt-1">
-                 <input type="number" name="{{ form.prefix }}-wind_speed1" 
-                        class="block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
-                        min="0" max="50" step="0.1" placeholder="Start" value="{{ form.wind_speed1.value|default:'' }}">
-                 <input type="number" name="{{ form.prefix }}-wind_speed2" 
-                        class="block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
-                        min="0" max="50" step="0.1" placeholder="Mid" value="{{ form.wind_speed2.value|default:'' }}">
-                 <input type="number" name="{{ form.prefix }}-wind_speed3" 
-                        class="block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
-                        min="0" max="50" step="0.1" placeholder="End" value="{{ form.wind_speed3.value|default:'' }}">
-               </div>
-             </div>
-             <div class="lg:col-span-2">
-               <label for="{{ form.comments.id_for_label }}" class="block text-sm font-semibold text-dark-green mb-1">Comments</label>
-               <textarea name="{{ form.comments.html_name }}" id="{{ form.comments.id_for_label }}" rows="2"
-                         class="mt-1 block w-full border-2 border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-dark-green shadow-sm"
-                         placeholder="Flight comments">{{ form.comments.value|default:'' }}</textarea>
-               {{ form.comments.errors }}
-             </div>
-
-             <div class="lg:col-span-2">
-               <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 <div>
-                   <label class="block text-sm font-semibold text-dark-green mb-1">
-                     Skyline files
-                   </label>
-                   <div class="flex border border-gray-300 rounded-lg overflow-hidden">
-                     <label
-                       for="skyline_{{ form.prefix }}"
-                       class="px-4 py-2 bg-normal-green text-black cursor-pointer hover:bg-dark-green transition-colors"
-                     >
-                       Browse…
-                       <input
-                         id="skyline_{{ form.prefix }}"
-                         name="{{ form.prefix }}-skyline_files"
-                         type="file"
-                         multiple
-                         accept="image/*,.jpg,.jpeg,.png,.tif,.tiff"
-                         class="hidden"
-                         onchange="updateSkylineFiles(this, '{{ form.prefix }}')"
-                       >
-                     </label>
-                     <div
-                       id="skyline_display_{{ form.prefix }}"
-                       class="flex-1 px-4 py-2 bg-white flex items-center text-gray-700"
-                     >
-                       None selected
-                     </div>
-                   </div>
-                   <input type="hidden" name="{{ form.prefix }}-skyline_names" id="skyline_names_{{ form.prefix }}" value="{{ form.skyline_names.value|default:'' }}">
-               </div>
-           {# ── Unified file-picker row ── #}
-           <div class="lg:col-span-2">
-             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-               {# Skyline #}
-               <div>
-                 <label class="block text-sm font-semibold text-dark-green mb-1">
-                   Skyline files
-                 </label>
-                 <div class="flex border border-gray-300 rounded-lg overflow-hidden">
-                   <label
-                     for="{{ form.skyline_files.id_for_label }}"
-                     class="px-4 py-2 bg-normal-green text-white cursor-pointer hover:bg-dark-green transition-colors"
-                   >
-                     Browse…
-                     <input
-                       id="{{ form.skyline_files.id_for_label }}"
-                       name="{{ form.skyline_files.html_name }}"
-                       type="file"
-                       multiple
-                       webkitdirectory
-                       accept="image/jpeg"
-                       class="hidden"
-                     >
-                   </label>
-                   <div
-                     class="flex-1 px-4 py-2 bg-white flex items-center text-gray-700 file-count"
-                     data-input-name="{{ form.skyline_files.html_name }}"
-                   >
-                     None selected
-                   </div>
-                   <input type="hidden" name="{{ form.prefix }}-skyline_names" id="skyline_names_{{ form.prefix }}" value="{{ form.skyline_names.value|default:'' }}">
-                   </div>
-
-                 <div>
-                   <label class="block text-sm font-semibold text-dark-green mb-1">
-                     Reflectance panel folder
-                   </label>
-                   <div class="flex border border-gray-300 rounded-lg overflow-hidden">
-                     <label
-                       for="reflectance_{{ form.prefix }}"
-                       class="px-4 py-2 bg-normal-green text-black cursor-pointer hover:bg-dark-green transition-colors"
-                     >
-                       Browse…
-                       <input
-                         id="reflectance_{{ form.prefix }}"
-                         name="{{ form.prefix }}-reflectance_files"
-                         type="file"
-                         webkitdirectory
-                         class="hidden"
-                         onchange="updateReflectanceFolder(this, '{{ form.prefix }}')"
-                       >
-                     </label>
-                     <div
-                       id="reflectance_display_{{ form.prefix }}"
-                       class="flex-1 px-4 py-2 bg-white flex items-center text-gray-700"
-                     >
-                       None selected
-                     </div>
-                   </div>
-                 </div>
->>>>>>> feat/styling
-=======
->>>>>>> e46b171a (working)
-               </div>
-             </div>
-           </div>
-         </div>
-<<<<<<< HEAD
-<<<<<<< HEAD
-       </div>
-     {% empty %}
-       <p class="text-center text-gray-500">No flights detected on that card.</p>
-     {% endfor %}
-=======
-       {% empty %}
-         <p class="text-center text-gray-500">No flights detected on that card.</p>
-       {% endfor %}
->>>>>>> e46b171a (working)
-
-       <div class="flex justify-end">
-         <button
-           id="upload-btn"
-           name="upload"
-           type="submit"
-           class="relative inline-flex items-center px-8 py-3 bg-green-700 text-black font-semibold rounded-xl hover:bg-green-500 transition-colors"
-           onclick="showLoadingOverlay()"
-         >
-           <svg
-             id="upload-spinner"
-             class="absolute left-4 top-1/2 -mt-2 h-5 w-5 text-white hidden animate-spin"
-             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-           >
-             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-           </svg>
-           <span id="btn-text">Upload All</span>
-         </button>
-       </div>
-     {% else %}
-       {% if selected_dcim %}
-         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-           <h3 class="text-lg font-semibold text-blue-800 mb-2">No flights detected on that card.</h3>
-           <p class="text-blue-700">Make sure the SD card contains flight folders with the expected naming pattern.</p>
-         </div>
-       {% else %}
-         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-           <h3 class="text-lg font-semibold text-gray-800 mb-2">Select an SD card to view available flights.</h3>
-         </div>
-       {% endif %}
-     {% endif %}
-   </form>
- </div>
-<<<<<<< HEAD
-
- {# ── Info sidebar ── #}
- <aside class="hidden lg:block w-1/4 bg-light-turquoise rounded-2xl shadow-inner p-6 sticky top-24">
-   <h3 class="text-lg font-bold mb-4 text-dark-green">Upload info</h3>
-   <ul class="list-disc pl-5 space-y-2 text-sm text-gray-700">
-     <li>Select the SD card containing your DJI folders.</li>
-     <li>Add pilot name and drone model if needed.</li>
-     <li>Choose skyline images folder (opens DJI folder by default).</li>
-     <li>Choose reflectance panel folder (opens DCIM root).</li>
-     <li>Click "Upload All" to copy and organize files.</li>
-   </ul>
- </aside>
-=======
-       {% empty %}
-         <p class="text-center text-gray-500">No flights detected on that card.</p>
-       {% endfor %}
-
-       <div class="flex justify-end">
-         <button
-           id="upload-btn"
-           name="upload"
-           type="submit"
-           class="relative inline-flex items-center px-8 py-3 bg-green-700 text-black font-semibold rounded-xl hover:bg-green-500 transition-colors"
-           onclick="showLoadingOverlay()"
-         >
-           <svg
-             id="upload-spinner"
-             class="absolute left-4 top-1/2 -mt-2 h-5 w-5 text-white hidden animate-spin"
-             xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-           >
-             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
-             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
-           </svg>
-           <span id="btn-text">Upload All</span>
-         </button>
-       </div>
-     {% else %}
-       {% if selected_dcim %}
-         <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-           <h3 class="text-lg font-semibold text-blue-800 mb-2">No flights detected on that card.</h3>
-           <p class="text-blue-700">Make sure the SD card contains flight folders with the expected naming pattern.</p>
-         </div>
-       {% else %}
-         <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
-           <h3 class="text-lg font-semibold text-gray-800 mb-2">Select an SD card to view available flights.</h3>
-         </div>
-       {% endif %}
-     {% endif %}
-   </form>
- </div>
->>>>>>> feat/styling
-=======
->>>>>>> e46b171a (working)
+  <!-- Info sidebar -->
+  <aside class="hidden lg:block w-1/4 bg-light-turquoise rounded-2xl shadow-inner p-6 sticky top-24">
+    <h3 class="text-lg font-bold mb-4 text-dark-green">Upload info</h3>
+    <ul class="list-disc pl-5 space-y-2 text-sm text-gray-700">
+      <li>Select the SD card containing your DJI folders.</li>
+      <li>Add pilot name and drone model if needed.</li>
+      <li>Choose skyline images folder (opens DJI folder by default).</li>
+      <li>Choose reflectance panel folder (opens DCIM root).</li>
+      <li>Click "Upload All" to copy and organize files.</li>
+    </ul>
+  </aside>
 </div>
 
+<!-- Loading overlay -->
 <div
- id="loading-overlay"
- class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50"
- id="loading-overlay"
- class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50"
+  id="loading-overlay"
+  class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-50"
 >
- <div class="bg-white p-8 rounded-2xl flex items-center space-x-4 shadow-lg">
-   <svg
-     id="upload-spinner-overlay"
-     class="h-8 w-8 text-normal-green animate-spin"
-     xmlns="http://www.w3.org/2000/svg"
-     fill="none"
-     viewBox="0 0 24 24"
-   >
-     <circle
-       class="opacity-25"
-       cx="12"
-       cy="12"
-       r="10"
-       stroke="currentColor"
-       stroke-width="4"
-     />
-     <path
-       class="opacity-75"
-       fill="currentColor"
-       d="M4 12a8 8 0 018-8v8z"
-     />
-   </svg>
-   <span class="text-lg font-medium text-dark-green">Uploading…</span>
- </div>
- <div class="bg-white p-8 rounded-2xl flex items-center space-x-4 shadow-lg">
-   <svg
-     id="upload-spinner-overlay"
-     class="h-8 w-8 text-normal-green animate-spin"
-     xmlns="http://www.w3.org/2000/svg"
-     fill="none"
-     viewBox="0 0 24 24"
-   >
-     <circle
-       class="opacity-25"
-       cx="12"
-       cy="12"
-       r="10"
-       stroke="currentColor"
-       stroke-width="4"
-     />
-     <path
-       class="opacity-75"
-       fill="currentColor"
-       d="M4 12a8 8 0 018-8v8z"
-     />
-   </svg>
-   <span class="text-lg font-medium text-dark-green">Uploading…</span>
- </div>
+  <div class="bg-white p-8 rounded-2xl flex items-center space-x-4 shadow-lg">
+    <svg
+      id="upload-spinner-overlay"
+      class="h-8 w-8 text-normal-green animate-spin"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      />
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v8z"
+      />
+    </svg>
+    <span class="text-lg font-medium text-dark-green">Uploading…</span>
+  </div>
 </div>
+
 {% else %}
 <div class="flex flex-col items-center justify-center h-screen text-center">
   <h1 class="text-2xl font-bold text-nmbu-dark mb-4">No SD card detected</h1>
   <p class="text-gray-600 mb-6">Please insert an SD card and refresh this page.</p>
   <a href="" class="px-6 py-3 bg-nmbu-green bg-white text-black rounded-xl hover:bg-nmbu-dark transition">Refresh</a>
 </div>
+{% endif %}
 
 <script>
 function loadFlights() {
@@ -599,9 +319,4 @@ function showLoadingOverlay() {
 }
 </script>
 
-<<<<<<< HEAD
 {% endblock %}
->>>>>>> feat/styling
-=======
-{% endblock %}
->>>>>>> e46b171a (working)

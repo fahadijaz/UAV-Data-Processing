@@ -33,15 +33,13 @@ from .sd_card import (
     detect_sd_cards,
     build_initial_flights,
     process_flights_post,
+    FlightFormSet,
 )
 from .data_visualisation import (
     import_excel_to_db,
     VARIABLES,
     build_chart_data,
 )
-from .sd_card import detect_sd_cards
-import re
-from mainapp.sd_card import detect_sd_cards, build_initial_flights, process_flights_post, FlightFormSet, SDCardError
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -126,14 +124,9 @@ def weekly_overview(request):
 
     return render(request, "mainapp/weekly_overview.html", context)
 
-logger = logging.getLogger("mainapp")
-
-FlightFormSet = formset_factory(FlightForm, extra=0)
 
 def sd_card_view(request):
     try:
-        sd_cards = detect_sd_cards()
-        print(f"Detected SD cards: {sd_cards}")
         sd_cards = detect_sd_cards()
         print(f"Detected SD cards: {sd_cards}")
     except SDCardError:
@@ -183,37 +176,6 @@ def sd_card_view(request):
     })
 
 
-def data_visualisation(request):
-    selected_stats = request.GET.getlist("stats")
-    selected_dates = request.GET.getlist("date")
-    
-    all_dates = []
-    downloads_path = os.path.expanduser("/user/Downloads")
-    csv_file_path = os.path.join(downloads_path, "24BPROBARG20_Vollebekk_2024.csv")
-
-    if os.path.exists(csv_file_path):
-        df = pd.read_csv(csv_file_path)
-        if "date" in df.columns:
-            all_dates = (
-                pd.to_datetime(df["date"], errors="coerce")
-                .dt.strftime("%Y-%m-%d")
-                .drop_duplicates()
-                .sort_values()
-                .tolist()
-            )
-
-    plots = []
-    return render(request, "mainapp/data_visualisation.html", {
-        "plots": plots,
-        "stat_options": STAT_OPTIONS,
-        "selected_stats": selected_stats,
-        "selected_dates": selected_dates,
-        "all_dates": all_dates,
-    })
-
-"""def data_visualisation_view(request):
-    return render(request, 'mainapp/data_visualisation.html')"""
-
 STAT_OPTIONS = [
     ("cv", "Coefficient of Variation"),
     ("iqr", "Interquartile Range"),
@@ -257,6 +219,7 @@ STAT_OPTIONS = [
     ("variance", "Variance"),
     ("variety", "Variety (Number of Unique Values)"),
 ]
+
 
 def data_visualisation(request):
     """
@@ -342,9 +305,8 @@ def data_visualisation(request):
     })
 
 
-
 ####################################################################
-#review drone flights
+# Review drone flights
 ####################################################################
 
 
@@ -503,10 +465,8 @@ def flight_events(request):
     return JsonResponse(events, safe=False)
 
 
-
-
 ####################################################################
-#easygrowth
+# Easy Growth
 ####################################################################
 
 
@@ -583,6 +543,7 @@ FILENAME_RE = re.compile(
     re.IGNORECASE | re.VERBOSE,
 )
 
+
 def parse_sensor_id_from_filename(filename: str) -> str:
     """
     Generates a sensor_id from the filename in the format 'GROUP #NUMBER'.
@@ -601,7 +562,6 @@ def parse_sensor_id_from_filename(filename: str) -> str:
     group = group.replace("BPROBARG", "PROBAR")
 
     return f"{group} #{num}"
-
 
 
 def upload_easy_growth_data(request):

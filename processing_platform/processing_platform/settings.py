@@ -80,8 +80,8 @@ DATABASES = {
         "NAME": "UAV",  # POSTGRES_DB
         "USER": "admin",  # POSTGRES_USER
         "PASSWORD": "Drone2025PheNo",  # POSTGRES_PASSWORD
-        "HOST": "db",  # POSTGRES_HOST
-        "PORT": "5432",
+        "HOST": "localhost",  # POSTGRES_HOST
+        "PORT": "5433",
     }
 }
 
