@@ -21,7 +21,7 @@ from django.forms import formset_factory
 from .forms import FlightForm
 from .sd_card import detect_sd_cards
 import re
-from mainapp.sd_card import build_initial_flights, process_flights_post
+from mainapp.sd_card import detect_sd_cards, build_initial_flights, process_flights_post, FlightFormSet, SDCardError
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s %(levelname)s %(name)s: %(message)s')
 logger = logging.getLogger(__name__)
@@ -108,55 +108,57 @@ def weekly_overview(request):
 
 logger = logging.getLogger("mainapp")
 
-# regex to pull out your flight_path key from folder names
-FOLDER_RE = re.compile(r'''
-    ^(?:DJI_[0-9]{12}_[0-9]{3}_)?
-    (?P<flight_path>\d+-[\w-]+-\d+m-[\w-]+(?:-\d+){0,2})
-''', re.VERBOSE)
-
 FlightFormSet = formset_factory(FlightForm, extra=0)
 
-def discover_flights(dcim_root):
-    for name in os.listdir(dcim_root):
-        p = Path(dcim_root) / name
-        if p.is_dir():
-            m = FOLDER_RE.match(name)
-            if m:
-                yield p, m
-
 def sd_card_view(request):
-    from .sd_card import detect_sd_cards, build_initial_flights, process_flights_post, FlightFormSet, SDCardError
-    
-    if request.method == "POST":
-        selected_dcim = request.POST.get("selected_dcim")
-        if not selected_dcim:
-            messages.error(request, "Please select a valid DCIM path")
-            return redirect("sd_card")
-            
-        formset = FlightFormSet(request.POST, request.FILES)
-        processed = process_flights_post(formset, selected_dcim, request)
-        if processed is not None:
-            messages.success(request, f"Successfully processed {processed} flights")
-            return redirect("review_drone_flights")
-    
     try:
         sd_cards = detect_sd_cards()
-        context = {"sd_cards": sd_cards}
-    except SDCardError as e:
-        messages.warning(request, str(e))
-        context = {"sd_cards": []}
+        print(f"Detected SD cards: {sd_cards}")
+    except SDCardError:
+        sd_cards = []
+        messages.warning(request, "No SD cards detected.")
     
-    selected_dcim = request.GET.get("selected_dcim")
-    if selected_dcim and selected_dcim != "":
-        try:
-            initial_data = build_initial_flights(selected_dcim)
-            formset = FlightFormSet(initial=initial_data)
-            context["formset"] = formset
-            context["selected_dcim"] = selected_dcim
-        except (ValueError, OSError) as e:
-            messages.error(request, f"Error reading DCIM path: {e}")
+    selected = request.POST.get('sd_card') or request.GET.get('selected_dcim')
+    if not selected and sd_cards:
+        selected = sd_cards[0]
     
-    return render(request, "mainapp/sd_card.html", context)
+    formset = None
+    pilot_choices = [('', 'Select Pilot')] + Flight_Log.DRONE_PILOT_CHOICES
+    drone_model_choices = [('', 'Select Model')] + Flight_Log.DRONE_MODEL_CHOICES
+    
+    if request.method == 'POST' and selected:
+        dcim_path = selected
+        if os.path.exists(dcim_path):
+            initial_flights = build_initial_flights(dcim_path)
+            if initial_flights:
+                formset = FlightFormSet(request.POST, request.FILES, initial=initial_flights)
+                processed = process_flights_post(formset, selected, request)
+                if processed:
+                    messages.success(request, f"Successfully processed {processed} flights.")
+                else:
+                    messages.error(request, "Failed to process flights.")
+            else:
+                messages.warning(request, "No flights detected on that card. Make sure the SD card contains flight folders with the expected naming pattern.")
+        else:
+            messages.error(request, "No DCIM folder found on the selected SD card.")
+        return redirect("sd_card_view")
+    
+    if selected and os.path.exists(selected):
+        initial_flights = build_initial_flights(selected)
+        if initial_flights:
+            formset = FlightFormSet(initial=initial_flights)
+            print(f"Found {len(initial_flights)} flights: {[f['flight_path_key'] for f in initial_flights]}")
+        else:
+            print("No flights found matching the expected pattern")
+    
+    print(f"Passing to template - sd_cards: {sd_cards}, selected: {selected}")
+    return render(request, "mainapp/sd_card.html", {
+        "sd_cards": sd_cards,
+        "selected_dcim": selected,
+        "formset": formset,
+        "pilot_choices": pilot_choices,
+        "drone_model_choices": drone_model_choices,
+    })
 
 
 def data_visualisation(request):
