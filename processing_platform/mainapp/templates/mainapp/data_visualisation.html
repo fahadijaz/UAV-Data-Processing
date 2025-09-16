@@ -24,6 +24,7 @@
   </div>
 {% endif %}
 
+<!-- Excel-opplastingsskjema (POST) -->
 <form method="post" action="{% url 'data_visualisation' %}" enctype="multipart/form-data" class="mb-6">
   {% csrf_token %}
   <div class="flex flex-col gap-3 md:flex-row md:items-end">
@@ -31,10 +32,14 @@
       <label class="block text-sm font-medium text-gray-700">Excel (.xlsx)</label>
       <input type="file" name="file" accept=".xlsx" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
     </div>
-    <button type="submit" class="btn btn-forest">Last opp</button>
+
+    <button type="submit" class="btn btn-forest">
+      Last opp
+    </button>
   </div>
 </form>
 
+<!-- Filter-skjema for visualisering (GET) -->
 <form id="filter-form" method="get" action="{% url 'data_visualisation' %}">
   <div id="selector" class="rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm ring-1 ring-gray-100 backdrop-blur">
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -93,9 +98,18 @@
     </div>
 
     <div class="mt-4 flex gap-2">
-      <button type="submit" id="update-btn" class="btn btn-forest">Oppdater</button>
-      <button type="button" id="select-all-specters" class="btn btn-sm btn-forest">Velg alle spekter</button>
-      <button type="button" id="select-all-variables" class="btn btn-sm btn-forest">Velg alle variabler</button>
+      <button type="submit" id="update-btn" class="btn btn-forest">
+        Oppdater
+      </button>
+
+      <button type="button" id="select-all-specters" class="btn btn-sm btn-forest">
+        Velg alle spekter
+      </button>
+
+      <button type="button" id="select-all-variables" class="btn btn-sm btn-forest">
+        Velg alle variabler
+      </button>
+
     </div>
   </div>
 </form>
@@ -110,29 +124,30 @@
   <script id="chart-data" type="application/json">{{ chart_data_json|safe }}</script>
 {% endif %}
 
+
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  var sd = document.getElementById('start_date');
-  var ed = document.getElementById('end_date');
+(function () {
+  const sd = document.getElementById('start_date');
+  const ed = document.getElementById('end_date');
   if (sd && !sd.value) {
-    var now = new Date(); var lm = new Date(now); lm.setDate(now.getDate() - 30);
+    const t = new Date(); const lm = new Date(t); lm.setDate(t.getDate() - 30);
     sd.value = lm.toISOString().split('T')[0];
   }
-  if (ed && !ed.value) { var now2 = new Date(); ed.value = now2.toISOString().split('T')[0]; }
+  if (ed && !ed.value) { const t = new Date(); ed.value = t.toISOString().split('T')[0]; }
 
-  var dataEl = document.getElementById('chart-data');
-  var payload = dataEl ? JSON.parse(dataEl.textContent) : { dates: [], series: [] };
-  var labels = payload.dates || [];
-  var series = payload.series || [];
+  const dataEl = document.getElementById('chart-data');
+  const payload = dataEl ? JSON.parse(dataEl.textContent) : { dates: [], series: [] };
+  const labels = payload.dates || [];
+  const series = payload.series || [];
 
-  var traces = series.map(function (s) {
-    var x = [];
-    var y = [];
-    (s.data || []).forEach(function (vals, i) {
+  const traces = series.map(s => {
+    const x = [];
+    const y = [];
+    (s.data || []).forEach((vals, i) => {
       if (Array.isArray(vals) && vals.length) {
-        for (var k = 0; k < vals.length; k++) {
+        for (let k = 0; k < vals.length; k++) {
           x.push(labels[i] || '');
           y.push(vals[k]);
         }
@@ -141,26 +156,26 @@ document.addEventListener('DOMContentLoaded', function () {
     return {
       type: 'box',
       name: s.name,
-      x: x, y: y,
+      x, y,
       boxpoints: false,
-      boxmean: false,
+      boxmean: false,  
       notched: false,
       line: { width: 1 },
       fillcolor: 'rgba(0,0,0,0)',
-      marker: { size: 0 }
+      marker: { size: 0 } 
     };
   });
 
-  var hasData = traces.some(function (t) { return t.y && t.y.length; });
+  const hasData = traces.some(t => t.y && t.y.length);
   if (!hasData) {
-    var note = document.createElement('p');
+    const note = document.createElement('p');
     note.className = 'mt-2 text-sm text-gray-600';
     note.textContent = 'Ingen datapunkter for gjeldende utvalg.';
     document.getElementById('chart').parentElement.appendChild(note);
     return;
   }
 
-  var layout = {
+  const layout = {
     boxmode: 'group',
     margin: { l: 60, r: 10, t: 10, b: 60 },
     paper_bgcolor: 'white',
@@ -193,29 +208,23 @@ document.addEventListener('DOMContentLoaded', function () {
     hoverlabel: { bgcolor: 'white' }
   };
 
-  var config = {
+  const config = {
     responsive: true,
     displaylogo: false,
-    modeBarButtonsToRemove: ['autoScale2d', 'lasso2d', 'select2d'],
-    toImageButtonOptions: {
-      format: 'png',
-      filename: 'data-visualisation',
-      scale: 2
-    }
+    modeBarButtonsToRemove: ['autoScale2d', 'lasso2d', 'select2d']
   };
 
   Plotly.newPlot('chart', traces, layout, config);
 
   function selectAll(id) {
-    var sel = document.getElementById(id);
+    const sel = document.getElementById(id);
     if (!sel) return;
-    Array.from(sel.options).forEach(function (o) { o.selected = true; });
+    Array.from(sel.options).forEach(o => o.selected = true);
   }
-  var btnSpecters = document.getElementById('select-all-specters');
-  var btnVariables = document.getElementById('select-all-variables');
-  if (btnSpecters) btnSpecters.addEventListener('click', function () { selectAll('specters'); });
-  if (btnVariables) btnVariables.addEventListener('click', function () { selectAll('variables'); });
-});
+  document.getElementById('select-all-specters')?.addEventListener('click', () => selectAll('specters'));
+  document.getElementById('select-all-variables')?.addEventListener('click', () => selectAll('variables'));
+})();
 </script>
+
 
 {% endblock %}
