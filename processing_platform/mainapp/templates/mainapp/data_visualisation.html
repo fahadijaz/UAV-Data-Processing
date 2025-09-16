@@ -102,7 +102,6 @@
 
 <div class="mt-8 rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm ring-1 ring-gray-100 backdrop-blur">
   <div id="chart" style="height: 520px;"></div>
-  <button type="button" id="download-chart" class="btn btn-sm btn-forest mt-3">Last ned graf (PNG)</button>
 </div>
 
 <div id="debug-output" class="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 hidden"></div>
@@ -114,26 +113,26 @@
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 
 <script>
-(function () {
-  const sd = document.getElementById('start_date');
-  const ed = document.getElementById('end_date');
+document.addEventListener('DOMContentLoaded', function () {
+  var sd = document.getElementById('start_date');
+  var ed = document.getElementById('end_date');
   if (sd && !sd.value) {
-    const t = new Date(); const lm = new Date(t); lm.setDate(t.getDate() - 30);
+    var now = new Date(); var lm = new Date(now); lm.setDate(now.getDate() - 30);
     sd.value = lm.toISOString().split('T')[0];
   }
-  if (ed && !ed.value) { const t = new Date(); ed.value = t.toISOString().split('T')[0]; }
+  if (ed && !ed.value) { var now2 = new Date(); ed.value = now2.toISOString().split('T')[0]; }
 
-  const dataEl = document.getElementById('chart-data');
-  const payload = dataEl ? JSON.parse(dataEl.textContent) : { dates: [], series: [] };
-  const labels = payload.dates || [];
-  const series = payload.series || [];
+  var dataEl = document.getElementById('chart-data');
+  var payload = dataEl ? JSON.parse(dataEl.textContent) : { dates: [], series: [] };
+  var labels = payload.dates || [];
+  var series = payload.series || [];
 
-  const traces = series.map(s => {
-    const x = [];
-    const y = [];
-    (s.data || []).forEach((vals, i) => {
+  var traces = series.map(function (s) {
+    var x = [];
+    var y = [];
+    (s.data || []).forEach(function (vals, i) {
       if (Array.isArray(vals) && vals.length) {
-        for (let k = 0; k < vals.length; k++) {
+        for (var k = 0; k < vals.length; k++) {
           x.push(labels[i] || '');
           y.push(vals[k]);
         }
@@ -142,7 +141,7 @@
     return {
       type: 'box',
       name: s.name,
-      x, y,
+      x: x, y: y,
       boxpoints: false,
       boxmean: false,
       notched: false,
@@ -152,20 +151,16 @@
     };
   });
 
-  const hasData = traces.some(t => t.y && t.y.length);
-  const dlBtn = document.getElementById('download-chart');
+  var hasData = traces.some(function (t) { return t.y && t.y.length; });
   if (!hasData) {
-    const note = document.createElement('p');
+    var note = document.createElement('p');
     note.className = 'mt-2 text-sm text-gray-600';
     note.textContent = 'Ingen datapunkter for gjeldende utvalg.';
     document.getElementById('chart').parentElement.appendChild(note);
-    if (dlBtn) dlBtn.style.display = 'none';
     return;
-  } else {
-    if (dlBtn) dlBtn.style.display = '';
   }
 
-  const layout = {
+  var layout = {
     boxmode: 'group',
     margin: { l: 60, r: 10, t: 10, b: 60 },
     paper_bgcolor: 'white',
@@ -198,7 +193,7 @@
     hoverlabel: { bgcolor: 'white' }
   };
 
-  const config = {
+  var config = {
     responsive: true,
     displaylogo: false,
     modeBarButtonsToRemove: ['autoScale2d', 'lasso2d', 'select2d'],
@@ -212,21 +207,15 @@
   Plotly.newPlot('chart', traces, layout, config);
 
   function selectAll(id) {
-    const sel = document.getElementById(id);
+    var sel = document.getElementById(id);
     if (!sel) return;
-    Array.from(sel.options).forEach(o => o.selected = true);
+    Array.from(sel.options).forEach(function (o) { o.selected = true; });
   }
-  document.getElementById('select-all-specters')?.addEventListener('click', () => selectAll('specters'));
-  document.getElementById('select-all-variables')?.addEventListener('click', () => selectAll('variables'));
-
-  dlBtn?.addEventListener('click', () => {
-    const gd = document.getElementById('chart');
-    const sdVal = document.getElementById('start_date')?.value ?? '';
-    const edVal = document.getElementById('end_date')?.value ?? '';
-    const filename = `graf_${sdVal}_${edVal}`.replace(/-/g, '');
-    Plotly.downloadImage(gd, { format: 'png', filename, scale: 2 }).catch(() => {});
-  });
-})();
+  var btnSpecters = document.getElementById('select-all-specters');
+  var btnVariables = document.getElementById('select-all-variables');
+  if (btnSpecters) btnSpecters.addEventListener('click', function () { selectAll('specters'); });
+  if (btnVariables) btnVariables.addEventListener('click', function () { selectAll('variables'); });
+});
 </script>
 
 {% endblock %}
