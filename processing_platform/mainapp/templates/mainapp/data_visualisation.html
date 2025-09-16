@@ -24,7 +24,6 @@
   </div>
 {% endif %}
 
-<!-- Excel-opplastingsskjema (POST) -->
 <form method="post" action="{% url 'data_visualisation' %}" enctype="multipart/form-data" class="mb-6">
   {% csrf_token %}
   <div class="flex flex-col gap-3 md:flex-row md:items-end">
@@ -32,14 +31,10 @@
       <label class="block text-sm font-medium text-gray-700">Excel (.xlsx)</label>
       <input type="file" name="file" accept=".xlsx" class="mt-1 w-full rounded-lg border border-gray-300 p-2 focus:border-teal-500 focus:ring-teal-500">
     </div>
-
-    <button type="submit" class="btn btn-forest">
-      Last opp
-    </button>
+    <button type="submit" class="btn btn-forest">Last opp</button>
   </div>
 </form>
 
-<!-- Filter-skjema for visualisering (GET) -->
 <form id="filter-form" method="get" action="{% url 'data_visualisation' %}">
   <div id="selector" class="rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm ring-1 ring-gray-100 backdrop-blur">
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -98,24 +93,16 @@
     </div>
 
     <div class="mt-4 flex gap-2">
-      <button type="submit" id="update-btn" class="btn btn-forest">
-        Oppdater
-      </button>
-
-      <button type="button" id="select-all-specters" class="btn btn-sm btn-forest">
-        Velg alle spekter
-      </button>
-
-      <button type="button" id="select-all-variables" class="btn btn-sm btn-forest">
-        Velg alle variabler
-      </button>
-
+      <button type="submit" id="update-btn" class="btn btn-forest">Oppdater</button>
+      <button type="button" id="select-all-specters" class="btn btn-sm btn-forest">Velg alle spekter</button>
+      <button type="button" id="select-all-variables" class="btn btn-sm btn-forest">Velg alle variabler</button>
     </div>
   </div>
 </form>
 
 <div class="mt-8 rounded-xl border border-gray-200 bg-white/60 p-4 shadow-sm ring-1 ring-gray-100 backdrop-blur">
   <div id="chart" style="height: 520px;"></div>
+  <button type="button" id="download-chart" class="btn btn-sm btn-forest mt-3">Last ned graf (PNG)</button>
 </div>
 
 <div id="debug-output" class="mt-6 rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900 hidden"></div>
@@ -123,7 +110,6 @@
 {% if chart_data_json %}
   <script id="chart-data" type="application/json">{{ chart_data_json|safe }}</script>
 {% endif %}
-
 
 <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 
@@ -158,21 +144,25 @@
       name: s.name,
       x, y,
       boxpoints: false,
-      boxmean: false,  
+      boxmean: false,
       notched: false,
       line: { width: 1 },
       fillcolor: 'rgba(0,0,0,0)',
-      marker: { size: 0 } 
+      marker: { size: 0 }
     };
   });
 
   const hasData = traces.some(t => t.y && t.y.length);
+  const dlBtn = document.getElementById('download-chart');
   if (!hasData) {
     const note = document.createElement('p');
     note.className = 'mt-2 text-sm text-gray-600';
     note.textContent = 'Ingen datapunkter for gjeldende utvalg.';
     document.getElementById('chart').parentElement.appendChild(note);
+    if (dlBtn) dlBtn.style.display = 'none';
     return;
+  } else {
+    if (dlBtn) dlBtn.style.display = '';
   }
 
   const layout = {
@@ -211,7 +201,12 @@
   const config = {
     responsive: true,
     displaylogo: false,
-    modeBarButtonsToRemove: ['autoScale2d', 'lasso2d', 'select2d', 'toImage']
+    modeBarButtonsToRemove: ['autoScale2d', 'lasso2d', 'select2d'],
+    toImageButtonOptions: {
+      format: 'png',
+      filename: 'data-visualisation',
+      scale: 2
+    }
   };
 
   Plotly.newPlot('chart', traces, layout, config);
@@ -223,8 +218,15 @@
   }
   document.getElementById('select-all-specters')?.addEventListener('click', () => selectAll('specters'));
   document.getElementById('select-all-variables')?.addEventListener('click', () => selectAll('variables'));
+
+  dlBtn?.addEventListener('click', () => {
+    const gd = document.getElementById('chart');
+    const sdVal = document.getElementById('start_date')?.value ?? '';
+    const edVal = document.getElementById('end_date')?.value ?? '';
+    const filename = `graf_${sdVal}_${edVal}`.replace(/-/g, '');
+    Plotly.downloadImage(gd, { format: 'png', filename, scale: 2 }).catch(() => {});
+  });
 })();
 </script>
-
 
 {% endblock %}
