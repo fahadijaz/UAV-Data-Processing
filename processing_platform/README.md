@@ -17,7 +17,7 @@ https://github.com/fahadijaz/UAV-Data-Processing.git
 then
 ```bash
 cd UAV-Data-Processing/processing_platform
-``
+```
 now you can bring docker up with
 ```bash
 docker compose up --build -d
