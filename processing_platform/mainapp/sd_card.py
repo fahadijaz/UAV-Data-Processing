@@ -16,6 +16,8 @@ from .models import Flight_Paths, Flight_Log
 
 logger = logging.getLogger("mainapp")
 
+# Regex ensures strict DJI flight folder naming convention is matched.
+# Captures optional timestamp and required "flight_path" part of the folder.
 FOLDER_RE = re.compile(r'''
    ^
    (?:DJI_(?P<timestamp>\d{12})_[0-9]{3}_)?
@@ -29,11 +31,13 @@ class SDCardError(Exception):
    pass
 
 def is_removable_drive_windows(drive_letter):
+   # Windows-specific low-level API call to check drive type
    DRIVE_REMOVABLE = 2
    drive_type = ctypes.windll.kernel32.GetDriveTypeW(f"{drive_letter}:/")
    return drive_type == DRIVE_REMOVABLE
 
 def find_sd_cards_windows(dcim_folder="DCIM"):
+   # Detects SD cards by checking every drive letter for a DCIM folder
    sd_cards = []
    for drive_letter in string.ascii_uppercase:
        drive = f"{drive_letter}:/"
@@ -43,6 +47,7 @@ def find_sd_cards_windows(dcim_folder="DCIM"):
    return sd_cards
 
 def find_sd_cards_unix(dcim_folder="DCIM"):
+   # Looks for mounted drives across common Unix mount points
    sd_cards = []
    for base in ("/media", "/Volumes", "/mnt"):
        if not os.path.isdir(base):
@@ -54,6 +59,7 @@ def find_sd_cards_unix(dcim_folder="DCIM"):
    return sd_cards
 
 def detect_sd_cards(dcim_folder="DCIM"):
+   # OS-agnostic entry point for SD card detection
    if platform.system() == "Windows":
        cards = find_sd_cards_windows(dcim_folder)
    else:
@@ -63,6 +69,7 @@ def detect_sd_cards(dcim_folder="DCIM"):
    return cards
 
 def discover_flights(dcim_path):
+   # Iterates over subfolders in DCIM and yields those matching DJI flight folder pattern
    if not dcim_path:
        raise ValueError("DCIM path cannot be None or empty")
    
@@ -79,6 +86,7 @@ def discover_flights(dcim_path):
            yield p, m.group("flight_path")
 
 def build_initial_flights(dcim_path):
+   # Produces a list of initial flight entries for UI forms, based on DCIM discovery
    if not dcim_path:
        logger.warning("No DCIM path provided")
        return []
@@ -99,7 +107,7 @@ def build_initial_flights(dcim_path):
        return []
 
 def _match_flight_path(key: str):
-    """Match a flight path key to a database Flight_Paths object."""
+    """Finds the matching Flight_Paths DB entry by normalizing and reducing both sides to a 'core key'."""
     key_core = _core_key(_normalize_name(key))
     for fp in Flight_Paths.objects.all():
         db_core = _core_key(_normalize_name(fp.flight_path_name))
@@ -108,7 +116,7 @@ def _match_flight_path(key: str):
     return None
 
 def _normalize_name(s: str) -> list[str]:
-    """Normalize a flight path name into standardized parts."""
+    """Standardizes flight path naming by normalizing case, replacing variants, and splitting into parts."""
     s = (s or "").lower().strip()
     s = s.replace(".kmz", "")
     s = s.replace("horizontal", "oblique").replace("vertical", "oblique")
@@ -117,7 +125,7 @@ def _normalize_name(s: str) -> list[str]:
     return parts
 
 def _core_key(parts: list[str]) -> str:
-    """Extract the core identifying key from normalized name parts."""
+    """Reduces normalized parts to a stable identifier up to the altitude marker (e.g. '120m')."""
     idx = None
     for i, p in enumerate(parts):
         if p.endswith("m") and p[:-1].isdigit():
@@ -128,7 +136,7 @@ def _core_key(parts: list[str]) -> str:
     return "-".join(core)
 
 def copy_flight_with_reflectance(source_dir, dest_base, reflectance_dir, logger):
-    """Copy flight directory and optionally reflectance panel directory."""
+    """Copies main flight folder, and optionally the reflectance calibration folder if present."""
     source_path = Path(source_dir)
     dest_path = Path(dest_base)
 
@@ -148,7 +156,6 @@ def copy_flight_with_reflectance(source_dir, dest_base, reflectance_dir, logger)
                 logger.info("Copying reflectance panel: %s -> %s", reflectance_path, reflectance_dest)
                 shutil.copytree(reflectance_path, reflectance_dest, dirs_exist_ok=True)
                 reflectance_copied = True
-                logger.info("Successfully copied reflectance panel folder")
             except Exception as e:
                 logger.error("Failed to copy reflectance panel %s: %s", reflectance_path, e)
         else:
@@ -157,7 +164,7 @@ def copy_flight_with_reflectance(source_dir, dest_base, reflectance_dir, logger)
     return reflectance_copied
 
 def process_skyline_images(source_dir, dest_dir, skyline_names, logger):
-    """Process and copy skyline images to the skyline directory structure."""
+    """Creates a dedicated '_SKYLINE' folder structure and copies relevant images there for photogrammetry skyline correction."""
     if not skyline_names.strip():
         logger.debug("No skyline files specified")
         return
@@ -165,21 +172,19 @@ def process_skyline_images(source_dir, dest_dir, skyline_names, logger):
     skyline_dest_base = dest_dir.parent.parent / "_SKYLINE"
     skyline_dest = skyline_dest_base / dest_dir.name
     
-    logger.info("Creating skyline directory: %s", skyline_dest)
     skyline_dest.mkdir(parents=True, exist_ok=True)
     
     source_path = Path(source_dir)
     skyline_flight_dest = skyline_dest / source_path.name
     
     try:
-        logger.info("Copying entire flight folder for skyline: %s -> %s", source_path, skyline_flight_dest)
         shutil.copytree(source_path, skyline_flight_dest, dirs_exist_ok=True)
-        logger.info("Successfully copied entire flight folder to skyline location")
     except Exception as e:
         logger.error("Failed to copy flight folder to skyline: %s", e)
 
 def process_flights_post(formset, selected_dcim, request):
-    """Process uploaded flight data and create Flight_Log entries."""
+    """Main processing pipeline: validates forms, copies data, handles reflectance/skyline, 
+    and creates Flight_Log DB entries based on folder metadata + DB config."""
     if not formset.is_valid():
         logger.warning("Formset invalid: %s", formset.errors)
         return None
@@ -189,18 +194,16 @@ def process_flights_post(formset, selected_dcim, request):
 
     for i, form in enumerate(formset.forms, start=1):
         cd = form.cleaned_data
-        logger.debug("Form %d cleaned_data: %s", i, cd)
         key = cd.get("flight_path_key")
         if not key:
-            logger.warning("Form %d has no flight_path_key, skipping", i)
+            # Without a path key, we cannot associate flight to DB config
             continue
 
         fp = _match_flight_path(key)
         folder_name = Path(cd["flight_dir"]).name
         reflectance_dir = cd.get("reflectance_dir", "")
-        logger.debug("Form %d folder_name: %s, reflectance_dir: %s", i, folder_name, reflectance_dir)
 
-        # Extract date from folder name or use today's date
+        # Extracts flight date from DJI timestamp if available, otherwise falls back to today
         m = FOLDER_RE.match(folder_name)
         if m and m.group("timestamp"):
             ts = m.group("timestamp")[:8]
@@ -211,9 +214,9 @@ def process_flights_post(formset, selected_dcim, request):
                 date_str = date.today().strftime("%Y%m%d")
         else:
             date_str = date.today().strftime("%Y%m%d")
-        logger.debug("Form %d date_str: %s", i, date_str)
 
-        # Build destination folder name based on database config
+        # Destination naming logic: if DB config exists, use structured naming (date, ID, model, height, overlaps)
+        # Otherwise fallback to a raw copy with just date + folder name
         if fp:
             height = f"{int(fp.flight_height)}m" if fp.flight_height else ""
             overlap = ""
@@ -229,39 +232,30 @@ def process_flights_post(formset, selected_dcim, request):
             ]
             new_folder = " ".join(p for p in parts if p)
             base = Path(fp.first_flight_path)
-            logger.info("Matched DB config for %s", key)
         else:
             new_folder = f"{date_str} {folder_name}"
             base = Path(selected_dcim).parent
-            logger.warning("No DB config for %s, copying raw folder", key)
 
         dest = base / new_folder
-        logger.debug("Form %d copying from %s -> %s", i, cd["flight_dir"], dest)
         
-        # Copy flight folder and reflectance panel
+        # Copy raw flight and reflectance data
         try:
             reflectance_copied = copy_flight_with_reflectance(
                 cd["flight_dir"], dest, reflectance_dir, logger
             )
-            logger.info("Copied flight %s (reflectance panel: %s)", 
-                       new_folder, "Yes" if reflectance_copied else "No")
-            
         except Exception as e:
-            logger.error("Error copying %s -> %s: %s", cd["flight_dir"], dest, e)
             messages.error(request, f"Failed to copy {folder_name}: {e}")
             continue
 
-        # Process skyline images if specified
+        # Optional skyline image processing
         skyline_names = cd.get("skyline_names", "").strip()
         if skyline_names:
             try:
                 process_skyline_images(cd["flight_dir"], dest, skyline_names, logger)
-                logger.info("Processed skyline images for %s", new_folder)
             except Exception as e:
-                logger.error("Error processing skyline images for %s: %s", new_folder, e)
                 messages.warning(request, f"Skyline processing failed for {new_folder}: {e}")
 
-        # Create Flight_Log entry if we have database config
+        # Only create DB log entry if matched to a known Flight_Path config
         if fp:
             ws = ",".join(str(cd.get(f"wind_speed{i}") or 0) for i in (1, 2, 3))
             Flight_Log.objects.create(
@@ -284,12 +278,6 @@ def process_flights_post(formset, selected_dcim, request):
                 flight_path       = fp.flight_path_name,
                 p4d_path          = fp.pix4d_path,
             )
-            logger.info("Created Flight_Log for %s (reflectance: %s)", 
-                       new_folder, "Yes" if reflectance_copied else "No")
-        else:
-            logger.warning("No Flight_Paths match for %s, skipping Flight_Log creation", key)
-
         processed += 1
 
-    logger.debug("Finished processing. Total processed: %d", processed)
     return processed
