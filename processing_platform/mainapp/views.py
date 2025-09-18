@@ -126,6 +126,13 @@ def weekly_overview(request):
 
 
 def sd_card_view(request):
+    """
+    Main view for SD card flight processing.
+    Detects connected SD cards, discovers valid DJI flight folders,
+    and builds pre-filled flight forms for user review.
+    On submission, copies flight data (and optional reflectance/skyline images),
+    and creates corresponding Flight_Log database entries.
+    """
     try:
         sd_cards = detect_sd_cards()
         print(f"Detected SD cards: {sd_cards}")
